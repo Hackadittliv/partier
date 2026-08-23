@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
+import BrandLogo from "./brand-logo";
 import { electionDate, lastUpdated, parties, topics, type Party } from "./data";
 import { detectSearchGoal, findPartySearchContext, findSearchIntent, inferTopic, normalizeText, partyMatchScore, queryWords, stanceMeta, stanceSortValue, type Stance } from "./search";
 
@@ -107,7 +108,7 @@ export default function Home() {
     <main>
       <header className="topbar">
         <button className="brand" onClick={() => setView("utforska")} aria-label="Gå till startsidan">
-          <span className="brandMark">S</span><span>Sakfrågan</span>
+          <BrandLogo />
         </button>
         <nav aria-label="Huvudnavigering">
           {(["utforska", "jamfor", "partier", "om"] as View[]).map((item) => (
@@ -280,7 +281,7 @@ export default function Home() {
         <div className="methodCard"><div><p className="sectionLabel">Metod</p><h2>Vad tjänsten gör</h2></div><p>Materialet sammanfattas från partiernas officiella källor. Lokal politik blandas inte med nationell politik. Fakta och analys hålls isär. Brytdatum för denna version är {lastUpdated}. Källor och nya valbesked kontrolleras dagligen fram till valet den {electionDate}.</p></div>
       </section>}
 
-      <footer className="footer"><div className="brand"><span className="brandMark">S</span><span>Sakfrågan</span></div><p>Politik på vanlig svenska. Byggd för förståelse, inte övertalning.</p><button onClick={() => setView("om")}>Metod och transparens</button></footer>
+      <footer className="footer"><div className="brand"><BrandLogo /></div><p>Politik på vanlig svenska. Byggd för förståelse, inte övertalning.</p><button onClick={() => setView("om")}>Metod och transparens</button></footer>
 
       {selectedParty && <div className="modalBackdrop" role="presentation" onMouseDown={() => setSelectedParty(null)}>
         <section className="partyModal" role="dialog" aria-modal="true" aria-labelledby="partyTitle" onMouseDown={(event) => event.stopPropagation()} style={{ "--party": selectedParty.color } as React.CSSProperties}>

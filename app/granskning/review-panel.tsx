@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import BrandLogo from "../brand-logo";
 
 const REVIEW_ENDPOINT =
   "https://zcwfwfhgmsnzajzrryvm.supabase.co/functions/v1/sakfragan-review";
@@ -185,8 +186,7 @@ export default function ReviewPanel() {
       <main className="reviewShell">
         <header className="reviewHeader">
           <Link href="/" className="brand" aria-label="Till Sakfrågans startsida">
-            <span className="brandMark">S</span>
-            Sakfrågan
+            <BrandLogo />
           </Link>
           <span className="reviewHeaderLabel">Redaktion</span>
         </header>
@@ -232,8 +232,7 @@ export default function ReviewPanel() {
     <main className="reviewShell">
       <header className="reviewHeader">
         <Link href="/" className="brand" aria-label="Till Sakfrågans startsida">
-          <span className="brandMark">S</span>
-          Sakfrågan
+          <BrandLogo />
         </Link>
         <div className="reviewHeaderActions">
           <span className="reviewLive"><i /> Källflödet är anslutet</span>

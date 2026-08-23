@@ -17,9 +17,15 @@ export const metadata: Metadata = {
     images: ["/og.png"],
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon_192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon_512.png", sizes: "512x512", type: "image/png" },
+    ],
     shortcut: "/favicon.svg",
+    apple: [{ url: "/apple_touch_icon.png", sizes: "180x180", type: "image/png" }],
   },
+  manifest: "/site.webmanifest",
   other: {
     "codex-preview": "development",
   },

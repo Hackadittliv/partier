@@ -1,4 +1,6 @@
-<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Sakfrågans symbol</title>
+  <desc id="desc">Ett korallfärgat frågetecken inuti ett marinblått sökglas.</desc>
   <circle cx="62" cy="62" r="44" stroke="#10233C" stroke-width="12"/>
   <path d="M93 93L124 124" stroke="#10233C" stroke-width="12" stroke-linecap="round"/>
   <path d="M45 48.5C45 35.8 54.8 27 68.3 27C81.3 27 90.5 35.2 90.5 47.3C90.5 57.4 84.7 62.7 77.1 67.4C70.9 71.3 67.7 75.6 67.7 82.5" stroke="#ED5F48" stroke-width="10" stroke-linecap="round"/>
