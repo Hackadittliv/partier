@@ -1,3 +1,8 @@
+declare const Deno: {
+  env: { get(name: string): string | undefined };
+  serve(handler: (request: Request) => Response | Promise<Response>): void;
+};
+
 const SCHEMA = "sakfragan";
 const ADMIN_TOKEN_HASH = "bc4050a977986f3a331efb1ac6b174090abbb1855173cc7bf3677d825a09c330";
 const ALLOWED_ORIGINS = new Set([
