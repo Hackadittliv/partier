@@ -232,6 +232,110 @@ h1, h2, h3, p { margin-top: 0; }
 .sources b, .sources small { display: block; }
 .sources small { color: var(--muted); margin-top: 3px; }
 
+.reviewShell { min-height: 100vh; background: var(--paper); color: var(--ink); }
+.reviewHeader { min-height: 78px; padding: 0 5vw; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: rgba(246,243,235,.94); }
+.reviewHeader .brand { color: var(--ink); text-decoration: none; }
+.reviewHeaderLabel { padding: 8px 13px; border-radius: 999px; background: #e9edef; color: var(--muted); font-size: 12px; font-weight: 800; }
+.reviewHeaderActions { display: flex; align-items: center; gap: 18px; }
+.reviewHeaderActions > button, .reviewRefresh { border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; background: white; color: var(--ink); font-weight: 800; cursor: pointer; }
+.reviewLive { color: var(--muted); font-size: 12px; }
+.reviewLive i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: #4da878; box-shadow: 0 0 0 5px rgba(77,168,120,.12); }
+.reviewLogin { min-height: calc(100vh - 78px); padding: 8vw max(5vw, calc((100vw - 1250px) / 2)); display: grid; grid-template-columns: 1.15fr .85fr; gap: 8vw; align-items: center; background: radial-gradient(circle at 86% 9%, rgba(237,95,72,.11), transparent 28%), radial-gradient(circle at 16% 85%, rgba(55,117,107,.12), transparent 27%); }
+.reviewLoginCopy h1 { max-width: 720px; margin: 18px 0 22px; font-family: Georgia, serif; font-size: clamp(43px, 5.6vw, 76px); line-height: .98; letter-spacing: -.045em; }
+.reviewLoginCopy > p { max-width: 650px; color: var(--muted); font-size: 17px; line-height: 1.7; }
+.reviewLoginCopy ol { max-width: 620px; margin: 30px 0 0; padding: 0; list-style: none; counter-reset: reviewSteps; }
+.reviewLoginCopy li { position: relative; min-height: 42px; margin: 12px 0; padding: 10px 0 10px 58px; counter-increment: reviewSteps; }
+.reviewLoginCopy li::before { content: counter(reviewSteps); position: absolute; left: 0; top: 2px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: white; border: 1px solid var(--line); font-family: Georgia, serif; font-weight: 800; }
+.reviewLoginCard { padding: 38px; border: 1px solid var(--line); border-radius: 22px; background: white; box-shadow: 0 26px 70px rgba(16,35,60,.11); }
+.reviewLock { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: white; font-family: Georgia, serif; font-size: 22px; }
+.reviewLoginCard h2 { margin: 22px 0 8px; font-family: Georgia, serif; font-size: 28px; }
+.reviewLoginCard > p { color: var(--muted); line-height: 1.5; }
+.reviewLoginCard label, .reviewDecision label { display: block; margin: 24px 0 8px; font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.reviewLoginCard input { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #f7f7f4; color: var(--ink); font: inherit; }
+.reviewLoginCard input:focus, .reviewDecision textarea:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+.reviewLoginCard > button { width: 100%; margin-top: 12px; border: 0; border-radius: 10px; padding: 14px; background: var(--ink); color: white; font-weight: 900; cursor: pointer; }
+.reviewLoginCard small { display: block; margin-top: 13px; color: var(--muted); text-align: center; line-height: 1.4; }
+.reviewError { color: #a5362a !important; font-size: 13px; font-weight: 700; }
+.reviewWorkspace { max-width: 1500px; margin: 0 auto; padding: 58px 5vw 90px; }
+.reviewIntro { display: flex; align-items: end; justify-content: space-between; gap: 30px; }
+.reviewIntro h1 { margin: 10px 0 8px; font-family: Georgia, serif; font-size: clamp(44px, 5vw, 68px); line-height: 1; letter-spacing: -.04em; }
+.reviewIntro p { margin: 0; color: var(--muted); }
+.reviewMetrics { margin: 34px 0 24px; display: grid; grid-template-columns: repeat(3, minmax(135px, .6fr)) minmax(280px, 1.7fr); gap: 12px; }
+.reviewMetrics article { min-height: 132px; padding: 20px; border: 1px solid var(--line); border-radius: 15px; background: white; }
+.reviewMetrics article > span { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.reviewMetrics strong { display: block; margin-top: 13px; font-family: Georgia, serif; font-size: 41px; line-height: 1; }
+.reviewMetrics small { color: var(--muted); font-size: 11px; }
+.reviewMetrics .reviewPrinciple { background: var(--ink); color: white; }
+.reviewPrinciple > span { color: #aebac6 !important; }
+.reviewPrinciple p { margin: 18px 0 0; font-family: Georgia, serif; font-size: 20px; line-height: 1.35; }
+.reviewNotice, .reviewErrorBanner { margin-bottom: 18px; padding: 14px 17px; border-radius: 11px; font-size: 13px; font-weight: 700; }
+.reviewNotice { background: #e3f3e9; color: #246b47; }
+.reviewErrorBanner { background: #fde8e4; color: #9d3628; }
+.reviewBoard { min-height: 680px; display: grid; grid-template-columns: 350px minmax(0, 1fr); border: 1px solid var(--line); border-radius: 19px; overflow: hidden; background: white; box-shadow: 0 22px 65px rgba(16,35,60,.07); }
+.reviewQueue { border-right: 1px solid var(--line); background: #f8f8f5; }
+.reviewQueueHeader { padding: 22px 22px 15px; display: flex; align-items: center; justify-content: space-between; }
+.reviewQueueHeader h2 { margin: 0; font-family: Georgia, serif; }
+.reviewQueueHeader > span { min-width: 25px; min-height: 25px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: white; font-size: 11px; }
+.reviewFilters { padding: 0 18px 16px; display: flex; gap: 5px; }
+.reviewFilters button { border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; background: white; color: var(--muted); font-size: 10px; font-weight: 800; cursor: pointer; }
+.reviewFilters button.active { border-color: var(--ink); background: var(--ink); color: white; }
+.reviewQueueList { border-top: 1px solid var(--line); }
+.reviewQueueList > button { width: 100%; min-height: 105px; padding: 17px; display: grid; grid-template-columns: auto 1fr auto; gap: 11px; align-items: start; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+.reviewQueueList > button:hover, .reviewQueueList > button.selected { background: white; }
+.reviewQueueList > button.selected { box-shadow: inset 3px 0 var(--accent); }
+.reviewPartyDot { width: 35px; height: 35px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; color: white; font-size: 10px; font-style: normal; font-weight: 900; }
+.reviewPartyDot.large { width: 49px; height: 49px; font-size: 12px; }
+.reviewQueueList b, .reviewQueueList small, .reviewQueueList i { display: block; }
+.reviewQueueList b { margin: 1px 0 5px; font-size: 12px; }
+.reviewQueueList small { max-width: 170px; overflow: hidden; color: var(--muted); font-size: 10px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.reviewQueueList i { margin-top: 8px; color: #89949f; font-size: 9px; font-style: normal; }
+.reviewQueueList em { padding: 5px 7px; border-radius: 999px; font-size: 8px; font-style: normal; font-weight: 900; }
+.reviewQueueList em.pending { color: #9d3628; background: #fde8e4; }
+.reviewQueueList em.in_review { color: #7d5b12; background: #fff1ce; }
+.reviewQueueEmpty, .reviewDetailEmpty { padding: 70px 25px; color: var(--muted); text-align: center; }
+.reviewQueueEmpty > span, .reviewDetailEmpty > span { width: 48px; height: 48px; margin: 0 auto 14px; display: grid; place-items: center; border-radius: 50%; background: #e3f3e9; color: #246b47; font-size: 21px; }
+.reviewQueueEmpty b, .reviewQueueEmpty p { display: block; margin: 6px 0; }
+.reviewQueueEmpty p { font-size: 11px; line-height: 1.5; }
+.reviewDetail { min-width: 0; padding: 30px; }
+.reviewDetailHeader { display: flex; align-items: start; justify-content: space-between; gap: 30px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.reviewIdentity { display: flex; align-items: center; gap: 14px; }
+.reviewIdentity > div > span { color: var(--muted); font-size: 11px; }
+.reviewIdentity h2 { margin: 3px 0 0; font-family: Georgia, serif; font-size: 25px; }
+.reviewBadges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.reviewBadges span { padding: 7px 9px; border-radius: 999px; background: #edf0f1; color: var(--muted); font-size: 9px; font-weight: 800; }
+.reviewSourceRow { margin: 20px 0; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-radius: 10px; background: #f2f4f4; }
+.reviewSourceRow span, .reviewSourceRow b { display: block; }
+.reviewSourceRow span { color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+.reviewSourceRow b { max-width: 650px; margin-top: 4px; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.reviewSourceRow a { flex: 0 0 auto; color: var(--ink); font-size: 11px; font-weight: 900; text-decoration: none; }
+.reviewSourceRow a span { display: inline; color: inherit; font-size: 14px; }
+.reviewSummary { margin-bottom: 20px; padding: 16px; border-left: 3px solid var(--accent); background: #fff7f4; }
+.reviewSummary span { color: var(--accent); font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; }
+.reviewSummary p { margin: 6px 0 0; font-size: 13px; line-height: 1.55; }
+.reviewDiff { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.reviewDiff article { min-width: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fafaf8; }
+.reviewDiff article.after { background: #f7fbf8; border-color: #cfe3d6; }
+.reviewDiff header { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: white; }
+.reviewDiff header span { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .09em; }
+.reviewDiff header time { color: var(--muted); font-size: 9px; }
+.reviewDiff article > div { max-height: 330px; min-height: 235px; padding: 17px; overflow: auto; color: #455362; font-size: 12px; line-height: 1.65; white-space: pre-wrap; }
+.reviewRawDiff { margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; }
+.reviewRawDiff summary { padding: 12px 15px; font-size: 11px; font-weight: 800; cursor: pointer; }
+.reviewRawDiff pre { max-height: 240px; margin: 0; padding: 15px; overflow: auto; border-top: 1px solid var(--line); background: #f7f7f4; font-size: 10px; white-space: pre-wrap; }
+.reviewDecision { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+.reviewDecision label { margin-top: 0; }
+.reviewDecision textarea { width: 100%; min-height: 84px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 13px; background: #fafaf8; color: var(--ink); font: inherit; font-size: 13px; }
+.reviewDecision > p { margin: 9px 0 16px; color: var(--muted); font-size: 10px; }
+.reviewDecision > div { display: flex; justify-content: flex-end; gap: 8px; }
+.reviewDecision button { border: 0; border-radius: 9px; padding: 11px 14px; font-size: 11px; font-weight: 900; cursor: pointer; }
+.reviewDecision button.quiet { margin-right: auto; background: #edf0f1; color: var(--ink); }
+.reviewDecision button.reject { background: #fde8e4; color: #9d3628; }
+.reviewDecision button.approve { background: var(--ink); color: white; }
+.reviewDecision button:disabled { cursor: wait; opacity: .6; }
+.reviewDetailEmpty { display: grid; place-content: center; height: 100%; min-height: 560px; }
+.reviewDetailEmpty h2 { margin: 0; font-family: Georgia, serif; font-size: 30px; color: var(--ink); }
+.reviewDetailEmpty p { margin: 8px 0 0; }
+
 @media (max-width: 980px) {
   .topbar { grid-template-columns: 1fr auto; }
   .topbar nav { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 40; background: rgba(255,255,255,.96); box-shadow: 0 8px 30px rgba(16,35,60,.18); width: calc(100% - 24px); justify-content: center; }
@@ -243,6 +347,10 @@ h1, h2, h3, p { margin-top: 0; }
   .trustStrip { grid-template-columns: repeat(3, 1fr); }
   .trustText { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); padding: 22px 0 0; }
   .footer { padding-bottom: 100px; }
+  .reviewLogin { grid-template-columns: 1fr; padding-block: 70px; }
+  .reviewMetrics { grid-template-columns: repeat(3, 1fr); }
+  .reviewPrinciple { grid-column: 1 / -1; }
+  .reviewBoard { grid-template-columns: 290px minmax(0, 1fr); }
 }
 
 @media (max-width: 1180px) {
@@ -296,6 +404,30 @@ h1, h2, h3, p { margin-top: 0; }
   .modalContent { padding: 25px 20px 50px; }
   .modalHero { padding: 65px 20px 30px; }
   .modalHero h1 { font-size: 31px; }
+  .reviewHeader { padding-inline: 4vw; }
+  .reviewLive { display: none; }
+  .reviewLogin { padding: 48px 4vw 80px; }
+  .reviewLoginCopy h1 { font-size: 43px; }
+  .reviewLoginCard { padding: 24px; }
+  .reviewWorkspace { padding: 42px 4vw 80px; }
+  .reviewIntro { align-items: start; flex-direction: column; }
+  .reviewMetrics { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .reviewMetrics article { min-height: 105px; padding: 14px; }
+  .reviewMetrics strong { font-size: 32px; }
+  .reviewMetrics small { display: none; }
+  .reviewPrinciple { grid-column: 1 / -1; min-height: 0 !important; }
+  .reviewPrinciple p { font-size: 17px; }
+  .reviewBoard { display: block; }
+  .reviewQueue { border-right: 0; border-bottom: 1px solid var(--line); }
+  .reviewQueueList { max-height: 350px; overflow: auto; }
+  .reviewDetail { padding: 20px; }
+  .reviewDetailHeader, .reviewSourceRow { align-items: start; flex-direction: column; }
+  .reviewBadges { justify-content: flex-start; }
+  .reviewSourceRow b { max-width: 80vw; }
+  .reviewDiff { grid-template-columns: 1fr; }
+  .reviewDecision > div { flex-wrap: wrap; }
+  .reviewDecision button { flex: 1 1 auto; }
+  .reviewDecision button.quiet { margin-right: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
