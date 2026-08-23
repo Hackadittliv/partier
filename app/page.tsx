@@ -182,7 +182,7 @@ export default function Home() {
         <section className="trustStrip sectionWrap">
           <div><strong>11</strong><span>partier kartlagda</span></div>
           <div><strong>9</strong><span>sakområden</span></div>
-          <div><strong>26</strong><span>officiella källor</span></div>
+          <div><strong>25</strong><span>officiella källor</span></div>
           <div className="trustText"><b>Fakta först.</b><p>Varje sammanfattning går att kontrollera mot partiets egen källa. Äldre material markeras tydligt.</p></div>
         </section>
       </>}
@@ -230,7 +230,7 @@ export default function Home() {
             <div className="modalSection"><h2>Ideologisk riktning</h2><p>{selectedParty.ideology}</p></div>
             <div className="modalSection"><h2>Viktigaste prioriteringarna</h2><ol>{selectedParty.priorities.map((priority) => <li key={priority}>{priority}</li>)}</ol></div>
             <div className="positionList"><h2>Politiken område för område</h2>{topics.map((item) => <details key={item.id}><summary>{item.label}<span>+</span></summary><p>{selectedParty.positions[item.id]}</p></details>)}</div>
-            <div className="sources"><h2>Officiella källor</h2>{selectedParty.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer"><span>↗</span><div><b>{source.title}</b><small>Öppna originalkällan</small></div></a>)}</div>
+            <div className="sources"><h2>Officiella källor</h2>{selectedParty.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer"><span>↗</span><div><b>{source.title}</b><small>Kontrollerad 23 augusti 2026</small></div></a>)}</div>
           </div>
         </section>
       </div>}

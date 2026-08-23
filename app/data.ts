@@ -40,7 +40,7 @@ export const parties: Party[] = [
       regering: "Partiet vill byta regering men utesluter en regering med Vänsterpartiet och en regering som är beroende av Sverigedemokraterna.",
     },
     sources: [
-      { title: "Valmanifest 2026", url: "https://val2026.centerpartiet.se/wp-content/uploads/2026/06/Valmanifest%202026.pdf" },
+      { title: "Valmanifest 2026", url: "https://val2026.centerpartiet.se/wp-content/uploads/2026/06/Valmanifest-2026.pdf" },
       { title: "Regeringsbesked 2026", url: "https://www.centerpartiet.se/centerpartiet-lokalt/orebro-lan/orebro-lan/nyheter/nyhetsarkiv/2026-01-30-vi-tanker-aldrig-slappa-in-vansterpartiet-i-en-regering" },
     ],
   },
@@ -61,7 +61,7 @@ export const parties: Party[] = [
     },
     sources: [
       { title: "Valmanifest 2026", url: "https://kristdemokraterna.se/download/18.3fb0a02c1a01f5f28f7326/1787292489599/Valmanifest%202026.pdf" },
-      { title: "Ideologi och principprogram", url: "https://kristdemokraterna.se/var-politik/var-politik/ideologi-och-principprogram" },
+      { title: "Ideologi och principprogram", url: "https://kristdemokraterna.se/var-politik/ideologi-och-principprogram" },
     ],
   },
   {
@@ -81,7 +81,7 @@ export const parties: Party[] = [
     },
     sources: [
       { title: "Valmanifest 2026", url: "https://www.liberalerna.se/wp-content/uploads/liberalernas-valmanifest-2026-40s-komprimerad.pdf" },
-      { title: "Program och rapporter", url: "https://www.liberalerna.se/politik/program-och-rapporter" },
+      { title: "Program och rapporter", url: "https://www.liberalerna.se/program-och-rapporter" },
     ],
   },
   {
