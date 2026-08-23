@@ -3,64 +3,16 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { electionDate, lastUpdated, parties, topics, type Party } from "./data";
+import { detectSearchGoal, findSearchIntent, inferTopic, partyMatchScore, stanceMeta, stanceSortValue, type Stance } from "./search";
 
 type View = "utforska" | "jamfor" | "partier" | "om";
-type TopicId = (typeof topics)[number]["id"];
 
 const suggestions = [
   "Vilka partier vill bygga mer kärnkraft?",
-  "Vad vill partierna göra åt ungdomsbrottsligheten?",
-  "Vilka vill sänka skatten på arbete?",
-  "Hur skiljer sig partiernas syn på skolan?",
+  "Vilka vill stoppa vinster i skolan?",
+  "Vilka vill föra en stramare migrationspolitik?",
+  "Vilka partier vill lämna EU?",
 ];
-
-const topicSignals: Record<TopicId, string[]> = {
-  ekonomi: ["ekonomi", "skatt", "skatter", "jobb", "arbete", "lön", "pension", "bidrag", "företag"],
-  vard: ["vård", "sjukvård", "tandvård", "omsorg", "äldreomsorg", "läkare", "sjukhus", "psykiatri"],
-  skola: ["skola", "skolan", "skolor", "elev", "elever", "lärare", "förskola", "familj", "barnbidrag"],
-  brott: ["brott", "brottslighet", "kriminalitet", "gäng", "polis", "straff", "trygghet", "våld"],
-  migration: ["migration", "invandring", "invandrare", "asyl", "integration", "återvandring", "medborgarskap"],
-  klimat: ["klimat", "utsläpp", "miljö", "natur", "skog", "biologisk mångfald"],
-  energi: ["energi", "el", "kärnkraft", "vindkraft", "vattenkraft", "elnät", "bränsle", "bensin", "diesel"],
-  demokrati: ["demokrati", "eu", "nato", "yttrandefrihet", "rättsstat", "försvar", "ukraina"],
-  regering: ["regering", "regeringsfrågan", "samarbete", "block", "statsminister", "koalition"],
-};
-
-const stopWords = new Set(["hur", "vad", "vilka", "vilket", "vill", "ska", "skulle", "gor", "gora", "parti", "partier", "partierna", "partiernas", "syn", "skiljer", "sig", "och", "eller", "att", "med", "for", "fran", "till", "inom", "mot", "som", "det", "den", "de", "pa", "om", "at", "mer"]);
-
-function normalize(value: string) {
-  return value.toLocaleLowerCase("sv").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
-function queryWords(value: string) {
-  return normalize(value).split(/[^a-z0-9åäö]+/).filter((word) => word.length > 1 && !stopWords.has(word));
-}
-
-function inferTopic(value: string): TopicId | null {
-  const normalizedQuery = normalize(value);
-  let best: { id: TopicId; score: number } | null = null;
-
-  for (const [id, signals] of Object.entries(topicSignals) as [TopicId, string[]][]) {
-    const score = signals.reduce((total, signal) => total + (normalizedQuery.includes(normalize(signal)) ? Math.max(1, signal.length / 4) : 0), 0);
-    if (score > 0 && (!best || score > best.score)) best = { id, score };
-  }
-
-  return best?.id ?? null;
-}
-
-function matchScore(party: Party, query: string, activeTopic: string, inferredTopic: TopicId | null) {
-  if (!query && activeTopic === "alla") return 1;
-  if (!query) return party.positions[activeTopic] ? 1 : 0;
-
-  const words = queryWords(query);
-  const selectedText = activeTopic === "alla" ? Object.values(party.positions).join(" ") : party.positions[activeTopic] ?? "";
-  const haystack = normalize([party.name, party.ideology, party.overview, ...party.priorities, selectedText].join(" "));
-  const partyName = normalize(party.name);
-  const directPartyMatch = partyName.includes(normalize(query).trim()) ? 20 : 0;
-  const wordScore = words.reduce((score, word) => score + (haystack.includes(word) ? 2 : 0), 0);
-
-  return directPartyMatch + wordScore + (inferredTopic ? 6 : 0);
-}
 
 function badgeClass(status: Party["status"]) {
   if (status === "Aktuellt valmanifest") return "verified";
@@ -88,23 +40,42 @@ export default function Home() {
   const [compareIds, setCompareIds] = useState(["moderaterna", "socialdemokraterna", "sverigedemokraterna"]);
   const [compareTopic, setCompareTopic] = useState("ekonomi");
   const [showAll, setShowAll] = useState(false);
+  const [stanceFilter, setStanceFilter] = useState<"all" | Stance>("all");
 
-  const inferredTopic = topic === "alla" && query.trim() ? inferTopic(query) : null;
+  const rawIntentMatch = query.trim() ? findSearchIntent(query) : null;
+  const intentMatch = rawIntentMatch && (topic === "alla" || rawIntentMatch.intent.topic === topic) ? rawIntentMatch : null;
+  const searchGoal = intentMatch ? detectSearchGoal(query, intentMatch.intent) : "compare";
+  const inferredTopic = topic === "alla" && query.trim() ? intentMatch?.intent.topic ?? inferTopic(query) : null;
   const activeTopic = topic === "alla" ? inferredTopic ?? "alla" : topic;
   const activeTopicLabel = activeTopic === "alla" ? null : topics.find((item) => item.id === activeTopic)?.label;
 
   const results = useMemo(() => parties
-    .map((party) => ({ party, score: matchScore(party, query, activeTopic, inferredTopic) }))
+    .map((party) => ({ party, score: partyMatchScore(party, query, activeTopic, inferredTopic) }))
     .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score || a.party.name.localeCompare(b.party.name, "sv"))
-    .map(({ party }) => party), [query, activeTopic, inferredTopic]);
+    .sort((a, b) => {
+      if (intentMatch) {
+        const aStance = intentMatch.intent.stances[a.party.id] ?? "unclear";
+        const bStance = intentMatch.intent.stances[b.party.id] ?? "unclear";
+        const stanceDifference = stanceSortValue(bStance, searchGoal) - stanceSortValue(aStance, searchGoal);
+        if (stanceDifference) return stanceDifference;
+      }
+      return b.score - a.score || a.party.name.localeCompare(b.party.name, "sv");
+    })
+    .map(({ party }) => party), [query, activeTopic, inferredTopic, intentMatch, searchGoal]);
 
   const compared = compareIds.map((id) => parties.find((party) => party.id === id)).filter(Boolean) as Party[];
-  const visibleResults = showAll ? results : results.slice(0, 6);
+  const filteredResults = intentMatch && stanceFilter !== "all" ? results.filter((party) => (intentMatch.intent.stances[party.id] ?? "unclear") === stanceFilter) : results;
+  const visibleResults = showAll ? filteredResults : filteredResults.slice(0, 6);
+  const stanceCounts = intentMatch ? parties.reduce((counts, party) => {
+    const stance = intentMatch.intent.stances[party.id] ?? "unclear";
+    counts[stance] += 1;
+    return counts;
+  }, { for: 0, against: 0, conditional: 0, unclear: 0 } as Record<Stance, number>) : null;
 
   function runSuggestion(value: string) {
     setQuery(value);
     setTopic("alla");
+    setStanceFilter("all");
     setShowAll(true);
     setView("utforska");
   }
@@ -144,10 +115,10 @@ export default function Home() {
             <label htmlFor="mainSearch">Vad vill du förstå?</label>
             <div className="searchInput">
               <span aria-hidden="true">⌕</span>
-              <input id="mainSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Skriv exempelvis kärnkraft, skatt eller skola" />
-              {query && <button onClick={() => setQuery("")} aria-label="Rensa sökningen">Rensa</button>}
+              <input id="mainSearch" value={query} onChange={(event) => { setQuery(event.target.value); setStanceFilter("all"); setShowAll(false); }} placeholder="Fråga exempelvis vilka som vill bygga kärnkraft" />
+              {query && <button onClick={() => { setQuery(""); setStanceFilter("all"); setShowAll(false); }} aria-label="Rensa sökningen">Rensa</button>}
             </div>
-            <p className="searchHint">Sökningen tolkar sakområdet och visar partiernas svar med samma struktur.</p>
+            <p className="searchHint">Frågan matchas mot granskade ståndpunkter. Otydliga svar markeras öppet.</p>
             <div className="suggestions" aria-label="Exempelfrågor">
               {suggestions.map((suggestion) => <button key={suggestion} onClick={() => runSuggestion(suggestion)}>{suggestion}</button>)}
             </div>
@@ -159,20 +130,39 @@ export default function Home() {
             <div>
               <p className="sectionLabel">Välj sakområde</p>
               <div className="topicScroller">
-                <button className={topic === "alla" ? "selected" : ""} onClick={() => setTopic("alla")}>Alla frågor</button>
-                {topics.map((item) => <button key={item.id} className={topic === item.id ? "selected" : ""} onClick={() => setTopic(item.id)}>{item.label}</button>)}
+                <button className={topic === "alla" ? "selected" : ""} onClick={() => { setTopic("alla"); setStanceFilter("all"); setShowAll(false); }}>Alla frågor</button>
+                {topics.map((item) => <button key={item.id} className={topic === item.id ? "selected" : ""} onClick={() => { setTopic(item.id); setStanceFilter("all"); setShowAll(false); }}>{item.label}</button>)}
               </div>
             </div>
             <button className="compareCta" onClick={() => setView("jamfor")}>Öppna jämförelsen <span>→</span></button>
           </div>
 
+          {query && intentMatch && stanceCounts && <section className="directAnswer" aria-live="polite">
+            <div className="answerHeading">
+              <div>
+                <span className={`confidenceBadge ${intentMatch.confidence}`}>{intentMatch.confidence === "high" ? "Tydlig frågetolkning" : "Möjlig frågetolkning"}</span>
+                <p className="sectionLabel">Kort svar</p>
+                <h2>{intentMatch.intent.question}</h2>
+                <p>{searchGoal === "support" ? `${stanceCounts.for} partier har en tydligt stödjande linje i den riktning du frågar efter.` : searchGoal === "oppose" ? `${stanceCounts.against} partier har en tydligt avvisande linje i den riktning du frågar efter.` : "Partierna grupperas efter den riktning som framgår av deras publicerade material."}</p>
+              </div>
+              <div className="answerPrinciple"><span>Så läser du svaret</span><p>Riktningen är en redaktionell klassificering. Partiets egen formulering och officiella källa visas alltid under.</p></div>
+            </div>
+            <div className="stanceFilters" aria-label="Filtrera efter ståndpunkt">
+              <button className={stanceFilter === "all" ? "selected" : ""} onClick={() => { setStanceFilter("all"); setShowAll(false); }}><strong>{parties.length}</strong><span>Alla</span></button>
+              {(["for", "against", "conditional", "unclear"] as Stance[]).map((stance) => <button key={stance} className={`${stance}${stanceFilter === stance ? " selected" : ""}`} onClick={() => { setStanceFilter(stance); setShowAll(true); }}><strong>{stanceCounts[stance]}</strong><span>{stanceMeta[stance].shortLabel}</span><small>{stanceMeta[stance].description}</small></button>)}
+            </div>
+            <div className="relatedQuestions"><span>Fråga vidare</span>{intentMatch.intent.relatedQuestions.map((question) => <button key={question} onClick={() => runSuggestion(question)}>{question}</button>)}</div>
+          </section>}
+
+          {query && !intentMatch && inferredTopic && <div className="topicInterpretation" aria-live="polite"><span>Sakområde identifierat</span><strong>{activeTopicLabel}</strong><p>Frågan ger ännu ingen säker riktning mellan för och emot. Därför visas partiernas fulla ståndpunkt inom området.</p></div>}
+
           <div className="resultHeader">
             <div>
               <p className="sectionLabel">Sakliga svar</p>
-              <h2>{query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Träffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
+              <h2>{query && intentMatch ? intentMatch.intent.proposition : query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Träffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
               {query && inferredTopic && <span className="interpretationTag" aria-live="polite">Tolkad som {activeTopicLabel}</span>}
             </div>
-            <span>{results.length} {inferredTopic ? "partier jämförda" : "partier"}</span>
+            <span>{filteredResults.length} {inferredTopic ? "partier jämförda" : "partier"}</span>
           </div>
 
           {visibleResults.length ? <div className="resultGrid">
@@ -181,14 +171,18 @@ export default function Home() {
                 <div className="partyIdentity"><PartyEmblem party={party} /><div><h3>{party.name}</h3><p>{party.ideology}</p></div></div>
                 <span className={`sourceBadge ${badgeClass(party.status)}`}>{party.status}</span>
               </div>
-              <div className="factBlock"><span>Partiet säger</span><p>{activeTopic === "alla" ? party.overview : party.positions[activeTopic]}</p></div>
+              <div className="factBlock">
+                {intentMatch && <div className="stanceLine"><b className={`stanceBadge ${intentMatch.intent.stances[party.id] ?? "unclear"}`}>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].label}</b><small>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].description}</small></div>}
+                <span>{intentMatch ? "Partiets publicerade position" : "Partiet säger"}</span><p>{activeTopic === "alla" ? party.overview : party.positions[activeTopic]}</p>
+              </div>
+              {party.sources[0] && <a className="inlineSource" href={party.sources[0].url} target="_blank" rel="noreferrer"><span>Officiell källa</span><b>{party.sources[0].title}</b><i>↗</i></a>}
               <div className="cardActions">
                 <button onClick={() => setSelectedParty(party)}>Se hela partiprofilen</button>
                 <button className="quiet" onClick={() => { if (!compareIds.includes(party.id)) toggleCompare(party.id); setView("jamfor"); }}>Jämför</button>
               </div>
             </article>)}
           </div> : <div className="emptyState"><span>?</span><h3>Ingen tydlig träff ännu</h3><p>Prova ett bredare ord, exempelvis vård, skatt, skola, energi eller trygghet.</p></div>}
-          {results.length > 6 && <button className="showMore" onClick={() => setShowAll((value) => !value)}>{showAll ? "Visa färre" : `Visa alla ${results.length} partier`}</button>}
+          {filteredResults.length > 6 && <button className="showMore" onClick={() => setShowAll((value) => !value)}>{showAll ? "Visa färre" : `Visa alla ${filteredResults.length} partier`}</button>}
         </section>
 
         <section className="trustStrip sectionWrap">
