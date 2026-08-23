@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { electionDate, lastUpdated, parties, topics, type Party } from "./data";
 import { detectSearchGoal, findSearchIntent, inferTopic, partyMatchScore, stanceMeta, stanceSortValue, type Stance } from "./search";
 
@@ -33,6 +33,7 @@ const additionalParties = parties.filter((party) => party.group === "fler");
 const sourceCount = parties.reduce((total, party) => total + party.sources.length, 0);
 
 export default function Home() {
+  const resultsRef = useRef<HTMLElement | null>(null);
   const [view, setView] = useState<View>("utforska");
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("alla");
@@ -72,12 +73,20 @@ export default function Home() {
     return counts;
   }, { for: 0, against: 0, conditional: 0, unclear: 0 } as Record<Stance, number>) : null;
 
+  function scrollToResults() {
+    window.requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      resultsRef.current?.focus({ preventScroll: true });
+    });
+  }
+
   function runSuggestion(value: string) {
     setQuery(value);
     setTopic("alla");
     setStanceFilter("all");
     setShowAll(true);
     setView("utforska");
+    window.requestAnimationFrame(() => window.requestAnimationFrame(scrollToResults));
   }
 
   function toggleCompare(id: string) {
@@ -115,17 +124,39 @@ export default function Home() {
             <label htmlFor="mainSearch">Vad vill du förstå?</label>
             <div className="searchInput">
               <span aria-hidden="true">⌕</span>
-              <input id="mainSearch" value={query} onChange={(event) => { setQuery(event.target.value); setStanceFilter("all"); setShowAll(false); }} placeholder="Fråga exempelvis vilka som vill bygga kärnkraft" />
+              <input
+                id="mainSearch"
+                value={query}
+                onChange={(event) => { setQuery(event.target.value); setStanceFilter("all"); setShowAll(false); }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && query.trim()) {
+                    event.preventDefault();
+                    scrollToResults();
+                  }
+                }}
+                aria-describedby={query.trim() ? "searchHint searchFeedback" : "searchHint"}
+                placeholder="Fråga exempelvis vilka som vill bygga kärnkraft"
+              />
               {query && <button onClick={() => { setQuery(""); setStanceFilter("all"); setShowAll(false); }} aria-label="Rensa sökningen">Rensa</button>}
             </div>
-            <p className="searchHint">Frågan matchas mot granskade ståndpunkter. Otydliga svar markeras öppet.</p>
+            <p className="searchHint" id="searchHint">Resultaten uppdateras direkt när du skriver. Otydliga svar markeras öppet.</p>
+            {query.trim() && <div className="searchFeedback">
+              <div className="feedbackStatus" id="searchFeedback" role="status" aria-live="polite">
+                <span aria-hidden="true" />
+                <div>
+                  <b>{activeTopicLabel ? `Tolkad som ${activeTopicLabel}` : "Sökningen är uppdaterad"}</b>
+                  <small>{filteredResults.length} partisvar är redo längre ner på sidan.</small>
+                </div>
+              </div>
+              <button onClick={scrollToResults}>Visa {filteredResults.length} svar <span aria-hidden="true">↓</span></button>
+            </div>}
             <div className="suggestions" aria-label="Exempelfrågor">
               {suggestions.map((suggestion) => <button key={suggestion} onClick={() => runSuggestion(suggestion)}>{suggestion}</button>)}
             </div>
           </div>
         </section>
 
-        <section className="workspace sectionWrap">
+        <section className="workspace sectionWrap" ref={resultsRef} tabIndex={-1}>
           <div className="topicBar">
             <div>
               <p className="sectionLabel">Välj sakområde</p>

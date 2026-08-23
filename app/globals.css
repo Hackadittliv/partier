@@ -41,12 +41,22 @@ h1, h2, h3, p { margin-top: 0; }
 .searchInput input { flex: 1; border: 0; outline: 0; background: transparent; font-size: 16px; min-width: 0; }
 .searchInput button { border: 0; background: #eef0ef; border-radius: 999px; font-size: 12px; padding: 8px 11px; cursor: pointer; }
 .searchHint { margin: 10px 2px 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.searchFeedback { margin-top: 14px; padding: 12px; display: flex; justify-content: space-between; align-items: center; gap: 16px; border: 1px solid #cfe0d7; border-radius: 13px; background: #eef5f1; }
+.feedbackStatus { min-width: 0; display: flex; align-items: center; gap: 11px; }
+.feedbackStatus > span { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; background: #49a66e; box-shadow: 0 0 0 5px rgba(73,166,110,.16); animation: feedbackPulse 1.6s ease infinite; }
+.feedbackStatus b, .feedbackStatus small { display: block; }
+.feedbackStatus b { font-size: 12px; }
+.feedbackStatus small { margin-top: 2px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+.searchFeedback > button { flex: 0 0 auto; border: 0; border-radius: 999px; padding: 10px 13px; background: var(--accent); color: white; font-size: 11px; font-weight: 800; cursor: pointer; }
+.searchFeedback > button span { margin-left: 6px; }
+@keyframes feedbackPulse { 50% { box-shadow: 0 0 0 8px rgba(73,166,110,0); } }
 .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .suggestions button { border: 1px solid var(--line); background: #fafaf8; color: #485565; border-radius: 999px; padding: 8px 11px; font-size: 12px; text-align: left; cursor: pointer; transition: .18s ease; }
 .suggestions button:hover { border-color: var(--accent); color: var(--accent-dark); transform: translateY(-1px); }
 
 .sectionWrap { width: min(1440px, 92vw); margin-inline: auto; }
-.workspace { padding-block: 48px 70px; }
+.workspace { padding-block: 48px 70px; scroll-margin-top: 90px; }
+.workspace:focus { outline: 0; }
 .topicBar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; }
 .topicBar > div { min-width: 0; flex: 1; }
 .topicScroller { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 4px; }
@@ -247,6 +257,8 @@ h1, h2, h3, p { margin-top: 0; }
   .lead { font-size: 16px; }
   .searchPanel { padding: 17px; border-radius: 17px; }
   .searchInput { min-height: 58px; }
+  .searchFeedback { align-items: stretch; flex-direction: column; }
+  .searchFeedback > button { width: 100%; }
   .suggestions { flex-wrap: nowrap; overflow: auto; }
   .suggestions button { flex: 0 0 230px; }
   .directAnswer { padding: 20px; border-radius: 17px; }
