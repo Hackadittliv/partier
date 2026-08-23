@@ -27,6 +27,7 @@ function matchScore(party: Party, query: string, topic: string) {
 function badgeClass(status: Party["status"]) {
   if (status === "Aktuellt valmanifest") return "verified";
   if (status === "Aktuella vallöften") return "current";
+  if (status === "Valprogram publiceras löpande") return "current";
   return "review";
 }
 
@@ -136,9 +137,9 @@ export default function Home() {
         </section>
 
         <section className="trustStrip sectionWrap">
-          <div><strong>10</strong><span>partier kartlagda</span></div>
+          <div><strong>11</strong><span>partier kartlagda</span></div>
           <div><strong>9</strong><span>sakområden</span></div>
-          <div><strong>23</strong><span>officiella källor</span></div>
+          <div><strong>26</strong><span>officiella källor</span></div>
           <div className="trustText"><b>Fakta först.</b><p>Varje sammanfattning går att kontrollera mot partiets egen källa. Äldre material markeras tydligt.</p></div>
         </section>
       </>}

@@ -5,7 +5,7 @@ export type Party = {
   color: string;
   ideology: string;
   overview: string;
-  status: "Aktuellt valmanifest" | "Aktuella vallöften" | "Programmaterial granskas";
+  status: "Aktuellt valmanifest" | "Aktuella vallöften" | "Valprogram publiceras löpande" | "Programmaterial granskas";
   priorities: string[];
   positions: Record<string, string>;
   sources: { title: string; url: string }[];
@@ -224,6 +224,27 @@ export const parties: Party[] = [
       { title: "Viktigaste frågor", url: "https://www.partietnyans.se/vara-viktigaste-fragor/" },
       { title: "Politik från A till Ö", url: "https://www.partietnyans.se/var-politik/politik-a-o/" },
       { title: "Val 2026", url: "https://www.partietnyans.se/val-2026/" },
+    ],
+  },
+  {
+    id: "orebropartiet", name: "Örebropartiet", short: "ÖP", color: "#d94732", ideology: "Lokalt förankrat och systemkritiskt", status: "Valprogram publiceras löpande",
+    overview: "Örebropartiet kombinerar kraftigt strypt migration och hård rättspolitik med avgiftsfri tandvård, mer resurser till äldreomsorgen och statlig kontroll över central infrastruktur.",
+    priorities: ["Inför avgiftsfri tandvård i hela Sverige.", "Stryp invandringen och öka återvandringen.", "Avskaffa skatterna på el och bränsle.", "Skärp rättspolitiken och slå hårdare mot organiserad brottslighet."],
+    positions: {
+      ekonomi: "Slopa skatter på el och bränsle och prioritera kärnverksamhet framför bistånd, myndighetsadministration och projekt som partiet bedömer som onödiga. Staten ska äga central energiinfrastruktur.",
+      vard: "Låt tandvård omfattas av högkostnadsskyddet och gör den avgiftsfri. Förstatliga ansvaret för äldreomsorgen, anställ fler, höj lönerna och ställ tydligare språk och kompetenskrav.",
+      skola: "Någon fullständig nationell skolpolitik är ännu inte publicerad i valprogrammet för 2026. I det publicerade materialet vill partiet ta bort krav på hemspråksundervisning och rensa skolor från personer med kriminella kopplingar.",
+      brott: "Skapa en särskild enhet mot grov organiserad brottslighet, avskaffa straffrabatter och stärk gränskontroll och kameraövervakning. Utländska grova brottslingar ska utvisas.",
+      migration: "Ha noll som mål för inflödet, avskaffa asylinvandringen och stryp arbetskrafts och anhöriginvandringen. Använd återvandring och utvisning och ställ språk och försörjningskrav.",
+      klimat: "Slopa den politik som partiet kallar den gröna omställningen och stoppa offentligt stöd till gröna industriprojekt. Närmiljö och naturvård ska hanteras utan att hämma energi och produktion.",
+      energi: "Bygg ut statligt ägd kärnkraft och vattenkraft, förstärk elnäten och stoppa nya stora vindkraftsparker. Förstatliga elnäten och inför ett enhetligt Sverigepris på el.",
+      demokrati: "Partiet beskriver sig som svårt att placera på höger och vänsterskalan och vill minska politisk byråkrati. Det vill stärka totalförsvaret, laglydigt vapenägande och direktval av nämndemän.",
+      regering: "Partiet säger att det kan förhandla med alla. Det bedömer Tidösidan som enklast att få igenom politiken med, men säger sig vara berett att fälla varje regering som inte uppfyller dess avgörande vallöften.",
+    },
+    sources: [
+      { title: "Valprogram 2026", url: "https://www.orebropartiet.se/var-politik/" },
+      { title: "Riksdagen 2026", url: "https://www.orebropartiet.se/till-riksdagen/" },
+      { title: "Om Örebropartiet", url: "https://www.orebropartiet.se/om-oss/" },
     ],
   },
 ];
