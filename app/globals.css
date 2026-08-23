@@ -123,6 +123,10 @@ h1, h2, h3, p { margin-top: 0; }
 .factBlock { border-left: 3px solid var(--party); margin: 22px 0 21px; padding: 2px 0 2px 15px; flex: 1; }
 .factBlock span, .comparePosition span, .summaryBox span, .priorityList > span { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .11em; font-weight: 800; }
 .factBlock p, .comparePosition p { margin: 7px 0 0; font-size: 15px; line-height: 1.6; }
+.factBlock mark { padding: 1px 3px; border-radius: 4px; background: #ffe6a8; color: var(--ink); box-decoration-break: clone; }
+.matchContext { margin: 0 0 16px; display: flex; align-items: center; gap: 8px; }
+.matchContext span { padding: 6px 8px; border-radius: 999px; background: #e8f0f8; color: #2c6292; font-size: 9px; }
+.matchContext b { font-size: 12px; }
 .stanceLine { display: flex; align-items: center; gap: 9px; margin: 0 0 16px; }
 .stanceLine small { color: var(--muted); font-size: 10px; line-height: 1.35; }
 .stanceBadge { flex: 0 0 auto; padding: 6px 9px; border-radius: 999px; font-size: 10px; }

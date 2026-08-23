@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { electionDate, lastUpdated, parties, topics, type Party } from "./data";
-import { detectSearchGoal, findSearchIntent, inferTopic, partyMatchScore, stanceMeta, stanceSortValue, type Stance } from "./search";
+import { detectSearchGoal, findPartySearchContext, findSearchIntent, inferTopic, normalizeText, partyMatchScore, queryWords, stanceMeta, stanceSortValue, type Stance } from "./search";
 
 type View = "utforska" | "jamfor" | "partier" | "om";
 
@@ -28,6 +28,11 @@ function PartyEmblem({ party, compact = false, hero = false }: { party: Party; c
   </span>;
 }
 
+function HighlightedText({ text, query }: { text: string; query: string }) {
+  const words = queryWords(query);
+  return <>{text.split(/(\s+)/).map((part, index) => words.includes(normalizeText(part)) ? <mark key={`${part}-${index}`}>{part}</mark> : part)}</>;
+}
+
 const riksdagParties = parties.filter((party) => party.group === "riksdag");
 const additionalParties = parties.filter((party) => party.group === "fler");
 const sourceCount = parties.reduce((total, party) => total + party.sources.length, 0);
@@ -49,6 +54,7 @@ export default function Home() {
   const inferredTopic = topic === "alla" && query.trim() ? intentMatch?.intent.topic ?? inferTopic(query) : null;
   const activeTopic = topic === "alla" ? inferredTopic ?? "alla" : topic;
   const activeTopicLabel = activeTopic === "alla" ? null : topics.find((item) => item.id === activeTopic)?.label;
+  const isTextSearch = Boolean(query.trim() && !intentMatch && !activeTopicLabel);
 
   const results = useMemo(() => parties
     .map((party) => ({ party, score: partyMatchScore(party, query, activeTopic, inferredTopic) }))
@@ -144,11 +150,11 @@ export default function Home() {
               <div className="feedbackStatus" id="searchFeedback" role="status" aria-live="polite">
                 <span aria-hidden="true" />
                 <div>
-                  <b>{activeTopicLabel ? `Tolkad som ${activeTopicLabel}` : "Sökningen är uppdaterad"}</b>
-                  <small>{filteredResults.length} partisvar är redo längre ner på sidan.</small>
+                  <b>{activeTopicLabel ? `Tolkad som ${activeTopicLabel}` : "Textträffar hittade"}</b>
+                  <small>{filteredResults.length} {filteredResults.length === 1 ? "träff är redo" : "träffar är redo"} längre ner på sidan.</small>
                 </div>
               </div>
-              <button onClick={scrollToResults}>Visa {filteredResults.length} svar <span aria-hidden="true">↓</span></button>
+              <button onClick={scrollToResults}>Visa {filteredResults.length} {filteredResults.length === 1 ? "träff" : "träffar"} <span aria-hidden="true">↓</span></button>
             </div>}
             <div className="suggestions" aria-label="Exempelfrågor">
               {suggestions.map((suggestion) => <button key={suggestion} onClick={() => runSuggestion(suggestion)}>{suggestion}</button>)}
@@ -189,29 +195,36 @@ export default function Home() {
 
           <div className="resultHeader">
             <div>
-              <p className="sectionLabel">Sakliga svar</p>
-              <h2>{query && intentMatch ? intentMatch.intent.proposition : query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Träffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
+              <p className="sectionLabel">{isTextSearch ? "Textträffar" : "Sakliga svar"}</p>
+              <h2>{query && intentMatch ? intentMatch.intent.proposition : query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Textträffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
               {query && inferredTopic && <span className="interpretationTag" aria-live="polite">Tolkad som {activeTopicLabel}</span>}
             </div>
-            <span>{filteredResults.length} {inferredTopic ? "partier jämförda" : "partier"}</span>
+            <span>{filteredResults.length} {isTextSearch ? filteredResults.length === 1 ? "textträff" : "textträffar" : inferredTopic ? "partier jämförda" : "partier"}</span>
           </div>
 
           {visibleResults.length ? <div className="resultGrid">
-            {visibleResults.map((party) => <article className="partyCard" key={party.id} style={{ "--party": party.color } as React.CSSProperties}>
-              <div className="partyCardTop">
-                <div className="partyIdentity"><PartyEmblem party={party} /><div><h3>{party.name}</h3><p>{party.ideology}</p></div></div>
-                <span className={`sourceBadge ${badgeClass(party.status)}`}>{party.status}</span>
-              </div>
-              <div className="factBlock">
-                {intentMatch && <div className="stanceLine"><b className={`stanceBadge ${intentMatch.intent.stances[party.id] ?? "unclear"}`}>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].label}</b><small>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].description}</small></div>}
-                <span>{intentMatch ? "Partiets publicerade position" : "Partiet säger"}</span><p>{activeTopic === "alla" ? party.overview : party.positions[activeTopic]}</p>
-              </div>
-              {party.sources[0] && <a className="inlineSource" href={party.sources[0].url} target="_blank" rel="noreferrer"><span>Officiell källa</span><b>{party.sources[0].title}</b><i>↗</i></a>}
-              <div className="cardActions">
-                <button onClick={() => setSelectedParty(party)}>Se hela partiprofilen</button>
-                <button className="quiet" onClick={() => { if (!compareIds.includes(party.id)) toggleCompare(party.id); setView("jamfor"); }}>Jämför</button>
-              </div>
-            </article>)}
+            {visibleResults.map((party) => {
+              const searchContext = isTextSearch ? findPartySearchContext(party, query, activeTopic) : null;
+              const cardText = searchContext?.text ?? (activeTopic === "alla" ? party.overview : party.positions[activeTopic]);
+              const contextLabel = searchContext ? topics.find((item) => item.id === searchContext.topic)?.label : null;
+              return <article className="partyCard" key={party.id} style={{ "--party": party.color } as React.CSSProperties}>
+                <div className="partyCardTop">
+                  <div className="partyIdentity"><PartyEmblem party={party} /><div><h3>{party.name}</h3><p>{party.ideology}</p></div></div>
+                  <span className={`sourceBadge ${badgeClass(party.status)}`}>{party.status}</span>
+                </div>
+                <div className="factBlock">
+                  {intentMatch && <div className="stanceLine"><b className={`stanceBadge ${intentMatch.intent.stances[party.id] ?? "unclear"}`}>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].label}</b><small>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].description}</small></div>}
+                  {searchContext && <div className="matchContext"><span>Textträff</span><b>{contextLabel}</b></div>}
+                  <span>{searchContext ? "Matchande text" : intentMatch ? "Partiets publicerade position" : "Partiet säger"}</span>
+                  <p>{searchContext ? <HighlightedText text={cardText} query={query} /> : cardText}</p>
+                </div>
+                {party.sources[0] && <a className="inlineSource" href={party.sources[0].url} target="_blank" rel="noreferrer"><span>Officiell källa</span><b>{party.sources[0].title}</b><i>↗</i></a>}
+                <div className="cardActions">
+                  <button onClick={() => setSelectedParty(party)}>Se hela partiprofilen</button>
+                  <button className="quiet" onClick={() => { if (!compareIds.includes(party.id)) toggleCompare(party.id); setView("jamfor"); }}>Jämför</button>
+                </div>
+              </article>;
+            })}
           </div> : <div className="emptyState"><span>?</span><h3>Ingen tydlig träff ännu</h3><p>Prova ett bredare ord, exempelvis vård, skatt, skola, energi eller trygghet.</p></div>}
           {filteredResults.length > 6 && <button className="showMore" onClick={() => setShowAll((value) => !value)}>{showAll ? "Visa färre" : `Visa alla ${filteredResults.length} partier`}</button>}
         </section>

@@ -22,6 +22,12 @@ export type IntentMatch = {
   score: number;
 };
 
+export type PartySearchContext = {
+  topic: TopicId;
+  text: string;
+  score: number;
+};
+
 export const stanceMeta: Record<Stance, { label: string; shortLabel: string; description: string }> = {
   for: { label: "För förslaget", shortLabel: "För", description: "Partiets publicerade linje stödjer förslaget." },
   against: { label: "Emot förslaget", shortLabel: "Emot", description: "Partiets publicerade linje avvisar förslaget." },
@@ -177,6 +183,23 @@ function wordsMatch(queryWord: string, signalWord: string) {
   if (queryWord === signalWord) return 2;
   if (queryWord.length >= 5 && signalWord.length >= 5 && levenshtein(queryWord, signalWord) <= 1) return 1;
   return 0;
+}
+
+export function findPartySearchContext(party: Party, query: string, activeTopic: string): PartySearchContext | null {
+  const words = queryWords(query);
+  if (!words.length) return null;
+
+  const candidates = (Object.entries(party.positions) as [TopicId, string][])
+    .filter(([topic]) => activeTopic === "alla" || topic === activeTopic)
+    .map(([topic, text]) => {
+      const textWords = normalizeText(text).split(" ");
+      const score = words.reduce((total, word) => total + Math.max(0, ...textWords.map((candidate) => wordsMatch(word, candidate))), 0);
+      return { topic, text, score };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return candidates[0] ?? null;
 }
 
 function phraseScore(value: string, signal: string) {

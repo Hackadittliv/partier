@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { parties } from "../app/data.ts";
-import { detectSearchGoal, findSearchIntent, inferTopic, partyMatchScore, searchIntents } from "../app/search.ts";
+import { detectSearchGoal, findPartySearchContext, findSearchIntent, inferTopic, partyMatchScore, searchIntents } from "../app/search.ts";
 
 test("tolkar tydliga politiska frågor", () => {
   assert.equal(findSearchIntent("Vilka vill bygga mer kärnkraft?")?.intent.id, "new-nuclear");
@@ -34,6 +34,14 @@ test("ger partinamn hög vikt även i en hel fråga", () => {
   assert.ok(centerpartiet);
   const query = "Vad vill Moderaterna göra med skolan?";
   assert.ok(partyMatchScore(moderaterna, query, "skola", "skola") > partyMatchScore(centerpartiet, query, "skola", "skola"));
+});
+
+test("visar sammanhanget bakom en bred textträff", () => {
+  const medborgerligSamling = parties.find((party) => party.id === "medborgerligsamling");
+  assert.ok(medborgerligSamling);
+  const context = findPartySearchContext(medborgerligSamling, "kommunalt", "alla");
+  assert.equal(context?.topic, "energi");
+  assert.match(context?.text ?? "", /Kommunalt veto/);
 });
 
 test("alla granskade jämförelser omfattar samtliga partier", () => {
