@@ -22,7 +22,7 @@ Starta utvecklingsmiljön med npm run dev.
 
 ## Produktion
 
-Netlify bygger den statiska versionen med npm run build:netlify och publicerar mappen out.
+Netlify bygger webbplatsen med npm run build och publicerar mappen out.
 
 Den primära webbplatsen finns på https://sakfragan.netlify.app
 
