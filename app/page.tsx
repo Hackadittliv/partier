@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { parties, topics, type Party } from "./data";
 
 type View = "utforska" | "jamfor" | "partier" | "om";
+type TopicId = (typeof topics)[number]["id"];
 
 const suggestions = [
   "Vilka partier vill bygga mer kärnkraft?",
@@ -12,16 +13,52 @@ const suggestions = [
   "Hur skiljer sig partiernas syn på skolan?",
 ];
 
+const topicSignals: Record<TopicId, string[]> = {
+  ekonomi: ["ekonomi", "skatt", "skatter", "jobb", "arbete", "lön", "pension", "bidrag", "företag"],
+  vard: ["vård", "sjukvård", "tandvård", "omsorg", "äldreomsorg", "läkare", "sjukhus", "psykiatri"],
+  skola: ["skola", "skolan", "skolor", "elev", "elever", "lärare", "förskola", "familj", "barnbidrag"],
+  brott: ["brott", "brottslighet", "kriminalitet", "gäng", "polis", "straff", "trygghet", "våld"],
+  migration: ["migration", "invandring", "invandrare", "asyl", "integration", "återvandring", "medborgarskap"],
+  klimat: ["klimat", "utsläpp", "miljö", "natur", "skog", "biologisk mångfald"],
+  energi: ["energi", "el", "kärnkraft", "vindkraft", "vattenkraft", "elnät", "bränsle", "bensin", "diesel"],
+  demokrati: ["demokrati", "eu", "nato", "yttrandefrihet", "rättsstat", "försvar", "ukraina"],
+  regering: ["regering", "regeringsfrågan", "samarbete", "block", "statsminister", "koalition"],
+};
+
+const stopWords = new Set(["hur", "vad", "vilka", "vilket", "vill", "ska", "skulle", "gor", "gora", "parti", "partier", "partierna", "partiernas", "syn", "skiljer", "sig", "och", "eller", "att", "med", "for", "fran", "till", "inom", "mot", "som", "det", "den", "de", "pa", "om", "at", "mer"]);
+
 function normalize(value: string) {
   return value.toLocaleLowerCase("sv").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-function matchScore(party: Party, query: string, topic: string) {
-  if (!query && topic === "alla") return 1;
-  const words = normalize(query).split(/\s+/).filter((word) => word.length > 2);
-  const selectedText = topic === "alla" ? Object.values(party.positions).join(" ") : party.positions[topic] ?? "";
+function queryWords(value: string) {
+  return normalize(value).split(/[^a-z0-9åäö]+/).filter((word) => word.length > 1 && !stopWords.has(word));
+}
+
+function inferTopic(value: string): TopicId | null {
+  const normalizedQuery = normalize(value);
+  let best: { id: TopicId; score: number } | null = null;
+
+  for (const [id, signals] of Object.entries(topicSignals) as [TopicId, string[]][]) {
+    const score = signals.reduce((total, signal) => total + (normalizedQuery.includes(normalize(signal)) ? Math.max(1, signal.length / 4) : 0), 0);
+    if (score > 0 && (!best || score > best.score)) best = { id, score };
+  }
+
+  return best?.id ?? null;
+}
+
+function matchScore(party: Party, query: string, activeTopic: string, inferredTopic: TopicId | null) {
+  if (!query && activeTopic === "alla") return 1;
+  if (!query) return party.positions[activeTopic] ? 1 : 0;
+
+  const words = queryWords(query);
+  const selectedText = activeTopic === "alla" ? Object.values(party.positions).join(" ") : party.positions[activeTopic] ?? "";
   const haystack = normalize([party.name, party.ideology, party.overview, ...party.priorities, selectedText].join(" "));
-  return words.reduce((score, word) => score + (haystack.includes(word) ? 2 : 0), 0) + (topic === "alla" || party.positions[topic] ? 1 : 0);
+  const partyName = normalize(party.name);
+  const directPartyMatch = partyName.includes(normalize(query).trim()) ? 20 : 0;
+  const wordScore = words.reduce((score, word) => score + (haystack.includes(word) ? 2 : 0), 0);
+
+  return directPartyMatch + wordScore + (inferredTopic ? 6 : 0);
 }
 
 function badgeClass(status: Party["status"]) {
@@ -40,11 +77,15 @@ export default function Home() {
   const [compareTopic, setCompareTopic] = useState("ekonomi");
   const [showAll, setShowAll] = useState(false);
 
+  const inferredTopic = topic === "alla" && query.trim() ? inferTopic(query) : null;
+  const activeTopic = topic === "alla" ? inferredTopic ?? "alla" : topic;
+  const activeTopicLabel = activeTopic === "alla" ? null : topics.find((item) => item.id === activeTopic)?.label;
+
   const results = useMemo(() => parties
-    .map((party) => ({ party, score: matchScore(party, query, topic) }))
+    .map((party) => ({ party, score: matchScore(party, query, activeTopic, inferredTopic) }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score || a.party.name.localeCompare(b.party.name, "sv"))
-    .map(({ party }) => party), [query, topic]);
+    .map(({ party }) => party), [query, activeTopic, inferredTopic]);
 
   const compared = compareIds.map((id) => parties.find((party) => party.id === id)).filter(Boolean) as Party[];
   const visibleResults = showAll ? results : results.slice(0, 6);
@@ -94,6 +135,7 @@ export default function Home() {
               <input id="mainSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Skriv exempelvis kärnkraft, skatt eller skola" />
               {query && <button onClick={() => setQuery("")} aria-label="Rensa sökningen">Rensa</button>}
             </div>
+            <p className="searchHint">Sökningen tolkar sakområdet och visar partiernas svar med samma struktur.</p>
             <div className="suggestions" aria-label="Exempelfrågor">
               {suggestions.map((suggestion) => <button key={suggestion} onClick={() => runSuggestion(suggestion)}>{suggestion}</button>)}
             </div>
@@ -115,9 +157,10 @@ export default function Home() {
           <div className="resultHeader">
             <div>
               <p className="sectionLabel">Sakliga svar</p>
-              <h2>{query ? `Träffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
+              <h2>{query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Träffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
+              {query && inferredTopic && <span className="interpretationTag" aria-live="polite">Tolkad som {activeTopicLabel}</span>}
             </div>
-            <span>{results.length} partier</span>
+            <span>{results.length} {inferredTopic ? "partier jämförda" : "partier"}</span>
           </div>
 
           {visibleResults.length ? <div className="resultGrid">
@@ -126,7 +169,7 @@ export default function Home() {
                 <div className="partyIdentity"><span className="partyInitial">{party.short}</span><div><h3>{party.name}</h3><p>{party.ideology}</p></div></div>
                 <span className={`sourceBadge ${badgeClass(party.status)}`}>{party.status}</span>
               </div>
-              <div className="factBlock"><span>Partiet säger</span><p>{topic === "alla" ? party.overview : party.positions[topic]}</p></div>
+              <div className="factBlock"><span>Partiet säger</span><p>{activeTopic === "alla" ? party.overview : party.positions[activeTopic]}</p></div>
               <div className="cardActions">
                 <button onClick={() => setSelectedParty(party)}>Se hela partiprofilen</button>
                 <button className="quiet" onClick={() => { if (!compareIds.includes(party.id)) toggleCompare(party.id); setView("jamfor"); }}>Jämför</button>

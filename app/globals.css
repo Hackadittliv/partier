@@ -40,15 +40,16 @@ h1, h2, h3, p { margin-top: 0; }
 .searchInput > span { font-size: 32px; line-height: 1; transform: rotate(-20deg); }
 .searchInput input { flex: 1; border: 0; outline: 0; background: transparent; font-size: 16px; min-width: 0; }
 .searchInput button { border: 0; background: #eef0ef; border-radius: 999px; font-size: 12px; padding: 8px 11px; cursor: pointer; }
+.searchHint { margin: 10px 2px 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
 .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .suggestions button { border: 1px solid var(--line); background: #fafaf8; color: #485565; border-radius: 999px; padding: 8px 11px; font-size: 12px; text-align: left; cursor: pointer; transition: .18s ease; }
 .suggestions button:hover { border-color: var(--accent); color: var(--accent-dark); transform: translateY(-1px); }
 
 .sectionWrap { width: min(1440px, 92vw); margin-inline: auto; }
 .workspace { padding-block: 48px 70px; }
-.topicBar { display: flex; gap: 24px; justify-content: space-between; align-items: end; }
+.topicBar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; }
 .topicBar > div { min-width: 0; flex: 1; }
-.topicScroller { display: flex; gap: 8px; overflow: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.topicScroller { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 4px; }
 .topicScroller button { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; padding: 10px 14px; background: transparent; font-size: 13px; cursor: pointer; }
 .topicScroller button.selected { color: white; background: var(--ink); border-color: var(--ink); }
 .compareCta { border: 0; border-bottom: 1px solid var(--ink); background: transparent; padding: 8px 0; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -56,8 +57,9 @@ h1, h2, h3, p { margin-top: 0; }
 .resultHeader { margin: 50px 0 21px; display: flex; justify-content: space-between; align-items: end; gap: 20px; }
 .resultHeader h2 { font-family: Georgia, serif; font-size: clamp(28px, 3vw, 42px); max-width: 900px; margin: 0; letter-spacing: -.025em; }
 .resultHeader > span { color: var(--muted); font-size: 13px; }
+.interpretationTag { display: inline-flex; margin-top: 12px; padding: 6px 10px; border-radius: 999px; background: #e8f0f8; color: #2c6292; font-size: 11px; font-weight: 800; }
 .resultGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.partyCard { position: relative; overflow: hidden; padding: 24px; background: var(--surface); border: 1px solid rgba(16,35,60,.13); border-radius: 18px; box-shadow: 0 7px 25px rgba(16,35,60,.035); }
+.partyCard { position: relative; overflow: hidden; padding: 24px; background: var(--surface); border: 1px solid rgba(16,35,60,.13); border-radius: 18px; box-shadow: 0 7px 25px rgba(16,35,60,.035); display: flex; flex-direction: column; }
 .partyCard::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--party); }
 .partyCardTop, .partyIdentity, .cardActions, .compareParty, .modalHero, .sources a { display: flex; align-items: center; }
 .partyCardTop { justify-content: space-between; gap: 15px; align-items: flex-start; }
@@ -69,7 +71,7 @@ h1, h2, h3, p { margin-top: 0; }
 .sourceBadge.verified { background: #e6f4eb; color: var(--green); }
 .sourceBadge.current { background: #e8f0f8; color: #2c6292; }
 .sourceBadge.review { background: #fff1d1; color: var(--yellow); }
-.factBlock { border-left: 3px solid var(--party); margin: 22px 0 21px; padding: 2px 0 2px 15px; }
+.factBlock { border-left: 3px solid var(--party); margin: 22px 0 21px; padding: 2px 0 2px 15px; flex: 1; }
 .factBlock span, .comparePosition span, .summaryBox span, .priorityList > span { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .11em; font-weight: 800; }
 .factBlock p, .comparePosition p { margin: 7px 0 0; font-size: 15px; line-height: 1.6; }
 .cardActions { gap: 8px; }
@@ -99,11 +101,11 @@ h1, h2, h3, p { margin-top: 0; }
 .partyPicker button.picked span { background: var(--party); color: white; }
 .compareControls select { width: 100%; border: 1px solid var(--line); background: #fafaf8; border-radius: 10px; padding: 12px; }
 .compareGrid { display: grid; grid-template-columns: repeat(var(--count), minmax(0, 1fr)); gap: 12px; align-items: stretch; }
-.compareGrid article { border-top: 5px solid var(--party); background: white; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 10px 35px rgba(16,35,60,.05); }
+.compareGrid article { border-top: 5px solid var(--party); background: white; border-radius: 14px; padding: 22px; display: grid; grid-template-rows: 54px 62px minmax(260px, auto) minmax(205px, 1fr) auto; min-width: 0; box-shadow: 0 10px 35px rgba(16,35,60,.05); }
 .compareParty { gap: 11px; }
 .compareParty h2 { font-size: 18px; margin: 0; }
 .comparisonQuestion { min-height: 50px; margin: 20px 0 10px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-.comparePosition { padding: 15px; border-radius: 10px; background: #f2f3f0; flex: 1; }
+.comparePosition { padding: 15px; border-radius: 10px; background: #f2f3f0; }
 .priorityList { margin: 20px 0; }
 .priorityList ol { margin: 10px 0 0; padding-left: 20px; }
 .priorityList li { font-size: 13px; line-height: 1.5; margin-bottom: 7px; }
@@ -166,6 +168,11 @@ h1, h2, h3, p { margin-top: 0; }
   .footer { padding-bottom: 100px; }
 }
 
+@media (max-width: 1180px) {
+  .topicBar { grid-template-columns: 1fr; }
+  .compareCta { justify-self: start; }
+}
+
 @media (max-width: 680px) {
   .topbar { min-height: 64px; }
   .brand { font-size: 19px; }
@@ -183,6 +190,7 @@ h1, h2, h3, p { margin-top: 0; }
   .compareCta { margin-top: 17px; }
   .resultHeader { align-items: start; }
   .resultGrid, .directoryGrid, .principleGrid, .compareGrid { grid-template-columns: 1fr; }
+  .compareGrid article { grid-template-rows: auto auto auto auto auto; }
   .partyCard { padding: 18px; }
   .partyCardTop { display: block; }
   .sourceBadge { display: inline-block; margin-top: 13px; }
