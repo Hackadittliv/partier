@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
-import { parties, topics, type Party } from "./data";
+import { electionDate, lastUpdated, parties, topics, type Party } from "./data";
 
 type View = "utforska" | "jamfor" | "partier" | "om";
 type TopicId = (typeof topics)[number]["id"];
@@ -68,6 +69,17 @@ function badgeClass(status: Party["status"]) {
   return "review";
 }
 
+function PartyEmblem({ party, compact = false, hero = false }: { party: Party; compact?: boolean; hero?: boolean }) {
+  return <span className={`partyEmblem${compact ? " compact" : ""}${hero ? " hero" : ""}`} style={{ "--party": party.color } as React.CSSProperties} aria-hidden="true">
+    <span>{party.short}</span>
+    <Image src={party.emblem} alt="" width={compact ? 28 : hero ? 76 : 46} height={compact ? 28 : hero ? 76 : 46} onError={(event) => { event.currentTarget.style.display = "none"; }} />
+  </span>;
+}
+
+const riksdagParties = parties.filter((party) => party.group === "riksdag");
+const additionalParties = parties.filter((party) => party.group === "fler");
+const sourceCount = parties.reduce((total, party) => total + party.sources.length, 0);
+
 export default function Home() {
   const [view, setView] = useState<View>("utforska");
   const [query, setQuery] = useState("");
@@ -118,7 +130,7 @@ export default function Home() {
             </button>
           ))}
         </nav>
-        <span className="dateBadge"><i /> Uppdaterad 23 augusti 2026</span>
+        <span className="dateBadge"><i /> Uppdaterad {lastUpdated}</span>
       </header>
 
       {view === "utforska" && <>
@@ -166,7 +178,7 @@ export default function Home() {
           {visibleResults.length ? <div className="resultGrid">
             {visibleResults.map((party) => <article className="partyCard" key={party.id} style={{ "--party": party.color } as React.CSSProperties}>
               <div className="partyCardTop">
-                <div className="partyIdentity"><span className="partyInitial">{party.short}</span><div><h3>{party.name}</h3><p>{party.ideology}</p></div></div>
+                <div className="partyIdentity"><PartyEmblem party={party} /><div><h3>{party.name}</h3><p>{party.ideology}</p></div></div>
                 <span className={`sourceBadge ${badgeClass(party.status)}`}>{party.status}</span>
               </div>
               <div className="factBlock"><span>Partiet säger</span><p>{activeTopic === "alla" ? party.overview : party.positions[activeTopic]}</p></div>
@@ -180,22 +192,22 @@ export default function Home() {
         </section>
 
         <section className="trustStrip sectionWrap">
-          <div><strong>11</strong><span>partier kartlagda</span></div>
-          <div><strong>9</strong><span>sakområden</span></div>
-          <div><strong>25</strong><span>officiella källor</span></div>
-          <div className="trustText"><b>Fakta först.</b><p>Varje sammanfattning går att kontrollera mot partiets egen källa. Äldre material markeras tydligt.</p></div>
+          <div><strong>{parties.length}</strong><span>partier kartlagda</span></div>
+          <div><strong>{topics.length}</strong><span>sakområden</span></div>
+          <div><strong>{sourceCount}</strong><span>officiella källor</span></div>
+          <div className="trustText"><b>Fakta först.</b><p>Varje sammanfattning går att kontrollera mot partiets egen källa. Materialet bevakas dagligen fram till valet den {electionDate}.</p></div>
         </section>
       </>}
 
       {view === "jamfor" && <section className="sectionWrap pageSection">
         <div className="pageIntro"><p className="eyebrow">Se skillnaderna</p><h1>Jämför upp till fyra partier.</h1><p>Välj partier och sakområde. Samma fråga och struktur används för alla.</p></div>
         <div className="compareControls">
-          <div><label>Välj partier</label><div className="partyPicker">{parties.map((party) => <button key={party.id} className={compareIds.includes(party.id) ? "picked" : ""} style={{ "--party": party.color } as React.CSSProperties} onClick={() => toggleCompare(party.id)}><span>{party.short}</span>{party.name}</button>)}</div></div>
+          <div><label>Välj partier</label><div className="partyPicker">{parties.map((party) => <button key={party.id} className={compareIds.includes(party.id) ? "picked" : ""} style={{ "--party": party.color } as React.CSSProperties} onClick={() => toggleCompare(party.id)}><PartyEmblem party={party} compact />{party.name}</button>)}</div></div>
           <div><label htmlFor="compareTopic">Välj sakområde</label><select id="compareTopic" value={compareTopic} onChange={(event) => setCompareTopic(event.target.value)}>{topics.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></div>
         </div>
         {compared.length ? <div className="compareGrid" style={{ "--count": compared.length } as React.CSSProperties}>
           {compared.map((party) => <article key={party.id} style={{ "--party": party.color } as React.CSSProperties}>
-            <div className="compareParty"><span>{party.short}</span><h2>{party.name}</h2></div>
+            <div className="compareParty"><PartyEmblem party={party} /><h2>{party.name}</h2></div>
             <p className="comparisonQuestion">{topics.find((item) => item.id === compareTopic)?.question}</p>
             <div className="comparePosition"><span>Partiet säger</span><p>{party.positions[compareTopic]}</p></div>
             <div className="priorityList"><span>Tre tydliga prioriteringar</span><ol>{party.priorities.slice(0, 3).map((priority) => <li key={priority}>{priority}</li>)}</ol></div>
@@ -206,7 +218,18 @@ export default function Home() {
 
       {view === "partier" && <section className="sectionWrap pageSection">
         <div className="pageIntro"><p className="eyebrow">Partier från A till Ö</p><h1>Utforska hela politiken.</h1><p>Alla partier presenteras med samma struktur, oavsett storlek och ideologisk riktning.</p></div>
-        <div className="directoryGrid">{parties.map((party) => <button key={party.id} onClick={() => setSelectedParty(party)} style={{ "--party": party.color } as React.CSSProperties}><span className="directoryInitial">{party.short}</span><span><b>{party.name}</b><small>{party.ideology}</small></span><i>→</i></button>)}</div>
+        <div className="directorySection">
+          <div className="directoryHeading"><div><p className="sectionLabel">Riksdagen</p><h2>Riksdagspartier</h2></div><span>Riksdagens åtta partier</span></div>
+          <div className="directoryGrid">{riksdagParties.map((party) => <button key={party.id} onClick={() => setSelectedParty(party)} style={{ "--party": party.color } as React.CSSProperties}><PartyEmblem party={party} /><span><b>{party.name}</b><small>{party.ideology}</small></span><i>→</i></button>)}</div>
+        </div>
+        <div className="directorySection moreParties">
+          <div className="directoryHeading"><div><p className="sectionLabel">Bredare urval</p><h2>Fler partier</h2></div><span>{additionalParties.length} partier med nationell inriktning</span></div>
+          <div className="selectionNote">
+            <div><span>Så görs urvalet</span><p>Urvalet betyder inte stöd eller en prognos. Det gör det möjligt att jämföra tydliga perspektiv på samma villkor.</p></div>
+            <ul><li>Ställer upp nationellt 2026</li><li>Har verifierbart officiellt programmaterial</li><li>Tillför ett tydligt perspektiv i jämförelsen</li></ul>
+          </div>
+          <div className="directoryGrid">{additionalParties.map((party) => <button key={party.id} onClick={() => setSelectedParty(party)} style={{ "--party": party.color } as React.CSSProperties}><PartyEmblem party={party} /><span><b>{party.name}</b><small>{party.ideology}</small></span><i>→</i></button>)}</div>
+        </div>
       </section>}
 
       {view === "om" && <section className="sectionWrap pageSection">
@@ -214,9 +237,9 @@ export default function Home() {
         <div className="principleGrid">
           <article><span>01</span><h2>Samma frågor</h2><p>Alla partier möter samma ämnen, struktur och utrymme. Det gör jämförelsen begriplig.</p></article>
           <article><span>02</span><h2>Källan först</h2><p>Varje ståndpunkt går att följa tillbaka till partiets valmanifest, program eller officiella politiksida.</p></article>
-          <article><span>03</span><h2>Aktualitet syns</h2><p>Färska valmanifest skiljs från löpande vallöften och äldre programmaterial.</p></article>
+          <article><span>03</span><h2>Aktualitet syns</h2><p>Färska valmanifest skiljs från löpande vallöften och äldre programmaterial. Källorna bevakas dagligen fram till valdagen.</p></article>
         </div>
-        <div className="methodCard"><div><p className="sectionLabel">Metod</p><h2>Vad tjänsten gör</h2></div><p>Materialet sammanfattas från partiernas officiella källor. Lokal politik blandas inte med nationell politik. Fakta och analys hålls isär. Brytdatum för denna version är 23 augusti 2026. Valrörelsen pågår och uppgifter kan ändras.</p></div>
+        <div className="methodCard"><div><p className="sectionLabel">Metod</p><h2>Vad tjänsten gör</h2></div><p>Materialet sammanfattas från partiernas officiella källor. Lokal politik blandas inte med nationell politik. Fakta och analys hålls isär. Brytdatum för denna version är {lastUpdated}. Källor och nya valbesked kontrolleras dagligen fram till valet den {electionDate}.</p></div>
       </section>}
 
       <footer className="footer"><div className="brand"><span className="brandMark">S</span><span>Sakfrågan</span></div><p>Politik på vanlig svenska. Byggd för förståelse, inte övertalning.</p><button onClick={() => setView("om")}>Metod och transparens</button></footer>
@@ -224,13 +247,13 @@ export default function Home() {
       {selectedParty && <div className="modalBackdrop" role="presentation" onMouseDown={() => setSelectedParty(null)}>
         <section className="partyModal" role="dialog" aria-modal="true" aria-labelledby="partyTitle" onMouseDown={(event) => event.stopPropagation()} style={{ "--party": selectedParty.color } as React.CSSProperties}>
           <button className="closeButton" onClick={() => setSelectedParty(null)} aria-label="Stäng partiprofilen">×</button>
-          <div className="modalHero"><span>{selectedParty.short}</span><div><p>Partiprofil</p><h1 id="partyTitle">{selectedParty.name}</h1><small>{selectedParty.status}</small></div></div>
+          <div className="modalHero"><PartyEmblem party={selectedParty} hero /><div><p>Partiprofil</p><h1 id="partyTitle">{selectedParty.name}</h1><small>{selectedParty.status}</small></div></div>
           <div className="modalContent">
             <div className="summaryBox"><span>Kort sammanfattning</span><p>{selectedParty.overview}</p></div>
             <div className="modalSection"><h2>Ideologisk riktning</h2><p>{selectedParty.ideology}</p></div>
             <div className="modalSection"><h2>Viktigaste prioriteringarna</h2><ol>{selectedParty.priorities.map((priority) => <li key={priority}>{priority}</li>)}</ol></div>
             <div className="positionList"><h2>Politiken område för område</h2>{topics.map((item) => <details key={item.id}><summary>{item.label}<span>+</span></summary><p>{selectedParty.positions[item.id]}</p></details>)}</div>
-            <div className="sources"><h2>Officiella källor</h2>{selectedParty.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer"><span>↗</span><div><b>{source.title}</b><small>Kontrollerad 23 augusti 2026</small></div></a>)}</div>
+            <div className="sources"><h2>Officiella källor</h2>{selectedParty.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer"><span>↗</span><div><b>{source.title}</b><small>Kontrollerad {lastUpdated}</small></div></a>)}</div>
           </div>
         </section>
       </div>}

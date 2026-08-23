@@ -3,6 +3,8 @@ export type Party = {
   name: string;
   short: string;
   color: string;
+  emblem: string;
+  group: "riksdag" | "fler";
   ideology: string;
   overview: string;
   status: "Aktuellt valmanifest" | "Aktuella vallöften" | "Valprogram publiceras löpande" | "Programmaterial granskas";
@@ -10,6 +12,9 @@ export type Party = {
   positions: Record<string, string>;
   sources: { title: string; url: string }[];
 };
+
+export const lastUpdated = "23 augusti 2026";
+export const electionDate = "13 september 2026";
 
 export const topics = [
   { id: "ekonomi", label: "Ekonomi och skatt", question: "Hur vill partierna förändra ekonomi och skatter?" },
@@ -25,7 +30,7 @@ export const topics = [
 
 export const parties: Party[] = [
   {
-    id: "centerpartiet", name: "Centerpartiet", short: "C", color: "#15844c", ideology: "Socialliberalt och grönt", status: "Aktuellt valmanifest",
+    id: "centerpartiet", name: "Centerpartiet", short: "C", color: "#15844c", emblem: "/emblems/centerpartiet.svg", group: "riksdag", ideology: "Socialliberalt och grönt", status: "Aktuellt valmanifest",
     overview: "Centerpartiet kombinerar lägre kostnader för att anställa med stora klimatinvesteringar, stark landsbygdspolitik och liberala rättigheter.",
     priorities: ["Slopa arbetsgivaravgiften för de första tio anställda.", "Investera 50 miljarder kronor i landsbygder och lokal infrastruktur.", "Bygg ut fossilfri el, lagring och snabbare tillstånd.", "Ge fler en fast läkare och unga snabbare stöd för psykisk hälsa."],
     positions: {
@@ -45,7 +50,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "kristdemokraterna", name: "Kristdemokraterna", short: "KD", color: "#174b87", ideology: "Kristdemokratiskt", status: "Aktuellt valmanifest",
+    id: "kristdemokraterna", name: "Kristdemokraterna", short: "KD", color: "#174b87", emblem: "/emblems/kristdemokraterna.svg", group: "riksdag", ideology: "Kristdemokratiskt", status: "Aktuellt valmanifest",
     overview: "Kristdemokraterna prioriterar familjen, ett statligt huvudansvar för vården, ny kärnkraft och en tydligare värdegrund.",
     priorities: ["Förläng föräldraförsäkringen och låt familjer fördela dagarna friare.", "Låt staten ta huvudansvaret för sjukvården.", "Höj barnbidraget till 2 000 kronor.", "Bygg ny kärnkraft och fler småhus."],
     positions: {
@@ -65,7 +70,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "liberalerna", name: "Liberalerna", short: "L", color: "#1762a6", ideology: "Socialliberalt", status: "Aktuellt valmanifest",
+    id: "liberalerna", name: "Liberalerna", short: "L", color: "#1762a6", emblem: "/emblems/liberalerna.png", group: "riksdag", ideology: "Socialliberalt", status: "Aktuellt valmanifest",
     overview: "Liberalerna sätter skolan först och kombinerar stora skattesänkningar med starkare EU samarbete, ny kärnkraft och en stram men human migrationspolitik.",
     priorities: ["Sätt ett tak på 20 elever per klass.", "Förstatliga skolan och fasa ut vinstintresset.", "Halvera den statliga inkomstskatten.", "Förbered en folkomröstning om euron 2030."],
     positions: {
@@ -85,7 +90,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "miljopartiet", name: "Miljöpartiet de gröna", short: "MP", color: "#4a7d2b", ideology: "Grönt och feministiskt", status: "Aktuellt valmanifest",
+    id: "miljopartiet", name: "Miljöpartiet de gröna", short: "MP", color: "#4a7d2b", emblem: "/emblems/miljopartiet.png", group: "riksdag", ideology: "Grönt och feministiskt", status: "Aktuellt valmanifest",
     overview: "Miljöpartiet vill öka klimatinvesteringarna, minska klyftorna, stoppa vinststyrning i välfärden och bygga ett förnybart energisystem.",
     priorities: ["Inför ett nationellt kollektivtrafikkort för 499 kronor.", "Låt stora utsläppare och mycket stora förmögenheter betala mer.", "Avskaffa marknadsskolan och välfärdsvinsterna.", "Ta steg mot fyradagarsvecka med bibehållen lön."],
     positions: {
@@ -105,7 +110,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "moderaterna", name: "Moderaterna", short: "M", color: "#2a78b8", ideology: "Liberalkonservativt", status: "Aktuella vallöften",
+    id: "moderaterna", name: "Moderaterna", short: "M", color: "#2a78b8", emblem: "/emblems/moderaterna.png", group: "riksdag", ideology: "Liberalkonservativt", status: "Aktuella vallöften",
     overview: "Moderaterna prioriterar lägre skatt på arbete, hårdare brottsbekämpning, stram migration, valfrihet i välfärden och ett starkare försvar.",
     priorities: ["Fortsätt sänka skatten på arbete och pension.", "Stärk polis, domstolar och kriminalvård.", "Behåll en stram migrationspolitik med tydliga krav.", "Bygg ny kärnkraft och förstärk försvaret."],
     positions: {
@@ -125,7 +130,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "socialdemokraterna", name: "Socialdemokraterna", short: "S", color: "#d82c38", ideology: "Socialdemokratiskt", status: "Aktuella vallöften",
+    id: "socialdemokraterna", name: "Socialdemokraterna", short: "S", color: "#d82c38", emblem: "/emblems/socialdemokraterna.png", group: "riksdag", ideology: "Socialdemokratiskt", status: "Aktuella vallöften",
     overview: "Socialdemokraterna vill prioritera hushållens ekonomi, starkare välfärd, fler jobb genom industriinvesteringar och en offensiv mot organiserad brottslighet.",
     priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Investera i industri, energi, bostäder och infrastruktur."],
     positions: {
@@ -145,7 +150,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "sverigedemokraterna", name: "Sverigedemokraterna", short: "SD", color: "#d8a814", ideology: "Socialkonservativt och nationalistiskt", status: "Aktuellt valmanifest",
+    id: "sverigedemokraterna", name: "Sverigedemokraterna", short: "SD", color: "#d8a814", emblem: "/emblems/sverigedemokraterna.png", group: "riksdag", ideology: "Socialkonservativt och nationalistiskt", status: "Aktuellt valmanifest",
     overview: "Sverigedemokraterna prioriterar kraftigt minskad migration, nationell sammanhållning, lägre vardagskostnader, hård kriminalpolitik och direkt regeringsmakt.",
     priorities: ["Minska asyl och anhöriginvandringen kraftigt.", "Sänk skatt på drivmedel och energi.", "Skärp straff och utvisa fler utländska brottslingar.", "Stärk försvar, tandvård och medborgarnas välfärd."],
     positions: {
@@ -165,7 +170,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "vansterpartiet", name: "Vänsterpartiet", short: "V", color: "#b31942", ideology: "Socialistiskt och feministiskt", status: "Aktuellt valmanifest",
+    id: "vansterpartiet", name: "Vänsterpartiet", short: "V", color: "#b31942", emblem: "/emblems/vansterpartiet.svg", group: "riksdag", ideology: "Socialistiskt och feministiskt", status: "Aktuellt valmanifest",
     overview: "Vänsterpartiet vill omfördela ekonomisk makt, stoppa vinster i välfärden, sänka hushållens kostnader och investera offentligt i jobb och klimatomställning.",
     priorities: ["Frys hyror och pressa matpriser.", "Inför skatt på miljardärers förmögenheter.", "Stoppa vinstjakt i vård, skola och omsorg.", "Förkorta arbetstiden med bibehållen lön."],
     positions: {
@@ -185,7 +190,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "medborgerligsamling", name: "Medborgerlig Samling", short: "MED", color: "#23466c", ideology: "Liberalkonservativt", status: "Programmaterial granskas",
+    id: "medborgerligsamling", name: "Medborgerlig Samling", short: "MED", color: "#23466c", emblem: "/emblems/medborgerligsamling.webp", group: "fler", ideology: "Liberalkonservativt", status: "Programmaterial granskas",
     overview: "Medborgerlig Samling vill kraftigt sänka skattetrycket och den offentliga administrationen samt föra en mycket stram migrations och kriminalpolitik.",
     priorities: ["Sänk skattetrycket mot 30 procent av ekonomin.", "Avskaffa regionerna och minska offentlig administration.", "Skärp straff och utvisa utländska brottslingar.", "Bygg ut kärnkraft och lägg mer resurser på försvaret."],
     positions: {
@@ -206,7 +211,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "nyans", name: "Partiet Nyans", short: "PN", color: "#6f3d91", ideology: "Minoritetspolitiskt och socialt", status: "Programmaterial granskas",
+    id: "nyans", name: "Partiet Nyans", short: "PN", color: "#ef7b2c", emblem: "/emblems/nyans.jpg", group: "fler", ideology: "Minoritetspolitiskt och socialt", status: "Programmaterial granskas",
     overview: "Partiet Nyans fokuserar på religionsfrihet och minoritetsskydd och kombinerar statlig välfärd med riktade lättnader för företag och grupper.",
     priorities: ["Stärk skyddet mot islamofobi, afrofobi och diskriminering.", "Förstatliga skolan och vårdens styrning.", "Frys hyror i offentligt ägda bostäder.", "Kombinera rehabilitering med högre straff för grova brott."],
     positions: {
@@ -227,7 +232,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "orebropartiet", name: "Örebropartiet", short: "ÖP", color: "#d94732", ideology: "Lokalt förankrat och systemkritiskt", status: "Valprogram publiceras löpande",
+    id: "orebropartiet", name: "Örebropartiet", short: "ÖP", color: "#d94732", emblem: "/emblems/orebropartiet.png", group: "fler", ideology: "Lokalt förankrat och systemkritiskt", status: "Valprogram publiceras löpande",
     overview: "Örebropartiet kombinerar kraftigt strypt migration och hård rättspolitik med avgiftsfri tandvård, mer resurser till äldreomsorgen och statlig kontroll över central infrastruktur.",
     priorities: ["Inför avgiftsfri tandvård i hela Sverige.", "Stryp invandringen och öka återvandringen.", "Avskaffa skatterna på el och bränsle.", "Skärp rättspolitiken och slå hårdare mot organiserad brottslighet."],
     positions: {
@@ -245,6 +250,69 @@ export const parties: Party[] = [
       { title: "Valprogram 2026", url: "https://www.orebropartiet.se/var-politik/" },
       { title: "Riksdagen 2026", url: "https://www.orebropartiet.se/till-riksdagen/" },
       { title: "Om Örebropartiet", url: "https://www.orebropartiet.se/om-oss/" },
+    ],
+  },
+  {
+    id: "alternativforsverige", name: "Alternativ för Sverige", short: "AfS", color: "#1d4f91", emblem: "/emblems/alternativforsverige.png", group: "fler", ideology: "Nationalistiskt och EU kritiskt", status: "Programmaterial granskas",
+    overview: "Alternativ för Sverige prioriterar stoppad asylinvandring, omfattande återvandring, utträde ur EU, lägre skatter och en sträng kriminalpolitik.",
+    priorities: ["Stoppa all asylrelaterad invandring.", "Inrätta ett återvandringsverk och genomför ett omfattande återvandringsprogram.", "Lämna EU efter en ny folkomröstning.", "Sänk skatter och prioritera vård, trygghet och nationellt självbestämmande."],
+    positions: {
+      ekonomi: "Sänk skatter, minska offentlig byråkrati och statlig skuldsättning och försvara kontanter. Partiet vill omprioritera utgifter från migration, EU och bistånd till välfärd och kärnverksamhet.",
+      vard: "Prioritera primärvården, inför fri tandvård och avskaffa regionerna. Svensk välfärd ska i högre grad kopplas till medborgarskap.",
+      skola: "Sätt kunskap, ordning och lärarnas auktoritet i centrum. Skolan ska förmedla svensk kultur och familjer ska få större inflytande över barnens utbildning.",
+      brott: "Skärp straffen kraftigt, avskaffa automatisk villkorlig frigivning och stärk nödvärnsrätten. Partiet vill samtidigt begränsa generell övervakning av personer som inte är misstänkta för brott.",
+      migration: "Stoppa asyl och kvotflyktingmottagandet, inrätta ett återvandringsverk och använd både frivillig och tvingande återvandring. Kraven för medborgarskap ska skärpas kraftigt.",
+      klimat: "Värna biologisk mångfald, jordbruk, skog och nationell självförsörjning. Miljöpolitiken ska enligt partiet bygga på lokalt naturansvar och inte försvaga produktion eller landsbygd.",
+      energi: "Prioritera en stabil och nationellt kontrollerad energiförsörjning och motsätt dig politik som höjer hushållens drivmedels och elkostnader. Programmet ger inte en fullständig aktuell fördelning mellan kraftslagen.",
+      demokrati: "Inför fler bindande folkomröstningar, minska antalet myndigheter och stärk politiskt ansvarsutkrävande. Sverige ska lämna EU och stå militärt alliansfritt utanför Nato.",
+      regering: "Partiet fokuserar på riksdagsinträde och har inte publicerat en bindande nationell koalitionslinje för 2026.",
+    },
+    sources: [
+      { title: "Samlade politiska program", url: "https://alternativforsverige.se/politik/" },
+      { title: "Ekonomisk politik", url: "https://alternativforsverige.se/politik/ekonomisk-politik/" },
+      { title: "Återvandringspolitik", url: "https://alternativforsverige.se/politik/atervandring/" },
+    ],
+  },
+  {
+    id: "piratpartiet", name: "Piratpartiet", short: "PP", color: "#56329a", emblem: "/emblems/piratpartiet.png", group: "fler", ideology: "Frihetligt och digitalpolitiskt", status: "Programmaterial granskas",
+    overview: "Piratpartiet sätter personlig integritet, ett fritt internet, öppen kunskap, deltagande demokrati och evidensbaserade beslut i centrum.",
+    priorities: ["Stoppa massövervakning och skydda kryptering och privatliv.", "Stärk grundlagar, offentlighetsprincip och direkt medborgarinflytande.", "Inför ett generellt ekonomiskt grundstöd och bättre villkor för små företag.", "Modernisera skola, vård och offentlig digitalisering utifrån forskning och öppen teknik."],
+    positions: {
+      ekonomi: "Utred skattesystemet i grunden, förbättra villkoren för små och innovativa företag och ersätt delar av trygghetssystemen med ett generellt ekonomiskt stöd. Data och kunskap ses som centrala ekonomiska resurser.",
+      vard: "Gör vården jämlik, evidensbaserad och integritetssäker. Jämställ psykisk och fysisk hälsa, stärk beroendevård och låt patienten styra vem som får se journaluppgifter.",
+      skola: "Stärk lärarnas profession, forskningsanknytningen och elevernas rätt till stöd, hälsa och medbestämmande. Resurser ska följa ansvar och behov.",
+      brott: "Prioritera brott med offer och avkriminalisera eget drogbruk. Inför fristående granskning av polis och åklagare, återinför tjänstemannaansvar och begränsa övervakning till konkret misstanke.",
+      migration: "Prioritera skyddsbehövande efter utsatthet och förutsättningar och skilj bedömningen av asylskäl från beslut om uppehållstillstånd. Personer som begår allvarliga brott ska kunna utvisas.",
+      klimat: "Låt miljöbeslut vara evidensbaserade, främja grön innovation och skydda biologisk mångfald. Fossilfri energi ska kombineras med lokal egenproduktion.",
+      energi: "Använd en blandning av fossilfria kraftslag, inklusive dagens kärnkraft, och stärk möjligheten till egen el från sol, värme och mindre vindkraft.",
+      demokrati: "Stärk grundlagar, offentlighetsprincip, direktdemokrati och ett fritt internet. Reformera EU mot större insyn, ett starkare parlament och tydligare demokratisk kontroll.",
+      regering: "Partiet ställer upp med nationell lista 2026 men har inte publicerat en bindande regerings eller koalitionslinje.",
+    },
+    sources: [
+      { title: "Sakpolitik från A till Ö", url: "https://piratpartiet.se/sakpolitik/" },
+      { title: "Principprogram", url: "https://piratpartiet.se/principprogram/" },
+      { title: "Piratpartiet i valen 2026", url: "https://piratpartiet.se/nyheter/piratpartiet-i-valen-2026/" },
+    ],
+  },
+  {
+    id: "partietmod", name: "Partiet MoD", short: "MoD", color: "#e3a814", emblem: "/emblems/partietmod.png", group: "fler", ideology: "Direktdemokratiskt och suveränistiskt", status: "Aktuellt valmanifest",
+    overview: "Partiet MoD kombinerar direktdemokrati, nationellt självbestämmande, ekonomisk omfördelning, digital integritet och en utrikespolitik byggd på alliansfrihet.",
+    priorities: ["Lämna EU genom folkomröstning och lämna Nato.", "Inför fler folkomröstningar och avskaffa riksdagsspärren.", "Inför stegvis basinkomst och progressiv beskattning av kapital och stora förmögenheter.", "Förbjud generell massövervakning och stärk insynen i offentlig AI."],
+    positions: {
+      ekonomi: "Stärk Riksbankens roll, beskatta stora förmögenheter, kapital och bankövervinster mer och inför en stegvis basinkomst. Skydda kontanter och hushållens sparande från spekulation.",
+      vard: "Sänk kostnaderna för tandvård och vård, stärk psykisk hälsa och pensioner och minska ekonomiska klyftor. Välfärden ska väga tyngre än kortsiktig vinstmaximering.",
+      skola: "Ersätt skolplikt med lärorätt, tillåt reglerad hemundervisning och skydda alternativa pedagogiker. Stärk elevinflytande, studiero, folkbildning och mobilfria skoldagar.",
+      brott: "Valmanifestet har ingen fristående kriminalpolitisk del. Det betonar tjänstemannaansvar, starkare konstitutionell kontroll, mänskliga rättigheter och motstånd mot generell massövervakning.",
+      migration: "Partiet vill återta nationell kontroll över gränspolitiken genom ett svenskt EU utträde. Någon fullständig migrationsmodell presenteras inte i valmanifestet för 2026.",
+      klimat: "Stärk lokal och regional matproduktion, ekologiskt och regenerativt jordbruk och svensk självförsörjning. Fasa ut glyfosat och andra riskabla bekämpningsmedel.",
+      energi: "Valmanifestet för 2026 presenterar inte någon fullständig modell för elsystemets kraftslag. Energifrågan behandlas främst genom självförsörjning, ekonomisk trygghet och nationellt självbestämmande.",
+      demokrati: "Inför fler folkomröstningar, medborgarinitiativ och tjänstemannaansvar och avskaffa riksdagsspärren. Sverige ska lämna EU och Nato, skydda yttrandefrihet och stoppa generell massövervakning.",
+      regering: "Partiet fokuserar på riksdagsinträde och har inte publicerat en bindande nationell koalitionslinje för 2026.",
+    },
+    sources: [
+      { title: "Valmanifest 2026", url: "https://partietmod.se/politik/valmanifest-2026/" },
+      { title: "Partiprogram", url: "https://partietmod.se/politik/partiprogram/" },
+      { title: "Riksdagslista 2026", url: "https://partietmod.se/aktuellt/nyheter/mod-staller-upp-i-riksdagsvalet-2026-har-ar-var-lista/" },
     ],
   },
 ];

@@ -64,7 +64,15 @@ h1, h2, h3, p { margin-top: 0; }
 .partyCardTop, .partyIdentity, .cardActions, .compareParty, .modalHero, .sources a { display: flex; align-items: center; }
 .partyCardTop { justify-content: space-between; gap: 15px; align-items: flex-start; }
 .partyIdentity { gap: 13px; }
-.partyInitial, .compareParty > span, .directoryInitial { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: var(--party); color: white; font-weight: 900; font-size: 13px; }
+.partyEmblem { position: relative; flex: 0 0 auto; width: 46px; height: 46px; border-radius: 14px; overflow: hidden; display: grid; place-items: center; background: white; border: 1px solid rgba(16,35,60,.13); box-shadow: 0 3px 10px rgba(16,35,60,.07); }
+.partyEmblem > span { position: absolute; inset: 0; display: grid; place-items: center; background: var(--party); color: white; font-weight: 900; font-size: 12px; }
+.partyEmblem img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; background: white; padding: 4px; }
+.partyEmblem.compact { width: 28px; height: 28px; border-radius: 9px; }
+.partyEmblem.compact > span { font-size: 8px; }
+.partyEmblem.compact img { padding: 2px; }
+.partyEmblem.hero { width: 76px; height: 76px; border-radius: 20px; border: 2px solid rgba(255,255,255,.7); box-shadow: 0 9px 24px rgba(0,0,0,.14); }
+.partyEmblem.hero > span { font-size: 17px; }
+.partyEmblem.hero img { padding: 6px; }
 .partyIdentity h3 { font-size: 18px; margin: 0 0 3px; }
 .partyIdentity p { font-size: 12px; color: var(--muted); margin: 0; }
 .sourceBadge { font-size: 10px; font-weight: 800; border-radius: 999px; padding: 7px 9px; white-space: nowrap; }
@@ -96,9 +104,8 @@ h1, h2, h3, p { margin-top: 0; }
 .compareControls { display: grid; grid-template-columns: 1fr 260px; gap: 30px; padding: 24px; border: 1px solid var(--line); background: white; border-radius: 17px; margin-bottom: 25px; }
 .partyPicker { display: flex; flex-wrap: wrap; gap: 7px; }
 .partyPicker button { display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: white; border-radius: 999px; padding: 7px 11px 7px 7px; font-size: 12px; cursor: pointer; }
-.partyPicker button span { width: 25px; height: 25px; border-radius: 50%; display: grid; place-items: center; background: #dfe4e6; font-size: 9px; font-weight: 900; }
 .partyPicker button.picked { border-color: var(--party); box-shadow: inset 0 0 0 1px var(--party); }
-.partyPicker button.picked span { background: var(--party); color: white; }
+.partyPicker button.picked .partyEmblem { box-shadow: 0 0 0 2px color-mix(in srgb, var(--party) 35%, transparent); }
 .compareControls select { width: 100%; border: 1px solid var(--line); background: #fafaf8; border-radius: 10px; padding: 12px; }
 .compareGrid { display: grid; grid-template-columns: repeat(var(--count), minmax(0, 1fr)); gap: 12px; align-items: stretch; }
 .compareGrid article { border-top: 5px solid var(--party); background: white; border-radius: 14px; padding: 22px; display: grid; grid-template-rows: 54px 62px minmax(260px, auto) minmax(205px, 1fr) auto; min-width: 0; box-shadow: 0 10px 35px rgba(16,35,60,.05); }
@@ -110,12 +117,24 @@ h1, h2, h3, p { margin-top: 0; }
 .priorityList ol { margin: 10px 0 0; padding-left: 20px; }
 .priorityList li { font-size: 13px; line-height: 1.5; margin-bottom: 7px; }
 .compareGrid article > button { width: 100%; background: var(--party); }
+.directorySection { margin-top: 44px; }
+.directorySection:first-of-type { margin-top: 0; }
+.directoryHeading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+.directoryHeading .sectionLabel { margin-bottom: 8px; }
+.directoryHeading h2 { margin: 0; font-family: Georgia, serif; font-size: 32px; letter-spacing: -.02em; }
+.directoryHeading > span { color: var(--muted); font-size: 12px; }
 .directoryGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .directoryGrid > button { min-height: 105px; padding: 20px; border: 1px solid var(--line); border-radius: 15px; background: white; display: grid; grid-template-columns: auto 1fr auto; gap: 15px; align-items: center; text-align: left; cursor: pointer; transition: .2s ease; }
 .directoryGrid > button:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(16,35,60,.07); border-color: var(--party); }
 .directoryGrid b { display: block; font-size: 17px; margin-bottom: 5px; }
 .directoryGrid small { color: var(--muted); }
 .directoryGrid i { font-style: normal; font-size: 20px; }
+.moreParties { margin-top: 62px; padding-top: 50px; border-top: 1px solid rgba(16,35,60,.14); }
+.selectionNote { margin-bottom: 18px; padding: 24px; display: grid; grid-template-columns: .9fr 1.1fr; gap: 34px; align-items: center; border-radius: 15px; background: #eaf0ef; border: 1px solid #d2dcda; }
+.selectionNote > div > span { display: block; margin-bottom: 7px; color: var(--green); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
+.selectionNote p { margin: 0; color: #455362; font-size: 13px; line-height: 1.6; }
+.selectionNote ul { margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; list-style: none; }
+.selectionNote li { min-height: 74px; padding: 14px; display: flex; align-items: center; border-radius: 11px; background: rgba(255,255,255,.75); color: var(--ink); font-size: 12px; font-weight: 700; line-height: 1.4; }
 .principleGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .principleGrid article { background: white; border: 1px solid var(--line); border-radius: 15px; padding: 24px; }
 .principleGrid article > span { color: var(--accent); font-weight: 900; }
@@ -133,7 +152,6 @@ h1, h2, h3, p { margin-top: 0; }
 @keyframes slideIn { from { transform: translateX(40px); opacity: .4; } }
 .closeButton { position: absolute; z-index: 2; top: 18px; right: 18px; border: 0; background: rgba(255,255,255,.9); width: 40px; height: 40px; border-radius: 50%; font-size: 25px; cursor: pointer; }
 .modalHero { gap: 18px; min-height: 200px; padding: 50px 42px 35px; background: var(--party); color: white; }
-.modalHero > span { width: 70px; height: 70px; border-radius: 50%; border: 2px solid rgba(255,255,255,.55); display: grid; place-items: center; font-weight: 900; font-size: 18px; }
 .modalHero p { margin: 0 0 6px; text-transform: uppercase; font-size: 11px; letter-spacing: .14em; opacity: .8; }
 .modalHero h1 { margin: 0 0 7px; font-family: Georgia, serif; font-size: 38px; letter-spacing: -.03em; }
 .modalHero small { opacity: .8; }
@@ -198,6 +216,10 @@ h1, h2, h3, p { margin-top: 0; }
   .trustStrip strong { font-size: 32px; }
   .trustStrip span { font-size: 10px; }
   .compareControls { grid-template-columns: 1fr; padding: 17px; }
+  .directoryHeading { align-items: start; }
+  .selectionNote { grid-template-columns: 1fr; gap: 18px; }
+  .selectionNote ul { grid-template-columns: 1fr; }
+  .selectionNote li { min-height: 0; }
   .pageSection { padding-block: 48px 90px; }
   .methodCard { grid-template-columns: 1fr; padding: 25px; }
   .footer { grid-template-columns: 1fr; gap: 17px; }
