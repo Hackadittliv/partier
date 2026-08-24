@@ -24,6 +24,19 @@ type DetectedChange = {
   id: string;
 };
 
+type IngestRunState = {
+  details: Record<string, unknown>;
+  sources_total: number;
+};
+
+type LinkCheckState = {
+  ok: boolean;
+};
+
+type SnapshotReference = {
+  id: string;
+};
+
 function firstString(...values: unknown[]) {
   return values.find((value): value is string => typeof value === "string" && value.length > 0);
 }
@@ -197,7 +210,41 @@ async function processPage(page: FirecrawlPage, ingestRunId?: string) {
 }
 
 async function finishRun(ingestRunId: string, payload: FirecrawlWebhook) {
-  const status = payload.type === "batch_scrape.failed" ? "failed" : "succeeded";
+  const runQuery = postgrestQuery({
+    select: "details,sources_total",
+    id: `eq.${ingestRunId}`,
+    limit: "1",
+  });
+  const linkQuery = postgrestQuery({
+    select: "ok",
+    ingest_run_id: `eq.${ingestRunId}`,
+  });
+  const snapshotQuery = postgrestQuery({
+    select: "id",
+    ingest_run_id: `eq.${ingestRunId}`,
+  });
+  const [[run], linkChecks, snapshots] = await Promise.all([
+    supabaseRequest<IngestRunState[]>(`ingest_runs?${runQuery}`),
+    supabaseRequest<LinkCheckState[]>(`link_checks?${linkQuery}`),
+    supabaseRequest<SnapshotReference[]>(`source_snapshots?${snapshotQuery}`),
+  ]);
+  const successfulSources = linkChecks.filter((check) => check.ok).length;
+  const failedChecks = linkChecks.length - successfulSources;
+  const missingResults = Math.max(0, (run?.sources_total ?? 0) - linkChecks.length);
+  const upstreamFailed = payload.type === "batch_scrape.failed";
+  const errorCount = failedChecks + missingResults + (upstreamFailed ? 1 : 0);
+  let changedSources = 0;
+
+  if (snapshots.length > 0) {
+    const changeQuery = postgrestQuery({
+      select: "id",
+      after_snapshot_id: `in.(${snapshots.map((snapshot) => snapshot.id).join(",")})`,
+    });
+    const changes = await supabaseRequest<DetectedChange[]>(`detected_changes?${changeQuery}`);
+    changedSources = changes.length;
+  }
+
+  const status = upstreamFailed ? "failed" : errorCount > 0 ? "partial" : "succeeded";
   const query = postgrestQuery({ id: `eq.${ingestRunId}` });
 
   await supabaseRequest(`ingest_runs?${query}`, {
@@ -206,8 +253,11 @@ async function finishRun(ingestRunId: string, payload: FirecrawlWebhook) {
     body: {
       status,
       finished_at: new Date().toISOString(),
-      error_count: status === "failed" ? 1 : 0,
+      sources_succeeded: successfulSources,
+      sources_changed: changedSources,
+      error_count: errorCount,
       details: {
+        ...(run?.details ?? {}),
         firecrawl_job_id: payload.id,
         firecrawl_event: payload.type,
         error: payload.error ?? null,
