@@ -30,7 +30,13 @@ Följande hemligheter ska läggas in för funktionernas körningsmiljö i Netlif
 
 5. `SAKFRAGAN_AUTOMATION_ENABLED`
 
+6. `SAKFRAGAN_MANUAL_TRIGGER_SECRET`
+
 Sätt `SAKFRAGAN_AUTOMATION_ENABLED` till `true` först när övriga variabler är konfigurerade och schemat är exponerat i Supabase Data API. Fram till dess kan koden publiceras utan att den schemalagda kontrollen försöker starta en hämtning.
+
+## Manuell verifiering
+
+En behörig driftkontroll kan startas med `POST /api/automation/run` och hemligheten i ett Bearer authorization huvud. Anropet använder samma hämtning, databaslogg och signerade Firecrawl webhook som den dagliga kontrollen. Hemligheten ska bara finnas i Netlify och får aldrig skickas till webbläsarkod eller sparas i Git.
 
 ## Supabase
 
