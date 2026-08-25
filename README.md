@@ -16,6 +16,8 @@ Sakfrågan gör svensk politik sökbar, jämförbar och begriplig. Tjänsten pre
 
 6. Lägga källändringar i en mänsklig granskningskö före publicering
 
+7. Ta emot ett manuellt verifierat X-inlägg, analysera det via Connie Social MCP och lägga resultatet i samma granskningskö
+
 ## Lokal utveckling
 
 Installera beroenden med npm install.
@@ -33,3 +35,5 @@ Den primära webbplatsen finns på https://sakfragan.netlify.app
 Materialet bygger på partiernas officiella program, valmanifest och politiksidor. Brytdatum för den aktuella versionen är 23 augusti 2026. Fakta, pedagogisk sammanfattning och källa hålls tydligt åtskilda.
 
 Den löpande källkontrollen dokumenteras i `docs/automation.md`.
+
+Connie Social-kopplingen dokumenteras i `docs/connie-social.md`. Automatisk X-insamling och automatisk publicering är avstängda i pilotläget.
