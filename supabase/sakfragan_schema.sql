@@ -98,6 +98,19 @@ create table if not exists sakfragan.ingest_runs (
   )
 );
 
+create table if not exists sakfragan.collector_cursors (
+  collector_key text primary key,
+  platform text not null check (platform = 'x'),
+  last_external_post_id text check (
+    last_external_post_id is null or last_external_post_id ~ '^[0-9]+$'
+  ),
+  last_success_at timestamptz,
+  last_run_id uuid references sakfragan.ingest_runs(id) on delete set null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists sakfragan.source_snapshots (
   id uuid primary key default gen_random_uuid(),
   source_id uuid not null references sakfragan.sources(id) on delete restrict,
@@ -242,6 +255,10 @@ create table if not exists sakfragan.public_updates (
 create unique index if not exists source_snapshots_source_hash_uq
   on sakfragan.source_snapshots (source_id, content_hash);
 
+create unique index if not exists ingest_runs_collection_slot_uq
+  on sakfragan.ingest_runs ((details ->> 'collection_slot'))
+  where details ? 'collection_slot';
+
 create index if not exists sources_due_idx
   on sakfragan.sources (active, next_check_at, priority desc);
 
@@ -283,6 +300,7 @@ begin
     'party_profiles',
     'sources',
     'ingest_runs',
+    'collector_cursors',
     'source_snapshots',
     'detected_changes',
     'party_positions',
@@ -307,6 +325,7 @@ begin
     'party_profiles',
     'sources',
     'ingest_runs',
+    'collector_cursors',
     'source_snapshots',
     'detected_changes',
     'party_positions',
@@ -348,6 +367,11 @@ for each row execute function sakfragan.touch_updated_at();
 drop trigger if exists sources_touch_updated_at on sakfragan.sources;
 create trigger sources_touch_updated_at
 before update on sakfragan.sources
+for each row execute function sakfragan.touch_updated_at();
+
+drop trigger if exists collector_cursors_touch_updated_at on sakfragan.collector_cursors;
+create trigger collector_cursors_touch_updated_at
+before update on sakfragan.collector_cursors
 for each row execute function sakfragan.touch_updated_at();
 
 drop trigger if exists detected_changes_touch_updated_at on sakfragan.detected_changes;
@@ -399,6 +423,7 @@ alter default privileges for role postgres in schema sakfragan
 
 comment on table sakfragan.parties is 'Partier som presenteras av Sakfrågan.';
 comment on table sakfragan.sources is 'Officiella källor och sociala konton som kontrolleras löpande.';
+comment on table sakfragan.collector_cursors is 'Server-only high-water marks for deterministic external source collectors.';
 comment on table sakfragan.source_snapshots is 'Oföränderliga versioner av hämtat källinnehåll.';
 comment on table sakfragan.detected_changes is 'Skillnader som måste bedömas innan publicering.';
 comment on table sakfragan.party_positions is 'Senast granskade ståndpunkt per parti och sakområde.';
