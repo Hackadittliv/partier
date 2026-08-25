@@ -1,11 +1,12 @@
-import { createHash, timingSafeEqual } from "node:crypto";
-import type { Config } from "@netlify/functions";
+import { createHash } from "node:crypto";
+import type { Config, Context } from "@netlify/functions";
 import { z } from "zod";
 import {
   analyzeWithConnie,
   connieSocialRequestSchema,
   type ConnieSocialResult,
 } from "./_shared/connie-social";
+import { authorizedConnieWebhook } from "./_shared/connie-webhook-auth";
 import { postgrestQuery, supabaseRequest } from "./_shared/supabase";
 
 const requestEnvelopeSchema = z.union([
@@ -29,16 +30,6 @@ class SourceVerificationError extends Error {
     super(message);
     this.name = "SourceVerificationError";
   }
-}
-
-function authorized(request: Request, expectedSecret: string) {
-  const authorization = request.headers.get("authorization") ?? "";
-  const suppliedSecret = authorization.startsWith("Bearer ")
-    ? authorization.slice("Bearer ".length)
-    : "";
-  const supplied = Buffer.from(suppliedSecret);
-  const expected = Buffer.from(expectedSecret);
-  return supplied.length === expected.length && timingSafeEqual(supplied, expected);
 }
 
 async function verifiedSource(input: z.infer<typeof connieSocialRequestSchema>) {
@@ -239,10 +230,33 @@ async function storeResult(source: RegisteredSource, run: IngestRun, result: Con
   return { stored: Boolean(socialPost), duplicate, reviewItemCreated: Boolean(socialPost) };
 }
 
-export default async function connieSocial(request: Request) {
+async function processAnalysis(
+  input: z.infer<typeof connieSocialRequestSchema>,
+  source: RegisteredSource,
+  run: IngestRun,
+) {
+  try {
+    const result = await analyzeWithConnie(input);
+    assertResultMatchesInput(input, result);
+    await storeResult(source, run, result);
+  } catch (error) {
+    await updateRun(run.id, {
+      status: "failed",
+      finished_at: new Date().toISOString(),
+      error_count: 1,
+      details: {
+        collector: "connie_social_mcp",
+        error: error instanceof Error ? error.message.slice(0, 1_000) : "Okänt fel",
+      },
+    }).catch(() => undefined);
+    console.error("Connie Social background analysis failed", error instanceof Error ? error.message : error);
+  }
+}
+
+export default async function connieSocial(request: Request, context: Context) {
   const webhookSecret = Netlify.env.get("CONNIE_WEBHOOK_SECRET")?.trim();
   if (!webhookSecret) return new Response("Connie Social is not configured", { status: 503 });
-  if (!authorized(request, webhookSecret)) return new Response("Unauthorized", { status: 401 });
+  if (!authorizedConnieWebhook(request, webhookSecret)) return new Response("Unauthorized", { status: 401 });
   if (Netlify.env.get("CONNIE_SOCIAL_ENABLED") !== "true") {
     return Response.json({ error: "Connie Social is not enabled" }, { status: 409 });
   }
@@ -279,18 +293,13 @@ export default async function connieSocial(request: Request) {
       });
     }
 
-    const result = await analyzeWithConnie(input);
-    assertResultMatchesInput(input, result);
-    const storage = await storeResult(source, run, result);
+    context.waitUntil(processAnalysis(input, source, run));
     return Response.json({
       run_id: run.id,
-      connie_run_id: result.run_id,
-      status: result.status,
-      provider: result.provider,
-      model: result.model,
-      usage: result.usage,
-      ...storage,
-    });
+      status: "accepted",
+      status_url: `/api/connie/social/runs/${run.id}`,
+      automatic_x_collection: false,
+    }, { status: 202 });
   } catch (error) {
     if (run) {
       await updateRun(run.id, {
