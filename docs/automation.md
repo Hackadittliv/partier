@@ -32,6 +32,8 @@ Följande hemligheter ska läggas in för funktionernas körningsmiljö i Netlif
 
 6. `SAKFRAGAN_MANUAL_TRIGGER_SECRET`
 
+Connie Social använder dessutom de serverhemligheter som listas i `docs/connie-social.md`. De är separerade från Firecrawl-hemligheterna.
+
 Sätt `SAKFRAGAN_AUTOMATION_ENABLED` till `true` först när övriga variabler är konfigurerade och schemat är exponerat i Supabase Data API. Fram till dess kan koden publiceras utan att den schemalagda kontrollen försöker starta en hämtning.
 
 ## Manuell verifiering

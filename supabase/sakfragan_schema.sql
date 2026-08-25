@@ -153,14 +153,38 @@ create table if not exists sakfragan.party_positions (
 create table if not exists sakfragan.social_posts (
   id uuid primary key default gen_random_uuid(),
   source_id uuid references sakfragan.sources(id) on delete restrict,
+  ingest_run_id uuid references sakfragan.ingest_runs(id) on delete set null,
   party_id text not null references sakfragan.parties(id) on delete restrict,
   platform text not null,
   external_post_id text not null,
   url text not null,
+  author_handle text,
   author_name text,
+  account_type text check (account_type is null or account_type = 'central_party'),
   body text,
-  published_at timestamptz not null,
+  published_at timestamptz,
   collected_at timestamptz not null default now(),
+  post_type text check (post_type is null or post_type in ('original', 'thread', 'quote', 'reply')),
+  thread_id text,
+  topic_ids text[] not null default '{}',
+  statement_type text check (
+    statement_type is null or statement_type in (
+      'policy_position',
+      'election_pledge',
+      'proposal',
+      'reaction',
+      'government_statement',
+      'campaign_message',
+      'correction',
+      'other'
+    )
+  ),
+  source_query text,
+  confidence numeric(4, 3) check (confidence is null or confidence between 0 and 1),
+  provider text,
+  model text,
+  raw_evidence text,
+  media_urls text[] not null default '{}',
   content_hash text,
   metrics jsonb not null default '{}'::jsonb,
   review_status text not null default 'unreviewed'
@@ -232,6 +256,9 @@ create unique index if not exists detected_changes_transition_uq
 
 create index if not exists social_posts_party_published_idx
   on sakfragan.social_posts (party_id, published_at desc);
+
+create index if not exists social_posts_ingest_run_idx
+  on sakfragan.social_posts (ingest_run_id);
 
 create index if not exists link_checks_source_checked_idx
   on sakfragan.link_checks (source_id, checked_at desc);
