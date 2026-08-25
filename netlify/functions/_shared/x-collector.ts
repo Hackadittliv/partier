@@ -225,7 +225,23 @@ export function scheduledStockholmSlot(now: Date) {
   return `${localDate}T${String(hour).padStart(2, "0")}:00+Europe/Stockholm`;
 }
 
-export function configuredSourceCost(postsRead: number, costPerPostUsd: number | null) {
-  if (costPerPostUsd === null) return null;
-  return Number((postsRead * costPerPostUsd).toFixed(8));
+export type XResourceCounts = {
+  posts: number;
+  users: number;
+  media: number;
+};
+
+export type XResourceRates = {
+  postUsd: number | null;
+  userUsd: number | null;
+  mediaUsd: number | null;
+};
+
+export function configuredSourceCost(counts: XResourceCounts, rates: XResourceRates) {
+  if (rates.postUsd === null || rates.userUsd === null || rates.mediaUsd === null) return null;
+  return Number((
+    counts.posts * rates.postUsd
+    + counts.users * rates.userUsd
+    + counts.media * rates.mediaUsd
+  ).toFixed(8));
 }

@@ -123,6 +123,15 @@ test("schemalägger enligt svensk tid och går ned till en gång per dygn efter 
 });
 
 test("rapporterar bara källkostnad när en aktuell enhetskostnad är konfigurerad", () => {
-  assert.equal(configuredSourceCost(14, null), null);
-  assert.equal(configuredSourceCost(14, 0.001), 0.014);
+  const resources = { posts: 14, users: 3, media: 2 };
+  assert.equal(configuredSourceCost(resources, {
+    postUsd: null,
+    userUsd: 0.01,
+    mediaUsd: 0.005,
+  }), null);
+  assert.equal(configuredSourceCost(resources, {
+    postUsd: 0.005,
+    userUsd: 0.01,
+    mediaUsd: 0.005,
+  }), 0.11);
 });

@@ -54,7 +54,9 @@ Valfria kostnads- och volymgränser:
 
 - `CONNIE_SOCIAL_X_MAX_POSTS_PER_RUN` — hårt tak, standard 20 och maximalt 100.
 - `X_API_INITIAL_LOOKBACK_HOURS` — första körningens intervall, standard 6 och maximalt 168.
-- `X_API_COST_USD_PER_POST` — aktuell avtalskostnad per läst post. Om värdet saknas loggas antal API-anrop och lästa poster, men kostnaden visas som okänd i stället för ett påhittat belopp.
+- `X_API_COST_USD_PER_POST`, `X_API_COST_USD_PER_USER` och `X_API_COST_USD_PER_MEDIA` — aktuella enhetspriser från X. Om något värde saknas loggas resursantalen, men uppskattningen visas som okänd i stället för ett påhittat belopp.
+
+X kan deduplicera samma lästa resurs inom ett UTC-dygn. Därför märks den beräknade summan uttryckligen som en uppskattning före dygnsdeduplicering. Den debiterade källkostnaden stäms av mot X Developer Console; Connies modellkostnad kommer separat från Hermes faktiska usage-logg.
 
 Variablerna får inte heta `NEXT_PUBLIC_*` och får aldrig skrivas i Git, chatt eller logg.
 
