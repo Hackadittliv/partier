@@ -7,6 +7,16 @@ export class MissingEnvironmentVariableError extends Error {
   }
 }
 
+export class SupabaseRequestError extends Error {
+  status: number;
+
+  constructor(status: number, method: string, resource: string, responseText: string) {
+    super(`Supabase svarade med ${status} för ${method} ${resource}: ${responseText.slice(0, 500)}`);
+    this.name = "SupabaseRequestError";
+    this.status = status;
+  }
+}
+
 function requiredEnvironmentVariable(name: string) {
   const value = Netlify.env.get(name)?.trim();
 
@@ -48,9 +58,7 @@ export async function supabaseRequest<T>(
   const responseText = await response.text();
 
   if (!response.ok) {
-    throw new Error(
-      `Supabase svarade med ${response.status} för ${method} ${resource}: ${responseText.slice(0, 500)}`,
-    );
+    throw new SupabaseRequestError(response.status, method, resource, responseText);
   }
 
   if (!responseText) {

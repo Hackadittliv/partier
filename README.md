@@ -36,4 +36,4 @@ Materialet bygger på partiernas officiella program, valmanifest och politiksido
 
 Den löpande källkontrollen dokumenteras i `docs/automation.md`.
 
-Connie Social-kopplingen dokumenteras i `docs/connie-social.md`. Automatisk X-insamling och automatisk publicering är avstängda i pilotläget.
+Connie Social-kopplingen och den spärrade X API-kollektorn dokumenteras i `docs/connie-social.md`. Automatisk X-insamling och automatisk publicering är avstängda i pilotläget.
