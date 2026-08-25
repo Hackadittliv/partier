@@ -54,13 +54,15 @@ export type XCollectionResult = {
   collectionSlot?: string;
   accountsChecked: number;
   postsRead: number;
+  usersRead: number;
+  mediaRead: number;
   postsFound: number;
   postsQueued: number;
   duplicatesSkipped: number;
   failedToQueue: number;
   sourceRequests: number;
-  sourceCostUsd: number | null;
-  sourceCostConfigured: boolean;
+  sourceCostEstimateUsd: number | null;
+  sourceCostEstimateBasis: "configured_resource_rates_before_daily_dedup" | "not_configured";
   newestExternalPostId: string | null;
   childRunIds: string[];
   message?: string;
@@ -90,14 +92,22 @@ function numberEnvironmentVariable(name: string, fallback: number, min: number, 
   return parsed;
 }
 
-function optionalCostPerPost() {
-  const raw = Netlify.env.get("X_API_COST_USD_PER_POST")?.trim();
+function optionalResourceRate(name: string) {
+  const raw = Netlify.env.get(name)?.trim();
   if (!raw) return null;
   const parsed = Number(raw);
   if (!Number.isFinite(parsed) || parsed < 0) {
-    throw new Error("Miljövariabeln X_API_COST_USD_PER_POST måste vara ett positivt tal.");
+    throw new Error(`Miljövariabeln ${name} måste vara ett positivt tal.`);
   }
   return parsed;
+}
+
+function configuredResourceRates() {
+  return {
+    postUsd: optionalResourceRate("X_API_COST_USD_PER_POST"),
+    userUsd: optionalResourceRate("X_API_COST_USD_PER_USER"),
+    mediaUsd: optionalResourceRate("X_API_COST_USD_PER_MEDIA"),
+  };
 }
 
 async function verifiedAccounts(includeDisabled: boolean) {
@@ -297,9 +307,14 @@ function runDetails(
     source_usage: {
       provider: "x_api_v2",
       requests: result.sourceRequests,
-      posts_read: result.postsRead,
-      cost_usd: result.sourceCostUsd,
-      cost_configured: result.sourceCostConfigured,
+      resources_read: {
+        posts: result.postsRead,
+        users: result.usersRead,
+        media: result.mediaRead,
+      },
+      estimated_cost_usd: result.sourceCostEstimateUsd,
+      estimate_basis: result.sourceCostEstimateBasis,
+      actual_cost_source: "x_developer_console",
     },
     newest_external_post_id: result.newestExternalPostId,
     child_run_ids: result.childRunIds,
@@ -320,13 +335,15 @@ export async function runXCollection(
       collectionSlot: options.collectionSlot,
       accountsChecked: 0,
       postsRead: 0,
+      usersRead: 0,
+      mediaRead: 0,
       postsFound: 0,
       postsQueued: 0,
       duplicatesSkipped: 0,
       failedToQueue: 0,
       sourceRequests: 0,
-      sourceCostUsd: null,
-      sourceCostConfigured: false,
+      sourceCostEstimateUsd: null,
+      sourceCostEstimateBasis: "not_configured",
       newestExternalPostId: null,
       childRunIds: [],
       message: options.dryRun
@@ -343,13 +360,15 @@ export async function runXCollection(
       collectionSlot: options.collectionSlot,
       accountsChecked: accounts.length,
       postsRead: 0,
+      usersRead: 0,
+      mediaRead: 0,
       postsFound: 0,
       postsQueued: 0,
       duplicatesSkipped: 0,
       failedToQueue: 0,
       sourceRequests: 0,
-      sourceCostUsd: null,
-      sourceCostConfigured: false,
+      sourceCostEstimateUsd: null,
+      sourceCostEstimateBasis: "not_configured",
       newestExternalPostId: null,
       childRunIds: [],
       message: "Den här schemaplatsen är redan hämtad eller pågår.",
@@ -389,8 +408,14 @@ export async function runXCollection(
     const items = mapRecentSearchResponse(parsed, accounts, sourceQuery).slice(0, requestedLimit);
     const latestId = newestPostId(items);
     const postsRead = parsed.meta?.result_count ?? parsed.data.length;
-    const costPerPost = optionalCostPerPost();
-    const sourceCostUsd = configuredSourceCost(postsRead, costPerPost);
+    const usersRead = parsed.includes?.users.length ?? 0;
+    const mediaRead = parsed.includes?.media.length ?? 0;
+    const resourceRates = configuredResourceRates();
+    const sourceCostEstimateUsd = configuredSourceCost({
+      posts: postsRead,
+      users: usersRead,
+      media: mediaRead,
+    }, resourceRates);
     const queued = options.dryRun
       ? { childRunIds: [], postsQueued: 0, duplicatesSkipped: 0, failedToQueue: 0 }
       : await queueWithConcurrency(
@@ -402,13 +427,17 @@ export async function runXCollection(
     const result = {
       accountsChecked: accounts.length,
       postsRead,
+      usersRead,
+      mediaRead,
       postsFound: items.length,
       postsQueued: queued.postsQueued,
       duplicatesSkipped: queued.duplicatesSkipped,
       failedToQueue: queued.failedToQueue,
       sourceRequests: 1,
-      sourceCostUsd,
-      sourceCostConfigured: costPerPost !== null,
+      sourceCostEstimateUsd,
+      sourceCostEstimateBasis: sourceCostEstimateUsd === null
+        ? "not_configured" as const
+        : "configured_resource_rates_before_daily_dedup" as const,
       newestExternalPostId: latestId,
       childRunIds: queued.childRunIds,
     };
