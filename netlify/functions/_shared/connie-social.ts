@@ -50,6 +50,40 @@ export const connieSocialRequestSchema = z.object({
 
 export type ConnieSocialRequest = z.infer<typeof connieSocialRequestSchema>;
 
+const connieSocialItemSchema = z.object({
+  party_id: z.string(),
+  platform: z.literal("x"),
+  external_post_id: z.string(),
+  url: z.url(),
+  author_handle: z.string(),
+  author_name: z.string(),
+  account_type: z.literal("central_party"),
+  account_url: z.url(),
+  verification_url: z.url(),
+  body: z.string(),
+  published_at: z.string().nullable(),
+  collected_at: z.string(),
+  post_type: z.enum(["original", "thread", "quote", "reply"]),
+  thread_id: z.string().nullable(),
+  topic_ids: z.array(topicSchema),
+  statement_type: statementTypeSchema,
+  source_query: z.string(),
+  metrics: z.record(z.string(), z.unknown()),
+  confidence: z.number().min(0).max(1),
+  uncertainty_reason: z.string().nullable(),
+  provider: z.string(),
+  model: z.string(),
+  raw_evidence: z.string(),
+  media_urls: z.array(z.url()),
+});
+
+const usageSchema = z.object({
+  input_tokens: z.number().int().nonnegative(),
+  output_tokens: z.number().int().nonnegative(),
+  cost_usd: z.number().nonnegative(),
+  latency_ms: z.number().int().nonnegative(),
+});
+
 export const connieSocialResultSchema = z.object({
   run_id: z.uuid(),
   agent: z.literal("Connie Social"),
@@ -58,41 +92,25 @@ export const connieSocialResultSchema = z.object({
   model: z.string(),
   collected_at: z.string(),
   status: z.enum(["classified", "needs_review", "irrelevant"]),
-  items: z.array(z.object({
-    party_id: z.string(),
-    platform: z.literal("x"),
-    external_post_id: z.string(),
-    url: z.url(),
-    author_handle: z.string(),
-    author_name: z.string(),
-    account_type: z.literal("central_party"),
-    account_url: z.url(),
-    verification_url: z.url(),
-    body: z.string(),
-    published_at: z.string().nullable(),
-    collected_at: z.string(),
-    post_type: z.enum(["original", "thread", "quote", "reply"]),
-    thread_id: z.string().nullable(),
-    topic_ids: z.array(topicSchema),
-    statement_type: statementTypeSchema,
-    source_query: z.string(),
-    metrics: z.record(z.string(), z.unknown()),
-    confidence: z.number().min(0).max(1),
-    uncertainty_reason: z.string().nullable(),
-    provider: z.string(),
-    model: z.string(),
-    raw_evidence: z.string(),
-    media_urls: z.array(z.url()),
-  })).max(1),
-  usage: z.object({
-    input_tokens: z.number().int().nonnegative(),
-    output_tokens: z.number().int().nonnegative(),
-    cost_usd: z.number().nonnegative(),
-    latency_ms: z.number().int().nonnegative(),
-  }),
+  items: z.array(connieSocialItemSchema).max(1),
+  usage: usageSchema,
 });
 
 export type ConnieSocialResult = z.infer<typeof connieSocialResultSchema>;
+
+export const connieSocialBatchResultSchema = z.object({
+  run_id: z.uuid(),
+  agent: z.literal("Connie Social"),
+  platform: z.literal("x"),
+  provider: z.string(),
+  model: z.string(),
+  collected_at: z.string(),
+  status: z.enum(["classified", "needs_review", "irrelevant"]),
+  items: z.array(connieSocialItemSchema).max(10),
+  usage: usageSchema,
+});
+
+export type ConnieSocialBatchResult = z.infer<typeof connieSocialBatchResultSchema>;
 
 const capabilitiesSchema = z.object({
   service: z.literal("Connie Social"),
@@ -150,5 +168,28 @@ export async function analyzeWithConnie(post: ConnieSocialRequest) {
     );
     if (result.isError) throw new Error("Connie Social returnerade ett verktygsfel.");
     return connieSocialResultSchema.parse(result.structuredContent);
+  });
+}
+
+export async function analyzeBatchWithConnie(posts: ConnieSocialRequest[]) {
+  const items = z.array(connieSocialRequestSchema).min(1).max(10).parse(posts);
+  return withConnieClient(async (client) => {
+    const capabilitiesResult = await client.callTool(
+      { name: "connie_social_capabilities", arguments: {} },
+      undefined,
+      { timeout: 10_000 },
+    );
+    const capabilities = capabilitiesSchema.parse(capabilitiesResult.structuredContent);
+    if (!capabilities.analysis_available) {
+      throw new Error("Connie Social saknar en aktiv Grok/OpenAI-kedja.");
+    }
+
+    const result = await client.callTool(
+      { name: "connie_social_analyze_batch", arguments: { items } },
+      undefined,
+      { timeout: 50_000 },
+    );
+    if (result.isError) throw new Error("Connie Social returnerade ett batchverktygsfel.");
+    return connieSocialBatchResultSchema.parse(result.structuredContent);
   });
 }

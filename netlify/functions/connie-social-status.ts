@@ -42,9 +42,9 @@ export default async function connieSocialStatus(request: Request, context: Cont
   const postQuery = postgrestQuery({
     select: "id,url,review_status,provider,model",
     ingest_run_id: `eq.${run.id}`,
-    limit: "1",
+    limit: "10",
   });
-  const [post] = await supabaseRequest<SocialPostStatus[]>(`social_posts?${postQuery}`);
+  const posts = await supabaseRequest<SocialPostStatus[]>(`social_posts?${postQuery}`);
 
   return Response.json({
     run_id: run.id,
@@ -55,7 +55,8 @@ export default async function connieSocialStatus(request: Request, context: Cont
     posts_stored: run.sources_changed,
     error_count: run.error_count,
     details: run.details,
-    result: post ?? null,
+    result: posts[0] ?? null,
+    results: posts,
   });
 }
 

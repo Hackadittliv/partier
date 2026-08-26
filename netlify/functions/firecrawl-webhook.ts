@@ -1,43 +1,21 @@
 import type { Config } from "@netlify/functions";
 
 import {
-  contentHash,
-  normalizeSourceMarkdown,
   type FirecrawlPage,
   type FirecrawlWebhook,
   verifyFirecrawlSignature,
 } from "./_shared/firecrawl";
+import { ingestSourceContent, type SourceRecord } from "./_shared/source-ingestion";
 import { postgrestQuery, supabaseRequest } from "./_shared/supabase";
-
-type Source = {
-  id: string;
-  party_id: string;
-  canonical_url: string;
-  consecutive_failures: number;
-};
-
-type Snapshot = {
-  id: string;
-  content_hash: string;
-  content_markdown: string | null;
-};
-
-type DetectedChange = {
-  id: string;
-};
 
 type IngestRunState = {
   details: Record<string, unknown>;
   sources_total: number;
 };
 
-type LinkCheckState = {
-  ok: boolean;
-};
-
-type SnapshotReference = {
-  id: string;
-};
+type LinkCheckState = { ok: boolean };
+type SnapshotReference = { id: string };
+type DetectedChange = { id: string };
 
 function firstString(...values: unknown[]) {
   return values.find((value): value is string => typeof value === "string" && value.length > 0);
@@ -45,174 +23,57 @@ function firstString(...values: unknown[]) {
 
 async function findSource(sourceUrl: string) {
   const query = postgrestQuery({
-    select: "id,party_id,canonical_url,consecutive_failures",
+    select: "id,party_id,canonical_url,check_frequency,consecutive_failures,metadata",
     canonical_url: `eq.${sourceUrl}`,
     limit: "1",
   });
-  const [source] = await supabaseRequest<Source[]>(`sources?${query}`);
+  const [source] = await supabaseRequest<SourceRecord[]>(`sources?${query}`);
   return source;
-}
-
-async function latestSnapshot(sourceId: string) {
-  const query = postgrestQuery({
-    select: "id,content_hash,content_markdown",
-    source_id: `eq.${sourceId}`,
-    order: "fetched_at.desc",
-    limit: "1",
-  });
-  const [snapshot] = await supabaseRequest<Snapshot[]>(`source_snapshots?${query}`);
-  return snapshot;
-}
-
-async function snapshotByHash(sourceId: string, hash: string) {
-  const query = postgrestQuery({
-    select: "id,content_hash,content_markdown",
-    source_id: `eq.${sourceId}`,
-    content_hash: `eq.${hash}`,
-    limit: "1",
-  });
-  const [snapshot] = await supabaseRequest<Snapshot[]>(`source_snapshots?${query}`);
-  return snapshot;
 }
 
 async function processPage(page: FirecrawlPage, ingestRunId?: string) {
   const sourceUrl = firstString(page.metadata?.sourceURL, page.metadata?.url);
-
-  if (!sourceUrl) {
-    throw new Error("Firecrawl resultatet saknar källadress.");
-  }
+  if (!sourceUrl) throw new Error("Firecrawl resultatet saknar källadress.");
 
   const source = await findSource(sourceUrl);
-
-  if (!source) {
-    throw new Error(`Källan finns inte registrerad: ${sourceUrl}`);
-  }
+  if (!source) throw new Error(`Källan finns inte registrerad: ${sourceUrl}`);
 
   const statusCode = typeof page.metadata?.statusCode === "number" ? page.metadata.statusCode : null;
   const ok = statusCode === null || (statusCode >= 200 && statusCode < 400);
   const finalUrl = firstString(page.metadata?.url, page.metadata?.sourceURL) ?? sourceUrl;
-  const now = new Date();
-  const nextCheck = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-  await supabaseRequest("link_checks", {
-    method: "POST",
-    prefer: "return=minimal",
-    body: {
-      source_id: source.id,
-      ingest_run_id: ingestRunId,
-      checked_at: now.toISOString(),
-      status_code: statusCode,
-      final_url: finalUrl,
-      ok,
-      error_message: page.metadata?.error ?? null,
-      metadata: { provider: "firecrawl" },
-    },
+  return ingestSourceContent({
+    source,
+    ingestRunId,
+    statusCode,
+    finalUrl,
+    ok,
+    provider: "firecrawl",
+    errorMessage: page.metadata?.error ?? null,
+    markdown: page.markdown ?? "",
+    title: page.metadata?.title ?? null,
+    rawMetadata: { page_metadata: page.metadata ?? {} },
   });
+}
 
-  const markdown = page.markdown?.trim() ?? "";
+async function firecrawlCreditsUsed(payload: FirecrawlWebhook) {
+  if (typeof payload.creditsUsed === "number") return payload.creditsUsed;
+  if (!payload.id) return null;
 
-  if (!markdown) {
-    const updateQuery = postgrestQuery({ id: `eq.${source.id}` });
-    await supabaseRequest(`sources?${updateQuery}`, {
-      method: "PATCH",
-      prefer: "return=minimal",
-      body: {
-        last_checked_at: now.toISOString(),
-        last_status_code: statusCode,
-        last_final_url: finalUrl,
-        next_check_at: nextCheck.toISOString(),
-        consecutive_failures: ok ? 0 : source.consecutive_failures + 1,
-        ...(ok ? { last_success_at: now.toISOString() } : {}),
-      },
+  const apiKey = Netlify.env.get("FIRECRAWL_API_KEY")?.trim();
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch(`https://api.firecrawl.dev/v2/batch/scrape/${payload.id}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(10_000),
     });
-    return false;
+    if (!response.ok) return null;
+    const result = await response.json() as { creditsUsed?: number };
+    return typeof result.creditsUsed === "number" ? result.creditsUsed : null;
+  } catch {
+    return null;
   }
-
-  const normalizedMarkdown = normalizeSourceMarkdown(markdown);
-  const hash = contentHash(normalizedMarkdown);
-  const previous = await latestSnapshot(source.id);
-  let snapshot = await snapshotByHash(source.id, hash);
-
-  if (!snapshot) {
-    const [created] = await supabaseRequest<Snapshot[]>("source_snapshots", {
-      method: "POST",
-      prefer: "resolution=ignore-duplicates,return=representation",
-      body: {
-        source_id: source.id,
-        ingest_run_id: ingestRunId,
-        fetched_at: now.toISOString(),
-        title: page.metadata?.title ?? null,
-        content_text: page.summary ?? null,
-        content_markdown: markdown,
-        content_hash: hash,
-        raw_metadata: {
-          provider: "firecrawl",
-          page_metadata: page.metadata ?? {},
-          change_tracking: page.changeTracking ?? {},
-        },
-      },
-    });
-    snapshot = created ?? (await snapshotByHash(source.id, hash));
-  }
-
-  if (!snapshot) {
-    throw new Error(`Kunde inte spara ögonblicksbild för ${sourceUrl}`);
-  }
-
-  const previousHash = previous?.content_markdown
-    ? contentHash(normalizeSourceMarkdown(previous.content_markdown))
-    : previous?.content_hash;
-  const changed = Boolean(previous && previousHash !== hash);
-
-  if (changed) {
-    const [change] = await supabaseRequest<DetectedChange[]>("detected_changes", {
-      method: "POST",
-      prefer: "resolution=ignore-duplicates,return=representation",
-      body: {
-        source_id: source.id,
-        before_snapshot_id: previous?.id ?? null,
-        after_snapshot_id: snapshot.id,
-        change_kind: "content",
-        materiality: "unknown",
-        summary: "Källans innehåll har ändrats och väntar på granskning.",
-        diff_text: page.changeTracking?.diff ?? null,
-        status: "pending",
-      },
-    });
-
-    if (change) {
-      await supabaseRequest("review_items", {
-        method: "POST",
-        prefer: "resolution=ignore-duplicates,return=minimal",
-        body: {
-          item_kind: "change",
-          item_id: change.id,
-          party_id: source.party_id,
-          title: `Ny källändring för ${page.metadata?.title ?? sourceUrl}`,
-          rationale: "Ändringen måste bedömas innan någon partiståndpunkt uppdateras.",
-          priority: 70,
-          status: "pending",
-        },
-      });
-    }
-  }
-
-  const sourceUpdateQuery = postgrestQuery({ id: `eq.${source.id}` });
-  await supabaseRequest(`sources?${sourceUpdateQuery}`, {
-    method: "PATCH",
-    prefer: "return=minimal",
-    body: {
-      last_checked_at: now.toISOString(),
-      next_check_at: nextCheck.toISOString(),
-      last_status_code: statusCode,
-      last_final_url: finalUrl,
-      last_content_hash: hash,
-      consecutive_failures: ok ? 0 : source.consecutive_failures + 1,
-      ...(ok ? { last_success_at: now.toISOString() } : {}),
-    },
-  });
-
-  return changed;
 }
 
 async function finishRun(ingestRunId: string, payload: FirecrawlWebhook) {
@@ -221,18 +82,13 @@ async function finishRun(ingestRunId: string, payload: FirecrawlWebhook) {
     id: `eq.${ingestRunId}`,
     limit: "1",
   });
-  const linkQuery = postgrestQuery({
-    select: "ok",
-    ingest_run_id: `eq.${ingestRunId}`,
-  });
-  const snapshotQuery = postgrestQuery({
-    select: "id",
-    ingest_run_id: `eq.${ingestRunId}`,
-  });
-  const [[run], linkChecks, snapshots] = await Promise.all([
+  const linkQuery = postgrestQuery({ select: "ok", ingest_run_id: `eq.${ingestRunId}` });
+  const snapshotQuery = postgrestQuery({ select: "id", ingest_run_id: `eq.${ingestRunId}` });
+  const [[run], linkChecks, snapshots, creditsUsed] = await Promise.all([
     supabaseRequest<IngestRunState[]>(`ingest_runs?${runQuery}`),
     supabaseRequest<LinkCheckState[]>(`link_checks?${linkQuery}`),
     supabaseRequest<SnapshotReference[]>(`source_snapshots?${snapshotQuery}`),
+    firecrawlCreditsUsed(payload),
   ]);
   const successfulSources = linkChecks.filter((check) => check.ok).length;
   const failedChecks = linkChecks.length - successfulSources;
@@ -252,7 +108,6 @@ async function finishRun(ingestRunId: string, payload: FirecrawlWebhook) {
 
   const status = upstreamFailed ? "failed" : errorCount > 0 ? "partial" : "succeeded";
   const query = postgrestQuery({ id: `eq.${ingestRunId}` });
-
   await supabaseRequest(`ingest_runs?${query}`, {
     method: "PATCH",
     prefer: "return=minimal",
@@ -266,6 +121,7 @@ async function finishRun(ingestRunId: string, payload: FirecrawlWebhook) {
         ...(run?.details ?? {}),
         firecrawl_job_id: payload.id,
         firecrawl_event: payload.type,
+        firecrawl_credits_used: creditsUsed,
         error: payload.error ?? null,
       },
     },
@@ -273,19 +129,13 @@ async function finishRun(ingestRunId: string, payload: FirecrawlWebhook) {
 }
 
 export default async function firecrawlWebhook(request: Request) {
-  if (request.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
-  }
+  if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   const webhookSecret = Netlify.env.get("FIRECRAWL_WEBHOOK_SECRET")?.trim();
-
-  if (!webhookSecret) {
-    return new Response("Webhook is not configured", { status: 503 });
-  }
+  if (!webhookSecret) return new Response("Webhook is not configured", { status: 503 });
 
   const rawBody = await request.text();
   const signature = request.headers.get("x-firecrawl-signature");
-
   if (!verifyFirecrawlSignature(rawBody, signature, webhookSecret)) {
     return new Response("Invalid signature", { status: 401 });
   }
@@ -295,14 +145,12 @@ export default async function firecrawlWebhook(request: Request) {
 
   try {
     if (payload.type === "batch_scrape.page") {
-      for (const page of payload.data ?? []) {
-        await processPage(page, ingestRunId);
-      }
+      for (const page of payload.data ?? []) await processPage(page, ingestRunId);
     }
 
     if (
-      ingestRunId &&
-      (payload.type === "batch_scrape.completed" || payload.type === "batch_scrape.failed")
+      ingestRunId
+      && (payload.type === "batch_scrape.completed" || payload.type === "batch_scrape.failed")
     ) {
       await finishRun(ingestRunId, payload);
     }

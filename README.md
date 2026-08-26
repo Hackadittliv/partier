@@ -16,7 +16,7 @@ Sakfrågan gör svensk politik sökbar, jämförbar och begriplig. Tjänsten pre
 
 6. Lägga källändringar i en mänsklig granskningskö före publicering
 
-7. Ta emot ett manuellt verifierat X-inlägg, analysera det via Connie Social MCP och lägga resultatet i samma granskningskö
+7. Ta emot verifierade X-inlägg, förfiltrera dem med kod, analysera dem kostnadseffektivt i batch via Connie Social MCP och lägga resultatet i samma granskningskö
 
 ## Lokal utveckling
 

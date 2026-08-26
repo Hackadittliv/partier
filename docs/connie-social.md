@@ -4,11 +4,11 @@ Sakfrågan använder Connie Social som en privat, serverbaserad MCP-tjänst. Web
 
 ## Pilotflöde
 
-1. En driftbehörig källa skickar ett enda verifierat X-inlägg till `POST /api/connie/social`.
+1. En driftbehörig källa skickar ett verifierat X-inlägg till `POST /api/connie/social` eller högst tio inlägg till `POST /api/connie/social/batch`.
 
 2. Netlify-funktionen kontrollerar Bearer-hemligheten och matchar kontot mot ett aktivt, officiellt och verifierat socialt konto i `sakfragan.sources`.
 
-3. Funktionen anropar `connie_social_capabilities` och därefter `connie_social_analyze_post` på Hermes MCP.
+3. Funktionen anropar `connie_social_capabilities` och därefter `connie_social_analyze_post` eller `connie_social_analyze_batch` på Hermes MCP.
 
 4. Connie använder Grok OAuth primärt och OpenAI OAuth som fallback. OpenRouter ligger sist endast om pilotkedjan redan innehåller den vägen.
 
@@ -27,7 +27,7 @@ Grok- och OpenAI-OAuth används för analys, inte för att läsa X. Automatisk i
 3. X-svarets användarnamn måste fortfarande matcha kontoregistret,
 4. första körningen tittar som standard sex timmar bakåt och efterföljande körningar använder `since_id`,
 5. högst 20 poster behandlas per körning om inget lägre tak anges,
-6. varje original köas till den befintliga Connie-endpointen och hamnar därefter i granskningskön,
+6. uppenbart opolitiskt brus filtreras med kod före AI och återstående poster analyseras i små batcher,
 7. ingen post publiceras automatiskt.
 
 Kollektorn och varje konto har varsin spärr. `CONNIE_SOCIAL_COLLECTION_ENABLED` måste vara `true` och kontot måste ha `metadata.automatic_collection_enabled = true`. Båda är avstängda när koden först driftsätts.
@@ -53,10 +53,13 @@ Lägg följande endast i Netlifys servermiljö:
 Valfria kostnads- och volymgränser:
 
 - `CONNIE_SOCIAL_X_MAX_POSTS_PER_RUN` — hårt tak, standard 20 och maximalt 100.
+- `CONNIE_SOCIAL_X_MAX_POSTS_PER_DAY` — hårt dygnstak för lästa poster, standard 200.
+- `CONNIE_SOCIAL_X_DAILY_BUDGET_USD` — hårt uppskattat dygnstak innan X-anropet görs, standard 1 USD.
+- `CONNIE_SOCIAL_AI_BATCH_SIZE` — antal verifierade kandidater per AI-anrop, standard 8 och maximalt 10.
 - `X_API_INITIAL_LOOKBACK_HOURS` — första körningens intervall, standard 6 och maximalt 168.
 - `X_API_COST_USD_PER_POST`, `X_API_COST_USD_PER_USER` och `X_API_COST_USD_PER_MEDIA` — aktuella enhetspriser från X. Om något värde saknas loggas resursantalen, men uppskattningen visas som okänd i stället för ett påhittat belopp.
 
-X kan deduplicera samma lästa resurs inom ett UTC-dygn. Därför märks den beräknade summan uttryckligen som en uppskattning före dygnsdeduplicering. Den debiterade källkostnaden stäms av mot X Developer Console; Connies modellkostnad kommer separat från Hermes faktiska usage-logg.
+X kan deduplicera samma lästa resurs inom ett UTC-dygn. Därför märks den beräknade summan uttryckligen som en uppskattning före dygnsdeduplicering. Systemet begränsar anropet innan det skickas, men den debiterade källkostnaden stäms fortfarande av mot X Developer Console; Connies modellkostnad kommer separat från Hermes faktiska usage-logg.
 
 Variablerna får inte heta `NEXT_PUBLIC_*` och får aldrig skrivas i Git, chatt eller logg.
 
