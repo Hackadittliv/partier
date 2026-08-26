@@ -10,10 +10,10 @@ export type Party = {
   status: "Aktuellt valmanifest" | "Aktuella vallöften" | "Valprogram publiceras löpande" | "Programmaterial granskas";
   priorities: string[];
   positions: Record<string, string>;
-  sources: { title: string; url: string }[];
+  sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "23 augusti 2026";
+export const lastUpdated = "26 augusti 2026";
 export const electionDate = "13 september 2026";
 
 export const topics = [
@@ -111,12 +111,12 @@ export const parties: Party[] = [
   },
   {
     id: "moderaterna", name: "Moderaterna", short: "M", color: "#2a78b8", emblem: "/emblems/moderaterna.png", group: "riksdag", ideology: "Liberalkonservativt", status: "Aktuella vallöften",
-    overview: "Moderaterna prioriterar lägre skatt på arbete, hårdare brottsbekämpning, stram migration, valfrihet i välfärden och ett starkare försvar.",
-    priorities: ["Fortsätt sänka skatten på arbete och pension.", "Stärk polis, domstolar och kriminalvård.", "Behåll en stram migrationspolitik med tydliga krav.", "Bygg ny kärnkraft och förstärk försvaret."],
+    overview: "Moderaterna prioriterar stärkt familjeekonomi, lägre skatt på arbete, hårdare brottsbekämpning, stram migration, valfrihet i välfärden och ett starkare försvar.",
+    priorities: ["Sänk skatten för arbetande föräldrar och avskaffa avgiften för förskola och fritidshem.", "Stärk polis, domstolar och kriminalvård.", "Behåll en stram migrationspolitik med tydliga krav.", "Bygg ny kärnkraft och förstärk försvaret."],
     positions: {
-      ekonomi: "Sänk skatten på arbete, pension och företagande. Fler ska gå från bidrag till arbete genom tydliga krav, utbildning och en starkare arbetslinje.",
+      ekonomi: "Sänk skatten på arbete, pension och företagande, särskilt för arbetande föräldrar. Höj gränsen för skattefritt sparande och stärk arbetslinjen.",
       vard: "Försvara valfrihet och privata utförare med skärpt kvalitetskontroll. Korta vårdköer och prioritera kärnverksamhet framför administration.",
-      skola: "Återupprätta kunskap, ordning och lärarnas auktoritet. Stärk statens kontroll av kvaliteten och behåll skolvalet.",
+      skola: "Återupprätta kunskap, ordning och lärarnas auktoritet. Stärk statens kvalitetskontroll, behåll skolvalet och avskaffa avgiften för förskola och fritidshem.",
       brott: "Bygg ut polis, domstolar och kriminalvård. Skärp straff, slå mot gängens ekonomi och ge rättsväsendet fler verktyg.",
       migration: "Behåll en stram migrationspolitik och skärp kraven för medborgarskap, egen försörjning och integration. Utvisning ska användas mer vid brott.",
       klimat: "Minska utsläpp genom teknik, elektrifiering och investeringar som bevarar konkurrenskraft. Klimatpolitiken ska vara kostnadseffektiv.",
@@ -132,14 +132,14 @@ export const parties: Party[] = [
   {
     id: "socialdemokraterna", name: "Socialdemokraterna", short: "S", color: "#d82c38", emblem: "/emblems/socialdemokraterna.png", group: "riksdag", ideology: "Socialdemokratiskt", status: "Aktuella vallöften",
     overview: "Socialdemokraterna vill prioritera hushållens ekonomi, starkare välfärd, fler jobb genom industriinvesteringar och en offensiv mot organiserad brottslighet.",
-    priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Investera i industri, energi, bostäder och infrastruktur."],
+    priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Slut en tillväxtpakt med näringslivet för fler jobb, investeringar och lägre utsläpp."],
     positions: {
-      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Investera i industri, utbildning och infrastruktur för full sysselsättning.",
+      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet och investera i industri, utbildning och infrastruktur för fler jobb.",
       vard: "Ge välfärden mer resurser och offentlig kontroll. Korta vårdköer, stärk personalen och minska utrymmet för vinststyrning.",
       skola: "Stoppa vinstjakt i skola och förskola, öka likvärdigheten och stärk lärare, elevhälsa och tidigt stöd.",
       brott: "Slå mot maffialiknande strukturer och kriminell ekonomi med fler poliser och hårdare verktyg. Kombinera detta med socialtjänst, skola och områdespolitik.",
       migration: "Behåll en stram migrationslinje och ställ krav på svenska, arbete och integration. Samhället ska bryta segregation och trångboddhet.",
-      klimat: "Driv klimatomställning genom industripolitik, elektrifiering, investeringar och nya jobb. Staten ska dela risk och skynda på omställningen.",
+      klimat: "Driv klimatomställningen med gröna krediter, industristöd, elektrifierade transporter och offentlig upphandling. Gör kollektivtrafiken avgiftsfri för barn och unga på fritiden samt för heltidsstudenter under terminerna.",
       energi: "Bygg ut fossilfri el genom en teknikneutral mix av kärnkraft, vind, vatten och elnät. Staten ska ta större ansvar för energiplaneringen.",
       demokrati: "Stärk demokrati, civilsamhälle och totalförsvar. Fördjupa EU samarbetet där det stärker jobb och säkerhet och fortsätt stödet till Ukraina.",
       regering: "Partiet vill leda en ny regering under Magdalena Andersson med gemensamma reformer och ett stabilt regeringsunderlag.",
@@ -147,6 +147,7 @@ export const parties: Party[] = [
     sources: [
       { title: "Val 2026", url: "https://www.socialdemokraterna.se/val-2026" },
       { title: "Principer för en ny regering", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-03-magdalena-andersson-inleder-valturnen---presenterar-tre-principer-for-en-regering-ledd-av-henne" },
+      { title: "Vallöfte om jobb och klimat", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-25-s-vallofte-fler-jobb-och-lagre-klimatutslapp", publishedAt: "25 augusti 2026" },
     ],
   },
   {

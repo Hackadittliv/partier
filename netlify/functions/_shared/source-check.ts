@@ -58,6 +58,8 @@ export async function runSourceCheck(
   const dueQuery = postgrestQuery({
     select: "id,canonical_url",
     active: "eq.true",
+    official: "eq.true",
+    source_kind: "neq.social",
     or: `(next_check_at.is.null,next_check_at.lte.${now})`,
     order: "priority.desc",
     limit: "100",
@@ -69,19 +71,27 @@ export async function runSourceCheck(
     return { started: false, sourcesTotal: 0 };
   }
 
-  const [run] = await supabaseRequest<IngestRun[]>("ingest_runs", {
+  const idempotencyKey = triggerKind === "scheduled" ? `scheduled:${now.slice(0, 10)}` : null;
+  const runResource = idempotencyKey
+    ? "ingest_runs?on_conflict=idempotency_key"
+    : "ingest_runs";
+  const [run] = await supabaseRequest<IngestRun[]>(runResource, {
     method: "POST",
-    prefer: "return=representation",
+    prefer: idempotencyKey
+      ? "resolution=ignore-duplicates,return=representation"
+      : "return=representation",
     body: {
       trigger_kind: triggerKind,
       status: "running",
       sources_total: sources.length,
+      idempotency_key: idempotencyKey,
       details: { scheduler: "netlify", requested_at: now },
     },
   });
 
   if (!run) {
-    throw new Error("Kunde inte skapa en körningslogg i Supabase.");
+    console.log("Dagens schemalagda källkontroll har redan startats.");
+    return { started: false, sourcesTotal: 0 };
   }
 
   try {

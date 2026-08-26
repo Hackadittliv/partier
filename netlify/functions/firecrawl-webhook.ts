@@ -2,6 +2,7 @@ import type { Config } from "@netlify/functions";
 
 import {
   contentHash,
+  normalizeSourceMarkdown,
   type FirecrawlPage,
   type FirecrawlWebhook,
   verifyFirecrawlSignature,
@@ -18,6 +19,7 @@ type Source = {
 type Snapshot = {
   id: string;
   content_hash: string;
+  content_markdown: string | null;
 };
 
 type DetectedChange = {
@@ -53,7 +55,7 @@ async function findSource(sourceUrl: string) {
 
 async function latestSnapshot(sourceId: string) {
   const query = postgrestQuery({
-    select: "id,content_hash",
+    select: "id,content_hash,content_markdown",
     source_id: `eq.${sourceId}`,
     order: "fetched_at.desc",
     limit: "1",
@@ -64,7 +66,7 @@ async function latestSnapshot(sourceId: string) {
 
 async function snapshotByHash(sourceId: string, hash: string) {
   const query = postgrestQuery({
-    select: "id,content_hash",
+    select: "id,content_hash,content_markdown",
     source_id: `eq.${sourceId}`,
     content_hash: `eq.${hash}`,
     limit: "1",
@@ -126,7 +128,8 @@ async function processPage(page: FirecrawlPage, ingestRunId?: string) {
     return false;
   }
 
-  const hash = contentHash(markdown);
+  const normalizedMarkdown = normalizeSourceMarkdown(markdown);
+  const hash = contentHash(normalizedMarkdown);
   const previous = await latestSnapshot(source.id);
   let snapshot = await snapshotByHash(source.id, hash);
 
@@ -156,7 +159,10 @@ async function processPage(page: FirecrawlPage, ingestRunId?: string) {
     throw new Error(`Kunde inte spara ögonblicksbild för ${sourceUrl}`);
   }
 
-  const changed = Boolean(previous && previous.content_hash !== hash);
+  const previousHash = previous?.content_markdown
+    ? contentHash(normalizeSourceMarkdown(previous.content_markdown))
+    : previous?.content_hash;
+  const changed = Boolean(previous && previousHash !== hash);
 
   if (changed) {
     const [change] = await supabaseRequest<DetectedChange[]>("detected_changes", {

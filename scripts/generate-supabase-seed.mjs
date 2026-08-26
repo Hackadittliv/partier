@@ -65,7 +65,7 @@ const positionRows = parties.flatMap((party) =>
 
 const sourceKind = (title) => {
   const normalized = title.toLocaleLowerCase("sv");
-  if (normalized.includes("valmanifest") || normalized.includes("valplattform") || normalized.includes("vallöften")) {
+  if (normalized.includes("valmanifest") || normalized.includes("valplattform") || normalized.includes("vallöfte")) {
     return "manifesto";
   }
   if (normalized.includes("program")) {
