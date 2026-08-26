@@ -20,7 +20,7 @@ const xPostSchema = z.object({
   }).optional(),
 });
 
-const xUserSchema = z.object({
+export const xUserSchema = z.object({
   id: z.string(),
   name: z.string(),
   username: z.string(),
@@ -52,6 +52,15 @@ export const xRecentSearchResponseSchema = z.object({
   })).optional(),
 });
 
+export const xUsersByUsernameResponseSchema = z.object({
+  data: z.array(xUserSchema).optional().default([]),
+  errors: z.array(z.object({
+    title: z.string().optional(),
+    detail: z.string().optional(),
+    value: z.string().optional(),
+  })).optional(),
+});
+
 export type VerifiedXAccount = {
   sourceId: string;
   partyId: string;
@@ -60,6 +69,8 @@ export type VerifiedXAccount = {
   accountUrl: string;
   verificationUrl: string;
   automaticCollectionEnabled: boolean;
+  userId: string | null;
+  sourceMetadata: Record<string, unknown>;
 };
 
 export type CollectedXPost = {
@@ -101,6 +112,14 @@ export function buildOfficialAccountsQuery(accounts: VerifiedXAccount[]) {
   return query;
 }
 
+export function buildUsersByUsernameUrl(accounts: VerifiedXAccount[]) {
+  const usernames = [...new Set(accounts.map((account) => account.handle.replace(/^@/, "")))];
+  const url = new URL("https://api.x.com/2/users/by");
+  url.searchParams.set("usernames", usernames.join(","));
+  url.searchParams.set("user.fields", "id,name,username");
+  return url;
+}
+
 type RecentSearchUrlOptions = {
   accounts: VerifiedXAccount[];
   maxResults: number;
@@ -121,9 +140,6 @@ export function buildRecentSearchUrl({
     "tweet.fields",
     "attachments,author_id,conversation_id,created_at,edit_history_tweet_ids,in_reply_to_user_id,public_metrics,referenced_tweets",
   );
-  url.searchParams.set("expansions", "attachments.media_keys,author_id");
-  url.searchParams.set("user.fields", "id,name,username");
-  url.searchParams.set("media.fields", "media_key,preview_image_url,type,url");
   if (sinceId) url.searchParams.set("since_id", sinceId);
   else if (startTime) url.searchParams.set("start_time", startTime);
   return url;
@@ -143,25 +159,15 @@ export function mapRecentSearchResponse(
   accounts: VerifiedXAccount[],
   sourceQuery: string,
 ) {
-  const usersById = new Map((response.includes?.users ?? []).map((user) => [user.id, user]));
-  const mediaByKey = new Map((response.includes?.media ?? []).map((media) => [media.media_key, media]));
-  const accountsByHandle = new Map(
-    accounts.map((account) => [normalizedHandle(account.handle), account]),
+  const accountsByUserId = new Map(
+    accounts.flatMap((account) => account.userId ? [[account.userId, account] as const] : []),
   );
 
   const items = response.data.flatMap<CollectedXPost>((post) => {
     if (post.referenced_tweets?.some((reference) => reference.type === "retweeted")) return [];
 
-    const user = usersById.get(post.author_id);
-    if (!user) return [];
-    const account = accountsByHandle.get(normalizedHandle(user.username));
+    const account = accountsByUserId.get(post.author_id);
     if (!account) return [];
-
-    const mediaUrls = (post.attachments?.media_keys ?? []).flatMap((key) => {
-      const media = mediaByKey.get(key);
-      const url = media?.url ?? media?.preview_image_url;
-      return url ? [url] : [];
-    });
     const type = postType(post);
 
     return [{
@@ -170,7 +176,7 @@ export function mapRecentSearchResponse(
       external_post_id: post.id,
       url: `https://x.com/${account.handle}/status/${post.id}`,
       author_handle: account.handle,
-      author_name: user.name || account.partyName,
+      author_name: account.partyName,
       account_type: "central_party",
       account_url: account.accountUrl,
       verification_url: account.verificationUrl,
@@ -187,14 +193,40 @@ export function mapRecentSearchResponse(
           conversation_id: post.conversation_id ?? null,
           edit_history_post_ids: post.edit_history_tweet_ids ?? [post.id],
           referenced_posts: post.referenced_tweets ?? [],
+          media_keys: post.attachments?.media_keys ?? [],
         },
       },
-      media_urls: [...new Set(mediaUrls)],
+      media_urls: [],
     }];
   });
 
   items.sort((left, right) => comparePostIds(left.external_post_id, right.external_post_id));
   return items;
+}
+
+export function resolvedAccountUserIds(
+  response: z.infer<typeof xUsersByUsernameResponseSchema>,
+  accounts: VerifiedXAccount[],
+) {
+  const accountsByHandle = new Map(accounts.map((account) => [normalizedHandle(account.handle), account]));
+  return response.data.flatMap((user) => {
+    const account = accountsByHandle.get(normalizedHandle(user.username));
+    return account ? [{ account, user }] : [];
+  });
+}
+
+export function isLikelyRelevantSocialPost(post: Pick<CollectedXPost, "body" | "post_type">) {
+  const text = post.body
+    .replace(/https?:\/\/\S+/gi, " ")
+    .replace(/@[A-Za-z0-9_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLocaleLowerCase("sv");
+  if (!text) return false;
+  if (/\b(?:tävla|tävling|giveaway|vinn ett|vinn biljetter)\b/u.test(text)) return false;
+  if (/^(?:stort )?(?:grattis|tack|välkommen)[!. ]*$/u.test(text)) return false;
+  if (/^(?:glad|trevlig) (?:midsommar|jul|påsk|nationaldag|helg)[!. ]*$/u.test(text)) return false;
+  return true;
 }
 
 export function newestPostId(items: CollectedXPost[]) {

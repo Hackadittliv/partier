@@ -5,12 +5,16 @@ import { postgrestQuery, SupabaseRequestError, supabaseRequest } from "./supabas
 import {
   buildOfficialAccountsQuery,
   buildRecentSearchUrl,
+  buildUsersByUsernameUrl,
   configuredSourceCost,
+  isLikelyRelevantSocialPost,
   mapRecentSearchResponse,
   newestPostId,
+  resolvedAccountUserIds,
   type CollectedXPost,
   type VerifiedXAccount,
   xRecentSearchResponseSchema,
+  xUsersByUsernameResponseSchema,
 } from "./x-collector";
 
 const COLLECTOR_KEY = "official_party_x_recent_search_v1";
@@ -22,6 +26,7 @@ const registeredSourceMetadataSchema = z.object({
   account_url: z.url(),
   verification_url: z.url(),
   automatic_collection_enabled: z.boolean().default(false),
+  x_user_id: z.string().regex(/^[0-9]+$/).optional(),
 });
 
 type RegisteredSource = {
@@ -44,7 +49,8 @@ type IngestRun = { id: string };
 type QueueResult = {
   run_id?: string;
   status?: string;
-  duplicate?: boolean;
+  accepted_items?: number;
+  duplicate_items?: number;
 };
 
 export type XCollectionResult = {
@@ -57,10 +63,12 @@ export type XCollectionResult = {
   usersRead: number;
   mediaRead: number;
   postsFound: number;
+  postsFilteredByCode: number;
   postsQueued: number;
   duplicatesSkipped: number;
   failedToQueue: number;
   sourceRequests: number;
+  analysisBatches: number;
   sourceCostEstimateUsd: number | null;
   sourceCostEstimateBasis: "configured_resource_rates_before_daily_dedup" | "not_configured";
   newestExternalPostId: string | null;
@@ -110,6 +118,85 @@ function configuredResourceRates() {
   };
 }
 
+async function resolveAccountUserIds(accounts: VerifiedXAccount[], bearerToken: string) {
+  const unresolved = accounts.filter((account) => !account.userId);
+  if (unresolved.length === 0) return { accounts, usersRead: 0, sourceRequests: 0 };
+
+  const response = await fetch(buildUsersByUsernameUrl(unresolved), {
+    headers: { Authorization: `Bearer ${bearerToken}` },
+    signal: AbortSignal.timeout(20_000),
+  });
+  const responseText = await response.text();
+  if (!response.ok) {
+    throw new Error(`X användarregister svarade med ${response.status}: ${responseText.slice(0, 500)}`);
+  }
+  const parsed = xUsersByUsernameResponseSchema.parse(JSON.parse(responseText));
+  const resolved = resolvedAccountUserIds(parsed, unresolved);
+  if (resolved.length !== unresolved.length) {
+    const resolvedSourceIds = new Set(resolved.map(({ account }) => account.sourceId));
+    const missing = unresolved.filter((account) => !resolvedSourceIds.has(account.sourceId));
+    throw new Error(`X kunde inte verifiera konto-ID för: ${missing.map((account) => account.handle).join(", ")}`);
+  }
+
+  const userIdBySource = new Map(resolved.map(({ account, user }) => [account.sourceId, user.id]));
+  await Promise.all(resolved.map(({ account, user }) => {
+    const query = postgrestQuery({ id: `eq.${account.sourceId}` });
+    return supabaseRequest(`sources?${query}`, {
+      method: "PATCH",
+      prefer: "return=minimal",
+      body: {
+        metadata: {
+          ...account.sourceMetadata,
+          x_user_id: user.id,
+          x_resolved_name: user.name,
+          x_user_id_verified_at: new Date().toISOString(),
+        },
+      },
+    });
+  }));
+
+  return {
+    accounts: accounts.map((account) => ({
+      ...account,
+      userId: account.userId ?? userIdBySource.get(account.sourceId) ?? null,
+    })),
+    usersRead: parsed.data.length,
+    sourceRequests: 1,
+  };
+}
+
+type UsageRun = { details: Record<string, unknown> };
+
+function numericDetail(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+async function xUsageToday(now: Date) {
+  const start = new Date(now);
+  start.setUTCHours(0, 0, 0, 0);
+  const query = postgrestQuery({
+    select: "details",
+    started_at: `gte.${start.toISOString()}`,
+    order: "started_at.desc",
+    limit: "100",
+  });
+  const runs = await supabaseRequest<UsageRun[]>(`ingest_runs?${query}`);
+  return runs.reduce((total, run) => {
+    const usage = run.details.source_usage;
+    if (!usage || typeof usage !== "object") return total;
+    const record = usage as Record<string, unknown>;
+    if (record.provider !== "x_api_v2") return total;
+    const resources = record.resources_read;
+    const counts = resources && typeof resources === "object"
+      ? resources as Record<string, unknown>
+      : {};
+    return {
+      posts: total.posts + numericDetail(counts.posts),
+      estimatedCostUsd: total.estimatedCostUsd + numericDetail(record.estimated_cost_usd),
+    };
+  }, { posts: 0, estimatedCostUsd: 0 });
+}
+
 async function verifiedAccounts(includeDisabled: boolean) {
   const query = postgrestQuery({
     select: "id,party_id,title,canonical_url,metadata",
@@ -136,6 +223,8 @@ async function verifiedAccounts(includeDisabled: boolean) {
       accountUrl: parsed.data.account_url,
       verificationUrl: parsed.data.verification_url,
       automaticCollectionEnabled: parsed.data.automatic_collection_enabled,
+      userId: parsed.data.x_user_id ?? null,
+      sourceMetadata: source.metadata,
     }];
   });
 }
@@ -230,19 +319,19 @@ async function markSourcesSucceeded(accounts: VerifiedXAccount[], completedAt: s
   }));
 }
 
-async function queueForConnie(
+async function queueBatchForConnie(
   context: Context,
-  item: CollectedXPost,
+  items: CollectedXPost[],
   webhookSecret: string,
 ) {
-  const endpoint = new URL("/api/connie/social", context.site.url);
+  const endpoint = new URL("/api/connie/social/batch", context.site.url);
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${webhookSecret}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(item),
+    body: JSON.stringify({ items }),
     signal: AbortSignal.timeout(15_000),
   });
   const responseText = await response.text();
@@ -252,39 +341,36 @@ async function queueForConnie(
   return JSON.parse(responseText) as QueueResult;
 }
 
-async function queueWithConcurrency(
+async function queueInBatches(
   context: Context,
   items: CollectedXPost[],
   webhookSecret: string,
+  batchSize: number,
 ) {
   const childRunIds: string[] = [];
   let postsQueued = 0;
   let duplicatesSkipped = 0;
   let failedToQueue = 0;
-  const queue = [...items];
+  let analysisBatches = 0;
 
-  async function worker() {
-    while (queue.length > 0) {
-      const item = queue.shift();
-      if (!item) return;
-      try {
-        const result = await queueForConnie(context, item, webhookSecret);
-        if (result.run_id) childRunIds.push(result.run_id);
-        if (result.duplicate || result.status === "duplicate") duplicatesSkipped += 1;
-        else postsQueued += 1;
-      } catch (error) {
-        failedToQueue += 1;
-        console.error(
-          "Kunde inte köa verifierat X-inlägg",
-          item.external_post_id,
-          error instanceof Error ? error.message : error,
-        );
-      }
+  for (let index = 0; index < items.length; index += batchSize) {
+    const batch = items.slice(index, index + batchSize);
+    try {
+      const result = await queueBatchForConnie(context, batch, webhookSecret);
+      analysisBatches += 1;
+      if (result.run_id) childRunIds.push(result.run_id);
+      postsQueued += result.accepted_items ?? (result.status === "duplicate" ? 0 : batch.length);
+      duplicatesSkipped += result.duplicate_items ?? (result.status === "duplicate" ? batch.length : 0);
+    } catch (error) {
+      failedToQueue += batch.length;
+      console.error(
+        "Kunde inte köa verifierad X-batch",
+        batch.map((item) => item.external_post_id).join(","),
+        error instanceof Error ? error.message : error,
+      );
     }
   }
-
-  await Promise.all(Array.from({ length: Math.min(3, items.length) }, () => worker()));
-  return { childRunIds, postsQueued, duplicatesSkipped, failedToQueue };
+  return { childRunIds, postsQueued, duplicatesSkipped, failedToQueue, analysisBatches };
 }
 
 function runDetails(
@@ -301,7 +387,9 @@ function runDetails(
     accounts_checked: result.accountsChecked,
     posts_read: result.postsRead,
     posts_found: result.postsFound,
+    posts_filtered_by_code: result.postsFilteredByCode,
     posts_queued: result.postsQueued,
+    analysis_batches: result.analysisBatches,
     duplicates_skipped: result.duplicatesSkipped,
     failed_to_queue: result.failedToQueue,
     source_usage: {
@@ -327,8 +415,9 @@ export async function runXCollection(
 ): Promise<XCollectionResult> {
   const now = options.now ?? new Date();
   const requestedAt = now.toISOString();
-  const accounts = await verifiedAccounts(options.dryRun);
-  if (accounts.length === 0) {
+  let chargedSourceUsage: Record<string, unknown> | null = null;
+  const registeredAccounts = await verifiedAccounts(options.dryRun);
+  if (registeredAccounts.length === 0) {
     return {
       started: false,
       dryRun: options.dryRun,
@@ -338,10 +427,12 @@ export async function runXCollection(
       usersRead: 0,
       mediaRead: 0,
       postsFound: 0,
+      postsFilteredByCode: 0,
       postsQueued: 0,
       duplicatesSkipped: 0,
       failedToQueue: 0,
       sourceRequests: 0,
+      analysisBatches: 0,
       sourceCostEstimateUsd: null,
       sourceCostEstimateBasis: "not_configured",
       newestExternalPostId: null,
@@ -352,21 +443,23 @@ export async function runXCollection(
     };
   }
 
-  const run = await createCollectionRun(options, accounts.length, requestedAt);
+  const run = await createCollectionRun(options, registeredAccounts.length, requestedAt);
   if (!run) {
     return {
       started: false,
       dryRun: options.dryRun,
       collectionSlot: options.collectionSlot,
-      accountsChecked: accounts.length,
+      accountsChecked: registeredAccounts.length,
       postsRead: 0,
       usersRead: 0,
       mediaRead: 0,
       postsFound: 0,
+      postsFilteredByCode: 0,
       postsQueued: 0,
       duplicatesSkipped: 0,
       failedToQueue: 0,
       sourceRequests: 0,
+      analysisBatches: 0,
       sourceCostEstimateUsd: null,
       sourceCostEstimateBasis: "not_configured",
       newestExternalPostId: null,
@@ -377,10 +470,82 @@ export async function runXCollection(
 
   try {
     const bearerToken = requiredEnvironmentVariable("X_API_BEARER_TOKEN");
+    const dailyPostLimit = numberEnvironmentVariable("CONNIE_SOCIAL_X_MAX_POSTS_PER_DAY", 200, 10, 10_000);
+    const dailyUsdBudget = numberEnvironmentVariable("CONNIE_SOCIAL_X_DAILY_BUDGET_USD", 1, 0.01, 1_000);
+    const priorUsage = await xUsageToday(now);
+    const remainingDailyPosts = dailyPostLimit - priorUsage.posts;
+    const resourceRates = configuredResourceRates();
+    const unresolvedAccountCount = registeredAccounts.filter((account) => !account.userId).length;
+    const allResourceRatesConfigured = resourceRates.postUsd !== null
+      && resourceRates.userUsd !== null
+      && resourceRates.mediaUsd !== null;
+    const accountLookupCostUsd = allResourceRatesConfigured
+      ? unresolvedAccountCount * resourceRates.userUsd!
+      : 0;
+    const remainingUsdAfterLookup = dailyUsdBudget
+      - priorUsage.estimatedCostUsd
+      - accountLookupCostUsd;
+    const affordablePosts = allResourceRatesConfigured && resourceRates.postUsd! > 0
+      ? Math.floor(Math.max(0, remainingUsdAfterLookup) / resourceRates.postUsd!)
+      : remainingDailyPosts;
+    const usdBudgetReached = resourceRates.postUsd !== null
+      && (priorUsage.estimatedCostUsd >= dailyUsdBudget || affordablePosts < 10);
+    if (remainingDailyPosts < 10 || usdBudgetReached) {
+      const message = usdBudgetReached
+        ? "Dagens X-budget i USD är förbrukad."
+        : "Dagens X-budget för lästa inlägg är förbrukad.";
+      await updateRun(run.id, {
+        status: "succeeded",
+        finished_at: new Date().toISOString(),
+        details: {
+          collector: "x_api_v2_recent_search",
+          budget_blocked: true,
+          message,
+          daily_post_limit: dailyPostLimit,
+          daily_usd_budget: dailyUsdBudget,
+          posts_read_today: priorUsage.posts,
+          estimated_cost_usd_today: priorUsage.estimatedCostUsd,
+          estimated_account_lookup_cost_usd: accountLookupCostUsd,
+          affordable_posts_before_request: affordablePosts,
+        },
+      });
+      return {
+        started: false,
+        dryRun: options.dryRun,
+        collectionRunId: run.id,
+        collectionSlot: options.collectionSlot,
+        accountsChecked: registeredAccounts.length,
+        postsRead: 0,
+        usersRead: 0,
+        mediaRead: 0,
+        postsFound: 0,
+        postsFilteredByCode: 0,
+        postsQueued: 0,
+        duplicatesSkipped: 0,
+        failedToQueue: 0,
+        sourceRequests: 0,
+        analysisBatches: 0,
+        sourceCostEstimateUsd: 0,
+        sourceCostEstimateBasis: resourceRates.postUsd === null
+          ? "not_configured"
+          : "configured_resource_rates_before_daily_dedup",
+        newestExternalPostId: null,
+        childRunIds: [],
+        message,
+      };
+    }
+
+    const resolved = await resolveAccountUserIds(registeredAccounts, bearerToken);
+    const accounts = resolved.accounts;
     const cursor = await collectorCursor();
     const lookbackHours = numberEnvironmentVariable("X_API_INITIAL_LOOKBACK_HOURS", 6, 1, 168);
     const hardLimit = numberEnvironmentVariable("CONNIE_SOCIAL_X_MAX_POSTS_PER_RUN", 20, 1, 100);
-    const requestedLimit = Math.max(1, Math.min(options.maxPosts ?? hardLimit, hardLimit));
+    const requestedLimit = Math.max(10, Math.min(
+      options.maxPosts ?? hardLimit,
+      hardLimit,
+      remainingDailyPosts,
+      affordablePosts,
+    ));
     const startTime = cursor?.last_external_post_id
       ? null
       : new Date(now.getTime() - lookbackHours * 60 * 60 * 1_000).toISOString();
@@ -405,23 +570,36 @@ export async function runXCollection(
     }
 
     const sourceQuery = buildOfficialAccountsQuery(accounts);
-    const items = mapRecentSearchResponse(parsed, accounts, sourceQuery).slice(0, requestedLimit);
-    const latestId = newestPostId(items);
+    const collectedItems = mapRecentSearchResponse(parsed, accounts, sourceQuery).slice(0, requestedLimit);
+    const items = collectedItems.filter(isLikelyRelevantSocialPost);
+    const postsFilteredByCode = collectedItems.length - items.length;
+    const latestId = newestPostId(collectedItems);
     const postsRead = parsed.meta?.result_count ?? parsed.data.length;
-    const usersRead = parsed.includes?.users.length ?? 0;
-    const mediaRead = parsed.includes?.media.length ?? 0;
-    const resourceRates = configuredResourceRates();
+    const usersRead = resolved.usersRead;
+    const mediaRead = 0;
     const sourceCostEstimateUsd = configuredSourceCost({
       posts: postsRead,
       users: usersRead,
       media: mediaRead,
     }, resourceRates);
+    chargedSourceUsage = {
+      provider: "x_api_v2",
+      requests: 1 + resolved.sourceRequests,
+      resources_read: { posts: postsRead, users: usersRead, media: mediaRead },
+      estimated_cost_usd: sourceCostEstimateUsd,
+      estimate_basis: sourceCostEstimateUsd === null
+        ? "not_configured"
+        : "configured_resource_rates_before_daily_dedup",
+      actual_cost_source: "x_developer_console",
+    };
+    const batchSize = numberEnvironmentVariable("CONNIE_SOCIAL_AI_BATCH_SIZE", 8, 2, 10);
     const queued = options.dryRun
-      ? { childRunIds: [], postsQueued: 0, duplicatesSkipped: 0, failedToQueue: 0 }
-      : await queueWithConcurrency(
+      ? { childRunIds: [], postsQueued: 0, duplicatesSkipped: 0, failedToQueue: 0, analysisBatches: 0 }
+      : await queueInBatches(
         context,
         items,
         requiredEnvironmentVariable("CONNIE_WEBHOOK_SECRET"),
+        batchSize,
       );
     const completedAt = new Date().toISOString();
     const result = {
@@ -430,10 +608,12 @@ export async function runXCollection(
       usersRead,
       mediaRead,
       postsFound: items.length,
+      postsFilteredByCode,
       postsQueued: queued.postsQueued,
       duplicatesSkipped: queued.duplicatesSkipped,
       failedToQueue: queued.failedToQueue,
-      sourceRequests: 1,
+      sourceRequests: 1 + resolved.sourceRequests,
+      analysisBatches: queued.analysisBatches,
       sourceCostEstimateUsd,
       sourceCostEstimateBasis: sourceCostEstimateUsd === null
         ? "not_configured" as const
@@ -447,6 +627,8 @@ export async function runXCollection(
         source_query: sourceQuery,
         accounts_checked: accounts.length,
         last_posts_read: postsRead,
+        daily_post_limit: dailyPostLimit,
+        daily_usd_budget: dailyUsdBudget,
       });
       await markSourcesSucceeded(accounts, completedAt);
     }
@@ -478,6 +660,7 @@ export async function runXCollection(
         dry_run: options.dryRun,
         collection_slot: options.collectionSlot,
         error: message.slice(0, 1_000),
+        ...(chargedSourceUsage ? { source_usage: chargedSourceUsage } : {}),
       },
     }).catch(() => undefined);
     throw error;

@@ -28,6 +28,7 @@ export type FirecrawlWebhook = {
     [key: string]: unknown;
   };
   error?: string | null;
+  creditsUsed?: number;
 };
 
 export function contentHash(content: string) {

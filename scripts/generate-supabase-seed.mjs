@@ -78,15 +78,23 @@ const sourceKind = (title) => {
 };
 
 const sourceRows = parties.flatMap((party) =>
-  party.sources.map((source, index) => [
-    sqlText(party.id),
-    sqlText(sourceKind(source.title)),
-    sqlText(source.title),
-    sqlText(source.url),
-    sqlText("daily"),
-    String(Math.max(10, 100 - index * 10)),
-    sqlJson({ imported_from: "app/data.ts" }),
-  ]),
+  party.sources.map((source, index) => {
+    const kind = sourceKind(source.title);
+    const frequency = kind === "manifesto" || kind === "program" ? "weekly" : "daily";
+    return [
+      sqlText(party.id),
+      sqlText(kind),
+      sqlText(source.title),
+      sqlText(source.url),
+      sqlText(frequency),
+      String(Math.max(10, 100 - index * 10)),
+      sqlJson({
+        imported_from: "app/data.ts",
+        monitoring_tier: frequency === "daily" ? "dynamic" : "stable",
+        ...(source.url.toLowerCase().includes(".pdf") ? { pdf_strategy: "direct_hash" } : {}),
+      }),
+    ];
+  }),
 );
 
 const output = `insert into sakfragan.parties (

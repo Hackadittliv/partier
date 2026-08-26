@@ -4,11 +4,15 @@ import test from "node:test";
 import {
   buildOfficialAccountsQuery,
   buildRecentSearchUrl,
+  buildUsersByUsernameUrl,
   configuredSourceCost,
+  isLikelyRelevantSocialPost,
   mapRecentSearchResponse,
   newestPostId,
+  resolvedAccountUserIds,
   scheduledStockholmSlot,
   xRecentSearchResponseSchema,
+  xUsersByUsernameResponseSchema,
 } from "../netlify/functions/_shared/x-collector.ts";
 
 const accounts = [
@@ -20,6 +24,8 @@ const accounts = [
     accountUrl: "https://x.com/socialdemokrat",
     verificationUrl: "https://www.socialdemokraterna.se/",
     automaticCollectionEnabled: false,
+    userId: "user-s",
+    sourceMetadata: {},
   },
   {
     sourceId: "source-m",
@@ -29,6 +35,8 @@ const accounts = [
     accountUrl: "https://x.com/moderaterna",
     verificationUrl: "https://moderaterna.se/",
     automaticCollectionEnabled: false,
+    userId: "user-m",
+    sourceMetadata: {},
   },
 ];
 
@@ -48,6 +56,26 @@ test("bygger en begränsad officiell sökning utan rena delningar", () => {
   assert.equal(url.searchParams.get("since_id"), "1234567890");
   assert.equal(url.searchParams.has("start_time"), false);
   assert.equal(url.searchParams.get("max_results"), "20");
+  assert.equal(url.searchParams.has("expansions"), false);
+  assert.equal(url.searchParams.has("media.fields"), false);
+});
+
+test("resolves and caches account ids with one constrained lookup", () => {
+  const unresolved = accounts.map((account) => ({ ...account, userId: null }));
+  const url = buildUsersByUsernameUrl(unresolved);
+  assert.equal(url.pathname, "/2/users/by");
+  assert.equal(url.searchParams.get("usernames"), "socialdemokrat,moderaterna");
+
+  const response = xUsersByUsernameResponseSchema.parse({
+    data: [
+      { id: "user-s", name: "Socialdemokraterna", username: "socialdemokrat" },
+      { id: "user-m", name: "Moderaterna", username: "Moderaterna" },
+    ],
+  });
+  assert.deepEqual(
+    resolvedAccountUserIds(response, unresolved).map(({ account, user }) => [account.partyId, user.id]),
+    [["socialdemokraterna", "user-s"], ["moderaterna", "user-m"]],
+  );
 });
 
 test("mappar endast registrerade kontoägare och bevarar originaltext", () => {
@@ -104,9 +132,19 @@ test("mappar endast registrerade kontoägare och bevarar originaltext", () => {
   assert.equal(items[1].post_type, "reply");
   assert.equal(items[1].body, "Exakt originaltext med åäö.");
   assert.equal(items[1].raw_evidence, undefined);
-  assert.deepEqual(items[1].media_urls, ["https://pbs.twimg.com/media/test.jpg"]);
+  assert.deepEqual(items[1].media_urls, []);
+  assert.deepEqual(items[1].metrics.x.media_keys, ["media-1"]);
   assert.deepEqual(items[1].metrics.x.edit_history_post_ids, ["101", "102"]);
   assert.equal(newestPostId(items), "102");
+});
+
+test("filters only obvious non-political noise before AI", () => {
+  assert.equal(isLikelyRelevantSocialPost({ body: "Glad midsommar!", post_type: "original" }), false);
+  assert.equal(isLikelyRelevantSocialPost({ body: "Tävla och vinn biljetter!", post_type: "original" }), false);
+  assert.equal(isLikelyRelevantSocialPost({
+    body: "Vi vill sänka skatten för företag som anställer unga.",
+    post_type: "original",
+  }), true);
 });
 
 test("schemalägger enligt svensk tid och går ned till en gång per dygn efter valet", () => {
