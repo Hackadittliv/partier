@@ -13,7 +13,7 @@ export type Party = {
   sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "26 augusti 2026";
+export const lastUpdated = "27 augusti 2026";
 export const electionDate = "13 september 2026";
 
 export const topics = [
@@ -42,11 +42,12 @@ export const parties: Party[] = [
       klimat: "Minska utsläppen genom elektrifiering, utsläppshandel, grön industri och billigare hållbara val. Jordbruk och skog ses som klimatlösning och beredskap.",
       energi: "Prioritera vind, sol, vattenkraft, lagring och snabbare elnät. Partiet är öppet för fossilfria lösningar, medan ny kärnkraft inte är huvudspåret.",
       demokrati: "Stärk liberal demokrati, integritet, oberoende medier och EU. Öka stödet till Ukraina och bygg ut militärt och civilt försvar.",
-      regering: "Partiet vill byta regering men utesluter en regering med Vänsterpartiet och en regering som är beroende av Sverigedemokraterna.",
+      regering: "Partiet vill se en bred och stabil mittenregering. Varken Vänsterpartiet eller Sverigedemokraterna ska enligt partiet ha inflytande över regeringsbildningen.",
     },
     sources: [
       { title: "Valmanifest 2026", url: "https://val2026.centerpartiet.se/wp-content/uploads/2026/06/Valmanifest-2026.pdf" },
       { title: "Regeringsbesked 2026", url: "https://www.centerpartiet.se/centerpartiet-lokalt/orebro-lan/orebro-lan/nyheter/nyhetsarkiv/2026-01-30-vi-tanker-aldrig-slappa-in-vansterpartiet-i-en-regering" },
+      { title: "Regeringsbesked om mittenregering", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-26-annie-loof-sverige-behover-en-regering-forankrad-i-mitten", publishedAt: "26 augusti 2026" },
     ],
   },
   {
@@ -131,10 +132,10 @@ export const parties: Party[] = [
   },
   {
     id: "socialdemokraterna", name: "Socialdemokraterna", short: "S", color: "#d82c38", emblem: "/emblems/socialdemokraterna.png", group: "riksdag", ideology: "Socialdemokratiskt", status: "Aktuella vallöften",
-    overview: "Socialdemokraterna vill prioritera hushållens ekonomi, starkare välfärd, fler jobb genom industriinvesteringar och en offensiv mot organiserad brottslighet.",
-    priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Slut en tillväxtpakt med näringslivet för fler jobb, investeringar och lägre utsläpp."],
+    overview: "Socialdemokraterna vill prioritera hushållens ekonomi, starkare välfärd, fler jobb genom industriinvesteringar, statlig närvaro i hela landet och en offensiv mot organiserad brottslighet.",
+    priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Stöd gröna industriinvesteringar, bostadsbyggande och ett Landsbygdslyft för fler jobb i hela landet."],
     positions: {
-      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet och investera i industri, utbildning och infrastruktur för fler jobb.",
+      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet och använd gröna kreditgarantier, investeringsstöd och statliga byggkrediter för fler jobb, industriinvesteringar och bostäder i hela landet.",
       vard: "Ge välfärden mer resurser och offentlig kontroll. Korta vårdköer, stärk personalen och minska utrymmet för vinststyrning.",
       skola: "Stoppa vinstjakt i skola och förskola, öka likvärdigheten och stärk lärare, elevhälsa och tidigt stöd.",
       brott: "Slå mot maffialiknande strukturer och kriminell ekonomi med fler poliser och hårdare verktyg. Kombinera detta med socialtjänst, skola och områdespolitik.",
@@ -148,6 +149,7 @@ export const parties: Party[] = [
       { title: "Val 2026", url: "https://www.socialdemokraterna.se/val-2026" },
       { title: "Principer för en ny regering", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-03-magdalena-andersson-inleder-valturnen---presenterar-tre-principer-for-en-regering-ledd-av-henne" },
       { title: "Vallöfte om jobb och klimat", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-25-s-vallofte-fler-jobb-och-lagre-klimatutslapp", publishedAt: "25 augusti 2026" },
+      { title: "Vallöfte om ett sammanhållet Sverige", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-25-s-sverige-ska-halla-ihop", publishedAt: "25 augusti 2026" },
     ],
   },
   {

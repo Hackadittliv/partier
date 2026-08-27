@@ -32,7 +32,7 @@ Den primära webbplatsen finns på https://sakfragan.netlify.app
 
 ## Metod
 
-Materialet bygger på partiernas officiella program, valmanifest och politiksidor. Brytdatum för den aktuella versionen är 23 augusti 2026. Fakta, pedagogisk sammanfattning och källa hålls tydligt åtskilda.
+Materialet bygger på partiernas officiella program, valmanifest och politiksidor. Brytdatum för den aktuella versionen är 27 augusti 2026. Fakta, pedagogisk sammanfattning och källa hålls tydligt åtskilda.
 
 Den löpande källkontrollen dokumenteras i `docs/automation.md`.
 

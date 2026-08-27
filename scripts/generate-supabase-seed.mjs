@@ -65,8 +65,11 @@ const positionRows = parties.flatMap((party) =>
 
 const sourceKind = (title) => {
   const normalized = title.toLocaleLowerCase("sv");
-  if (normalized.includes("valmanifest") || normalized.includes("valplattform") || normalized.includes("vallöfte")) {
+  if (normalized.includes("valmanifest") || normalized.includes("valplattform")) {
     return "manifesto";
+  }
+  if (normalized.includes("vallöfte")) {
+    return "press";
   }
   if (normalized.includes("program")) {
     return "program";
@@ -91,6 +94,7 @@ const sourceRows = parties.flatMap((party) =>
       sqlJson({
         imported_from: "app/data.ts",
         monitoring_tier: frequency === "daily" ? "dynamic" : "stable",
+        ...(source.publishedAt ? { published_at_label: source.publishedAt } : {}),
         ...(source.url.toLowerCase().includes(".pdf") ? { pdf_strategy: "direct_hash" } : {}),
       }),
     ];
