@@ -43,7 +43,6 @@ const publicUrlOptions = {
 
 export default function Home() {
   const resultsRef = useRef<HTMLElement | null>(null);
-  const urlReady = useRef(false);
   const [view, setView] = useState<View>("utforska");
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("alla");
@@ -53,6 +52,7 @@ export default function Home() {
   const [showAll, setShowAll] = useState(false);
   const [stanceFilter, setStanceFilter] = useState<"all" | Stance>("all");
   const [linkCopied, setLinkCopied] = useState(false);
+  const [urlReady, setUrlReady] = useState(false);
 
   useEffect(() => {
     function restoreUrlState() {
@@ -68,16 +68,16 @@ export default function Home() {
     }
 
     restoreUrlState();
-    urlReady.current = true;
+    queueMicrotask(() => setUrlReady(true));
     window.addEventListener("popstate", restoreUrlState);
     return () => window.removeEventListener("popstate", restoreUrlState);
   }, []);
 
   useEffect(() => {
-    if (!urlReady.current) return;
+    if (!urlReady) return;
     const search = buildPublicSearch({ view, query, topic, compareIds, compareTopic }, publicUrlOptions);
     window.history.replaceState(null, "", `${window.location.pathname}${search}${window.location.hash}`);
-  }, [view, query, topic, compareIds, compareTopic]);
+  }, [urlReady, view, query, topic, compareIds, compareTopic]);
 
   const rawIntentMatch = query.trim() ? findSearchIntent(query) : null;
   const intentMatch = rawIntentMatch && (topic === "alla" || rawIntentMatch.intent.topic === topic) ? rawIntentMatch : null;
