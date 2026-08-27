@@ -5,6 +5,7 @@ export type Party = {
   color: string;
   emblem: string;
   group: "riksdag" | "fler";
+  founded: number;
   ideology: string;
   overview: string;
   status: "Aktuellt valmanifest" | "Aktuella vallöften" | "Valprogram publiceras löpande" | "Programmaterial granskas";
@@ -30,7 +31,7 @@ export const topics = [
 
 export const parties: Party[] = [
   {
-    id: "centerpartiet", name: "Centerpartiet", short: "C", color: "#15844c", emblem: "/emblems/centerpartiet.svg", group: "riksdag", ideology: "Socialliberalt och grönt", status: "Aktuellt valmanifest",
+    id: "centerpartiet", name: "Centerpartiet", short: "C", color: "#15844c", emblem: "/emblems/centerpartiet.svg", group: "riksdag", founded: 1910, ideology: "Socialliberalt och grönt", status: "Aktuellt valmanifest",
     overview: "Centerpartiet kombinerar lägre kostnader för att anställa med stora klimatinvesteringar, stark landsbygdspolitik och liberala rättigheter.",
     priorities: ["Slopa arbetsgivaravgiften för de första tio anställda.", "Investera 50 miljarder kronor i landsbygder och lokal infrastruktur.", "Bygg ut fossilfri el, lagring och snabbare tillstånd.", "Ge fler en fast läkare och unga snabbare stöd för psykisk hälsa."],
     positions: {
@@ -51,7 +52,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "kristdemokraterna", name: "Kristdemokraterna", short: "KD", color: "#174b87", emblem: "/emblems/kristdemokraterna.svg", group: "riksdag", ideology: "Kristdemokratiskt", status: "Aktuellt valmanifest",
+    id: "kristdemokraterna", name: "Kristdemokraterna", short: "KD", color: "#174b87", emblem: "/emblems/kristdemokraterna.svg", group: "riksdag", founded: 1964, ideology: "Kristdemokratiskt", status: "Aktuellt valmanifest",
     overview: "Kristdemokraterna prioriterar familjen, ett statligt huvudansvar för vården, ny kärnkraft och en tydligare värdegrund.",
     priorities: ["Förläng föräldraförsäkringen och låt familjer fördela dagarna friare.", "Låt staten ta huvudansvaret för sjukvården.", "Höj barnbidraget till 2 000 kronor.", "Bygg ny kärnkraft och fler småhus."],
     positions: {
@@ -71,7 +72,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "liberalerna", name: "Liberalerna", short: "L", color: "#1762a6", emblem: "/emblems/liberalerna.png", group: "riksdag", ideology: "Socialliberalt", status: "Aktuellt valmanifest",
+    id: "liberalerna", name: "Liberalerna", short: "L", color: "#1762a6", emblem: "/emblems/liberalerna.png", group: "riksdag", founded: 1934, ideology: "Socialliberalt", status: "Aktuellt valmanifest",
     overview: "Liberalerna sätter skolan först och kombinerar stora skattesänkningar med starkare EU samarbete, ny kärnkraft och en stram men human migrationspolitik.",
     priorities: ["Sätt ett tak på 20 elever per klass.", "Förstatliga skolan och fasa ut vinstintresset.", "Halvera den statliga inkomstskatten.", "Förbered en folkomröstning om euron 2030."],
     positions: {
@@ -91,7 +92,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "miljopartiet", name: "Miljöpartiet de gröna", short: "MP", color: "#4a7d2b", emblem: "/emblems/miljopartiet.png", group: "riksdag", ideology: "Grönt och feministiskt", status: "Aktuellt valmanifest",
+    id: "miljopartiet", name: "Miljöpartiet de gröna", short: "MP", color: "#4a7d2b", emblem: "/emblems/miljopartiet.png", group: "riksdag", founded: 1981, ideology: "Grönt och feministiskt", status: "Aktuellt valmanifest",
     overview: "Miljöpartiet vill öka klimatinvesteringarna, minska klyftorna, stoppa vinststyrning i välfärden och bygga ett förnybart energisystem.",
     priorities: ["Inför ett nationellt kollektivtrafikkort för 499 kronor.", "Låt stora utsläppare och mycket stora förmögenheter betala mer.", "Avskaffa marknadsskolan och välfärdsvinsterna.", "Ta steg mot fyradagarsvecka med bibehållen lön."],
     positions: {
@@ -111,7 +112,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "moderaterna", name: "Moderaterna", short: "M", color: "#2a78b8", emblem: "/emblems/moderaterna.png", group: "riksdag", ideology: "Liberalkonservativt", status: "Aktuella vallöften",
+    id: "moderaterna", name: "Moderaterna", short: "M", color: "#2a78b8", emblem: "/emblems/moderaterna.png", group: "riksdag", founded: 1904, ideology: "Liberalkonservativt", status: "Aktuella vallöften",
     overview: "Moderaterna prioriterar stärkt familjeekonomi, lägre skatt på arbete, hårdare brottsbekämpning, stram migration, valfrihet i välfärden och ett starkare försvar.",
     priorities: ["Sänk skatten för arbetande föräldrar och avskaffa avgiften för förskola och fritidshem.", "Stärk polis, domstolar och kriminalvård.", "Behåll en stram migrationspolitik med tydliga krav.", "Bygg ny kärnkraft och förstärk försvaret."],
     positions: {
@@ -131,7 +132,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "socialdemokraterna", name: "Socialdemokraterna", short: "S", color: "#d82c38", emblem: "/emblems/socialdemokraterna.png", group: "riksdag", ideology: "Socialdemokratiskt", status: "Aktuella vallöften",
+    id: "socialdemokraterna", name: "Socialdemokraterna", short: "S", color: "#d82c38", emblem: "/emblems/socialdemokraterna.png", group: "riksdag", founded: 1889, ideology: "Socialdemokratiskt", status: "Aktuella vallöften",
     overview: "Socialdemokraterna vill prioritera hushållens ekonomi, starkare välfärd, fler jobb genom industriinvesteringar, statlig närvaro i hela landet och en offensiv mot organiserad brottslighet.",
     priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Stöd gröna industriinvesteringar, bostadsbyggande och ett Landsbygdslyft för fler jobb i hela landet."],
     positions: {
@@ -153,7 +154,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "sverigedemokraterna", name: "Sverigedemokraterna", short: "SD", color: "#d8a814", emblem: "/emblems/sverigedemokraterna.png", group: "riksdag", ideology: "Socialkonservativt och nationalistiskt", status: "Aktuellt valmanifest",
+    id: "sverigedemokraterna", name: "Sverigedemokraterna", short: "SD", color: "#d8a814", emblem: "/emblems/sverigedemokraterna.png", group: "riksdag", founded: 1988, ideology: "Socialkonservativt och nationalistiskt", status: "Aktuellt valmanifest",
     overview: "Sverigedemokraterna prioriterar kraftigt minskad migration, nationell sammanhållning, lägre vardagskostnader, hård kriminalpolitik och direkt regeringsmakt.",
     priorities: ["Minska asyl och anhöriginvandringen kraftigt.", "Sänk skatt på drivmedel och energi.", "Skärp straff och utvisa fler utländska brottslingar.", "Stärk försvar, tandvård och medborgarnas välfärd."],
     positions: {
@@ -173,7 +174,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "vansterpartiet", name: "Vänsterpartiet", short: "V", color: "#b31942", emblem: "/emblems/vansterpartiet.svg", group: "riksdag", ideology: "Socialistiskt och feministiskt", status: "Aktuellt valmanifest",
+    id: "vansterpartiet", name: "Vänsterpartiet", short: "V", color: "#b31942", emblem: "/emblems/vansterpartiet.svg", group: "riksdag", founded: 1917, ideology: "Socialistiskt och feministiskt", status: "Aktuellt valmanifest",
     overview: "Vänsterpartiet vill omfördela ekonomisk makt, stoppa vinster i välfärden, sänka hushållens kostnader och investera offentligt i jobb och klimatomställning.",
     priorities: ["Frys hyror och pressa matpriser.", "Inför skatt på miljardärers förmögenheter.", "Stoppa vinstjakt i vård, skola och omsorg.", "Förkorta arbetstiden med bibehållen lön."],
     positions: {
@@ -193,7 +194,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "medborgerligsamling", name: "Medborgerlig Samling", short: "MED", color: "#23466c", emblem: "/emblems/medborgerligsamling.webp", group: "fler", ideology: "Liberalkonservativt", status: "Programmaterial granskas",
+    id: "medborgerligsamling", name: "Medborgerlig Samling", short: "MED", color: "#23466c", emblem: "/emblems/medborgerligsamling.webp", group: "fler", founded: 2014, ideology: "Liberalkonservativt", status: "Programmaterial granskas",
     overview: "Medborgerlig Samling vill kraftigt sänka skattetrycket och den offentliga administrationen samt föra en mycket stram migrations och kriminalpolitik.",
     priorities: ["Sänk skattetrycket mot 30 procent av ekonomin.", "Avskaffa regionerna och minska offentlig administration.", "Skärp straff och utvisa utländska brottslingar.", "Bygg ut kärnkraft och lägg mer resurser på försvaret."],
     positions: {
@@ -214,7 +215,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "nyans", name: "Partiet Nyans", short: "PN", color: "#ef7b2c", emblem: "/emblems/nyans.jpg", group: "fler", ideology: "Minoritetspolitiskt och socialt", status: "Programmaterial granskas",
+    id: "nyans", name: "Partiet Nyans", short: "PN", color: "#ef7b2c", emblem: "/emblems/nyans.jpg", group: "fler", founded: 2019, ideology: "Minoritetspolitiskt och socialt", status: "Programmaterial granskas",
     overview: "Partiet Nyans fokuserar på religionsfrihet och minoritetsskydd och kombinerar statlig välfärd med riktade lättnader för företag och grupper.",
     priorities: ["Stärk skyddet mot islamofobi, afrofobi och diskriminering.", "Förstatliga skolan och vårdens styrning.", "Frys hyror i offentligt ägda bostäder.", "Kombinera rehabilitering med högre straff för grova brott."],
     positions: {
@@ -235,7 +236,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "orebropartiet", name: "Örebropartiet", short: "ÖP", color: "#d94732", emblem: "/emblems/orebropartiet.png", group: "fler", ideology: "Lokalt förankrat och systemkritiskt", status: "Valprogram publiceras löpande",
+    id: "orebropartiet", name: "Örebropartiet", short: "ÖP", color: "#d94732", emblem: "/emblems/orebropartiet.png", group: "fler", founded: 2014, ideology: "Lokalt förankrat och systemkritiskt", status: "Valprogram publiceras löpande",
     overview: "Örebropartiet kombinerar kraftigt strypt migration och hård rättspolitik med avgiftsfri tandvård, mer resurser till äldreomsorgen och statlig kontroll över central infrastruktur.",
     priorities: ["Inför avgiftsfri tandvård i hela Sverige.", "Stryp invandringen och öka återvandringen.", "Avskaffa skatterna på el och bränsle.", "Skärp rättspolitiken och slå hårdare mot organiserad brottslighet."],
     positions: {
@@ -256,7 +257,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "alternativforsverige", name: "Alternativ för Sverige", short: "AfS", color: "#1d4f91", emblem: "/emblems/alternativforsverige.png", group: "fler", ideology: "Nationalistiskt och EU kritiskt", status: "Programmaterial granskas",
+    id: "alternativforsverige", name: "Alternativ för Sverige", short: "AfS", color: "#1d4f91", emblem: "/emblems/alternativforsverige.png", group: "fler", founded: 2018, ideology: "Nationalistiskt och EU kritiskt", status: "Programmaterial granskas",
     overview: "Alternativ för Sverige prioriterar stoppad asylinvandring, omfattande återvandring, utträde ur EU, lägre skatter och en sträng kriminalpolitik.",
     priorities: ["Stoppa all asylrelaterad invandring.", "Inrätta ett återvandringsverk och genomför ett omfattande återvandringsprogram.", "Lämna EU efter en ny folkomröstning.", "Sänk skatter och prioritera vård, trygghet och nationellt självbestämmande."],
     positions: {
@@ -277,7 +278,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "piratpartiet", name: "Piratpartiet", short: "PP", color: "#56329a", emblem: "/emblems/piratpartiet.png", group: "fler", ideology: "Frihetligt och digitalpolitiskt", status: "Programmaterial granskas",
+    id: "piratpartiet", name: "Piratpartiet", short: "PP", color: "#56329a", emblem: "/emblems/piratpartiet.png", group: "fler", founded: 2006, ideology: "Frihetligt och digitalpolitiskt", status: "Programmaterial granskas",
     overview: "Piratpartiet sätter personlig integritet, ett fritt internet, öppen kunskap, deltagande demokrati och evidensbaserade beslut i centrum.",
     priorities: ["Stoppa massövervakning och skydda kryptering och privatliv.", "Stärk grundlagar, offentlighetsprincip och direkt medborgarinflytande.", "Inför ett generellt ekonomiskt grundstöd och bättre villkor för små företag.", "Modernisera skola, vård och offentlig digitalisering utifrån forskning och öppen teknik."],
     positions: {
@@ -298,7 +299,7 @@ export const parties: Party[] = [
     ],
   },
   {
-    id: "partietmod", name: "Partiet MoD", short: "MoD", color: "#e3a814", emblem: "/emblems/partietmod.png", group: "fler", ideology: "Direktdemokratiskt och suveränistiskt", status: "Aktuellt valmanifest",
+    id: "partietmod", name: "Partiet MoD", short: "MoD", color: "#e3a814", emblem: "/emblems/partietmod.png", group: "fler", founded: 2021, ideology: "Direktdemokratiskt och suveränistiskt", status: "Aktuellt valmanifest",
     overview: "Partiet MoD kombinerar direktdemokrati, nationellt självbestämmande, ekonomisk omfördelning, digital integritet och en utrikespolitik byggd på alliansfrihet.",
     priorities: ["Lämna EU genom folkomröstning och lämna Nato.", "Inför fler folkomröstningar och avskaffa riksdagsspärren.", "Inför stegvis basinkomst och progressiv beskattning av kapital och stora förmögenheter.", "Förbjud generell massövervakning och stärk insynen i offentlig AI."],
     positions: {
@@ -319,3 +320,7 @@ export const parties: Party[] = [
     ],
   },
 ];
+
+export const partiesByFounded = [...parties].sort(
+  (a, b) => a.founded - b.founded || a.name.localeCompare(b.name, "sv"),
+);

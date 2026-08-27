@@ -14,7 +14,7 @@ const sandbox = { exports: {}, module: { exports: {} } };
 sandbox.exports = sandbox.module.exports;
 vm.runInNewContext(javascript, sandbox);
 
-const { parties, topics } = sandbox.module.exports;
+const { parties, partiesByFounded, topics } = sandbox.module.exports;
 
 if (!Array.isArray(parties) || parties.length === 0) {
   throw new Error("Inga partier hittades i app/data.ts");
@@ -29,7 +29,9 @@ const sqlJson = (value) => `${sqlText(JSON.stringify(value))}::jsonb`;
 
 const values = (rows) => rows.map((row) => `  (${row.join(", ")})`).join(",\n");
 
-const partyRows = parties.map((party, index) => [
+const displayOrderByParty = new Map(partiesByFounded.map((party, index) => [party.id, index + 1]));
+
+const partyRows = parties.map((party) => [
   sqlText(party.id),
   sqlText(party.name),
   sqlText(party.short),
@@ -37,7 +39,7 @@ const partyRows = parties.map((party, index) => [
   sqlText(party.ideology),
   sqlText(party.color),
   sqlText(party.emblem),
-  String(index + 1),
+  String(displayOrderByParty.get(party.id)),
 ]);
 
 const topicRows = topics.map((topic, index) => [

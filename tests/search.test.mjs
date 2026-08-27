@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parties } from "../app/data.ts";
+import { parties, partiesByFounded } from "../app/data.ts";
 import { detectSearchGoal, findPartySearchContext, findSearchIntent, inferTopic, partyMatchScore, searchIntents } from "../app/search.ts";
 
 test("tolkar tydliga politiska frågor", () => {
@@ -48,4 +48,26 @@ test("alla granskade jämförelser omfattar samtliga partier", () => {
   for (const intent of searchIntents) {
     for (const party of parties) assert.ok(intent.stances[party.id], `${intent.id} saknar ${party.id}`);
   }
+});
+
+test("visar samtliga partier från äldst till yngst", () => {
+  assert.deepEqual(
+    partiesByFounded.map((party) => [party.id, party.founded]),
+    [
+      ["socialdemokraterna", 1889],
+      ["moderaterna", 1904],
+      ["centerpartiet", 1910],
+      ["vansterpartiet", 1917],
+      ["liberalerna", 1934],
+      ["kristdemokraterna", 1964],
+      ["miljopartiet", 1981],
+      ["sverigedemokraterna", 1988],
+      ["piratpartiet", 2006],
+      ["medborgerligsamling", 2014],
+      ["orebropartiet", 2014],
+      ["alternativforsverige", 2018],
+      ["nyans", 2019],
+      ["partietmod", 2021],
+    ],
+  );
 });
