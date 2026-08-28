@@ -43,6 +43,7 @@ const publicUrlOptions = {
 
 export default function Home() {
   const resultsRef = useRef<HTMLElement | null>(null);
+  const filteredResultsRef = useRef<HTMLDivElement | null>(null);
   const [view, setView] = useState<View>("utforska");
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("alla");
@@ -122,6 +123,17 @@ export default function Home() {
     setView("utforska");
     window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    });
+  }
+
+  function selectStanceFilter(filter: "all" | Stance) {
+    setStanceFilter(filter);
+    setShowAll(filter !== "all");
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        filteredResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        filteredResultsRef.current?.focus({ preventScroll: true });
+      });
     });
   }
 
@@ -236,15 +248,15 @@ export default function Home() {
               <div className="answerPrinciple"><span>Så läser du svaret</span><p>Riktningen är en redaktionell klassificering. Partiets egen formulering och officiella källa visas alltid under.</p></div>
             </div>
             <div className="stanceFilters" aria-label="Filtrera efter ståndpunkt">
-              <button className={stanceFilter === "all" ? "selected" : ""} onClick={() => { setStanceFilter("all"); setShowAll(false); }}><strong>{parties.length}</strong><span>Alla</span></button>
-              {(["for", "against", "conditional", "unclear"] as Stance[]).map((stance) => <button key={stance} className={`${stance}${stanceFilter === stance ? " selected" : ""}`} onClick={() => { setStanceFilter(stance); setShowAll(true); }}><strong>{stanceCounts[stance]}</strong><span>{stanceMeta[stance].shortLabel}</span><small>{stanceMeta[stance].description}</small></button>)}
+              <button className={stanceFilter === "all" ? "selected" : ""} onClick={() => selectStanceFilter("all")}><strong>{parties.length}</strong><span>Alla</span></button>
+              {(["for", "against", "conditional", "unclear"] as Stance[]).map((stance) => <button key={stance} className={`${stance}${stanceFilter === stance ? " selected" : ""}`} onClick={() => selectStanceFilter(stance)}><strong>{stanceCounts[stance]}</strong><span>{stanceMeta[stance].shortLabel}</span><small>{stanceMeta[stance].description}</small></button>)}
             </div>
             <div className="relatedQuestions"><span>Fråga vidare</span>{intentMatch.intent.relatedQuestions.map((question) => <button key={question} onClick={() => runSuggestion(question)}>{question}</button>)}</div>
           </section>}
 
           {query && !intentMatch && inferredTopic && <div className="topicInterpretation" aria-live="polite"><span>Sakområde identifierat</span><strong>{activeTopicLabel}</strong><p>Frågan ger ännu ingen säker riktning mellan för och emot. Därför visas partiernas fulla ståndpunkt inom området.</p></div>}
 
-          <div className="resultHeader">
+          <div className="resultHeader" ref={filteredResultsRef} tabIndex={-1}>
             <div>
               <p className="sectionLabel">{isTextSearch ? "Textträffar" : "Sakliga svar"}</p>
               <h2>{query && intentMatch ? intentMatch.intent.proposition : query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Textträffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
