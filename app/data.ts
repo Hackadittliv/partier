@@ -14,7 +14,7 @@ export type Party = {
   sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "27 augusti 2026";
+export const lastUpdated = "28 augusti 2026";
 export const electionDate = "13 september 2026";
 
 export const topics = [
@@ -42,13 +42,14 @@ export const parties: Party[] = [
       migration: "För en rättssäker migration med tydliga krav. Stoppa kompetensutvisningar och låt integration börja direkt genom svenska, praktik och arbete.",
       klimat: "Minska utsläppen genom elektrifiering, utsläppshandel, grön industri och billigare hållbara val. Jordbruk och skog ses som klimatlösning och beredskap.",
       energi: "Prioritera vind, sol, vattenkraft, lagring och snabbare elnät. Partiet är öppet för fossilfria lösningar, medan ny kärnkraft inte är huvudspåret.",
-      demokrati: "Stärk liberal demokrati, integritet, oberoende medier och EU. Öka stödet till Ukraina och bygg ut militärt och civilt försvar.",
+      demokrati: "Stärk liberal demokrati, integritet, oberoende medier och EU. Reglera beroendeframkallande algoritmer för minderåriga, inför en åldersgräns på 15 år för sociala medier med föräldraundantag från 13 år och utred beskattning av sociala mediebolag. Öka stödet till Ukraina och bygg ut militärt och civilt försvar.",
       regering: "Partiet vill se en bred och stabil mittenregering. Varken Vänsterpartiet eller Sverigedemokraterna ska enligt partiet ha inflytande över regeringsbildningen.",
     },
     sources: [
       { title: "Valmanifest 2026", url: "https://val2026.centerpartiet.se/wp-content/uploads/2026/06/Valmanifest-2026.pdf" },
       { title: "Regeringsbesked 2026", url: "https://www.centerpartiet.se/centerpartiet-lokalt/orebro-lan/orebro-lan/nyheter/nyhetsarkiv/2026-01-30-vi-tanker-aldrig-slappa-in-vansterpartiet-i-en-regering" },
       { title: "Regeringsbesked om mittenregering", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-26-annie-loof-sverige-behover-en-regering-forankrad-i-mitten", publishedAt: "26 augusti 2026" },
+      { title: "Förslag om sociala mediebolag", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-27-centerpartiet-vill-begransa-sociala-mediebolagens-frihet", publishedAt: "27 augusti 2026" },
     ],
   },
   {
@@ -83,12 +84,13 @@ export const parties: Party[] = [
       migration: "Behåll en stram men human asylpolitik. Kräv svenska och samhällskunskap för medborgarskap och underlätta efterfrågad arbetskraftsinvandring.",
       klimat: "Använd EU:s utsläppshandel, elektrifiering och innovation. Skydda mer natur och förena klimatmål med konkurrenskraft.",
       energi: "Bygg ny kärnkraft och annan fossilfri energi. Investera i elnät, laddning och en robust energiförsörjning.",
-      demokrati: "Inför en författningsdomstol och stärk individuella rättigheter. Fördjupa EU samarbetet och stödet till Ukraina.",
+      demokrati: "Inför en författningsdomstol och stärk individuella rättigheter. Bekämpa antisemitism genom utbildning, lokala handlingsplaner, skärpta straff för hatbrott i skolmiljö och stoppade offentliga bidrag till föreningar som sprider judehat. Fördjupa EU samarbetet och stödet till Ukraina.",
       regering: "Partiet vill fortsätta styra tillsammans med Moderaterna, Kristdemokraterna och Sverigedemokraterna.",
     },
     sources: [
       { title: "Valmanifest 2026", url: "https://www.liberalerna.se/wp-content/uploads/liberalernas-valmanifest-2026-40s-komprimerad.pdf" },
       { title: "Program och rapporter", url: "https://www.liberalerna.se/program-och-rapporter" },
+      { title: "Förslag mot antisemitism", url: "https://www.liberalerna.se/nyheter/liberalerna-presenterar-sex-forslag-for-ett-sverige-fritt-fran-antisemitism", publishedAt: "27 augusti 2026" },
     ],
   },
   {
@@ -101,7 +103,7 @@ export const parties: Party[] = [
       skola: "Avskaffa marknadsskolan och vinstuttagen. Fördela resurser efter behov, minska grupper och stärk elevstöd, kultur och ungas psykiska hälsa.",
       brott: "Kombinera lokal polis med skola, socialtjänst, vård och fritid. Bekämpa gängens ekonomi och våld mot kvinnor utan att fängsla barn.",
       migration: "Värna asylrätt och familjesammanhållning. Stoppa orimliga utvisningar av etablerade personer och bekämpa rasism och diskriminering.",
-      klimat: "Fasa snabbt ut fossila bränslen, gör utsläpp dyrare och hållbara val billigare. Skydda mer skog, hav och biologisk mångfald.",
+      klimat: "Fasa snabbt ut fossila bränslen, gör utsläpp dyrare och hållbara val billigare. Återinför stadsmiljöavtalen med 1,5 miljarder kronor per år till gång, cykel, kollektivtrafik och grönare stadsmiljöer. Skydda mer skog, hav och biologisk mångfald.",
       energi: "Bygg vind, sol, vattenkraft, lagring och effektivisering. Partiet avvisar ny kärnkraft och vill accelerera förnybar energi.",
       demokrati: "Försvara fria medier, kultur, forskning, minoriteter och samiska rättigheter. Stärk EU som klimataktör och fortsätt stödet till Ukraina.",
       regering: "Partiet vill se en rödgrön regering ledd av Socialdemokraterna med stark klimat och välfärdspolitik.",
@@ -109,6 +111,7 @@ export const parties: Party[] = [
     sources: [
       { title: "Valmanifest 2026", url: "https://www.mp.se/valmanifest2026/" },
       { title: "Partiprogram", url: "https://www.mp.se/om/partiprogram/" },
+      { title: "Satsning på grönare städer", url: "https://www.mp.se/just-nu/mp-satsar-6-miljarder-pa-gronare-stader/", publishedAt: "27 augusti 2026" },
     ],
   },
   {
@@ -119,7 +122,7 @@ export const parties: Party[] = [
       ekonomi: "Sänk skatten på arbete, pension och företagande, särskilt för arbetande föräldrar. Höj gränsen för skattefritt sparande och stärk arbetslinjen.",
       vard: "Försvara valfrihet och privata utförare med skärpt kvalitetskontroll. Korta vårdköer och prioritera kärnverksamhet framför administration.",
       skola: "Återupprätta kunskap, ordning och lärarnas auktoritet. Stärk statens kvalitetskontroll, behåll skolvalet och avskaffa avgiften för förskola och fritidshem.",
-      brott: "Bygg ut polis, domstolar och kriminalvård. Skärp straff, slå mot gängens ekonomi och ge rättsväsendet fler verktyg.",
+      brott: "Bygg ut polis, domstolar och kriminalvård. Avskaffa mängdrabatten senast den 1 januari 2029, skärp straff, slå mot gängens ekonomi och ge rättsväsendet fler verktyg.",
       migration: "Behåll en stram migrationspolitik och skärp kraven för medborgarskap, egen försörjning och integration. Utvisning ska användas mer vid brott.",
       klimat: "Minska utsläpp genom teknik, elektrifiering och investeringar som bevarar konkurrenskraft. Klimatpolitiken ska vara kostnadseffektiv.",
       energi: "Bygg ny kärnkraft, förstärk elnäten och säkra planerbar fossilfri el. Korta tillståndsprocesserna för energiinvesteringar.",
@@ -129,6 +132,7 @@ export const parties: Party[] = [
     sources: [
       { title: "Vallöften 2026", url: "https://moderaterna.se/valloften-2026/" },
       { title: "Politiskt handlingsprogram", url: "https://moderaterna.se/app/uploads/2025/10/Stammohandlingar2025_6oktober.pdf" },
+      { title: "Besked om avskaffad mängdrabatt", url: "https://moderaterna.se/nyhet/mangdrabatten-ska-avskaffas-2029/", publishedAt: "26 augusti 2026" },
     ],
   },
   {
@@ -136,12 +140,12 @@ export const parties: Party[] = [
     overview: "Socialdemokraterna vill prioritera hushållens ekonomi, starkare välfärd, fler jobb genom industriinvesteringar, statlig närvaro i hela landet och en offensiv mot organiserad brottslighet.",
     priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Stöd gröna industriinvesteringar, bostadsbyggande och ett Landsbygdslyft för fler jobb i hela landet."],
     positions: {
-      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet och använd gröna kreditgarantier, investeringsstöd och statliga byggkrediter för fler jobb, industriinvesteringar och bostäder i hela landet.",
+      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet, förstärk systemet för korttidsarbete och använd gröna kreditgarantier, investeringsstöd och statliga byggkrediter för fler jobb, industriinvesteringar och bostäder i hela landet.",
       vard: "Ge välfärden mer resurser och offentlig kontroll. Korta vårdköer, stärk personalen och minska utrymmet för vinststyrning.",
       skola: "Stoppa vinstjakt i skola och förskola, öka likvärdigheten och stärk lärare, elevhälsa och tidigt stöd.",
       brott: "Slå mot maffialiknande strukturer och kriminell ekonomi med fler poliser och hårdare verktyg. Kombinera detta med socialtjänst, skola och områdespolitik.",
       migration: "Behåll en stram migrationslinje och ställ krav på svenska, arbete och integration. Samhället ska bryta segregation och trångboddhet.",
-      klimat: "Driv klimatomställningen med gröna krediter, industristöd, elektrifierade transporter och offentlig upphandling. Gör kollektivtrafiken avgiftsfri för barn och unga på fritiden samt för heltidsstudenter under terminerna.",
+      klimat: "Driv klimatomställningen med gröna krediter, industristöd, elektrifierade transporter och offentlig upphandling. Stärk stödet till tunga elfordon och laddinfrastruktur. Stoppa storskaligt industrifiske av sill och strömming i Östersjön, flytta ut trålgränsen permanent och värna kustfisket. Gör kollektivtrafiken avgiftsfri för barn och unga på fritiden samt för heltidsstudenter under terminerna.",
       energi: "Bygg ut fossilfri el genom en teknikneutral mix av kärnkraft, vind, vatten och elnät. Staten ska ta större ansvar för energiplaneringen.",
       demokrati: "Stärk demokrati, civilsamhälle och totalförsvar. Fördjupa EU samarbetet där det stärker jobb och säkerhet och fortsätt stödet till Ukraina.",
       regering: "Partiet vill leda en ny regering under Magdalena Andersson med gemensamma reformer och ett stabilt regeringsunderlag.",
@@ -151,6 +155,8 @@ export const parties: Party[] = [
       { title: "Principer för en ny regering", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-03-magdalena-andersson-inleder-valturnen---presenterar-tre-principer-for-en-regering-ledd-av-henne" },
       { title: "Vallöfte om jobb och klimat", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-25-s-vallofte-fler-jobb-och-lagre-klimatutslapp", publishedAt: "25 augusti 2026" },
       { title: "Vallöfte om ett sammanhållet Sverige", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-25-s-sverige-ska-halla-ihop", publishedAt: "25 augusti 2026" },
+      { title: "Vallöfte om stärkt industrikonkurrens", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-27-s-vallofte-starkt-konkurrens-i-svensk-industri", publishedAt: "27 augusti 2026" },
+      { title: "Vallöfte om Östersjöfisket", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-27-s-vallofte-stoppa-det-storskaliga-industrifisket-av-sill-och-stromming-i-ostersjon", publishedAt: "27 augusti 2026" },
     ],
   },
   {
