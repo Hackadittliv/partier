@@ -18,6 +18,8 @@ Sakfrågan gör svensk politik sökbar, jämförbar och begriplig. Tjänsten pre
 
 7. Ta emot verifierade X-inlägg, förfiltrera dem med kod, analysera dem kostnadseffektivt i batch via Connie Social MCP och lägga resultatet i samma granskningskö
 
+8. Publicera indexerbara sidor för varje parti och sakfråga med canonical-adresser, strukturerad data och officiella källor
+
 ## Lokal utveckling
 
 Installera beroenden med npm install.
@@ -28,7 +30,9 @@ Starta utvecklingsmiljön med npm run dev.
 
 Netlify bygger den statiska versionen med npm run build:netlify och publicerar mappen out.
 
-Den primära webbplatsen finns på https://sakfragan.netlify.app
+Den primära webbplatsen finns på https://sakfragan.nu
+
+`robots.txt` och `sitemap.xml` genereras vid varje bygge. Netlify-adressen och www-adressen omdirigeras permanent till den primära domänen.
 
 ## Metod
 

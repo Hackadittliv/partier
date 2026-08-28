@@ -15,6 +15,22 @@ export type Party = {
 };
 
 export const lastUpdated = "28 augusti 2026";
+const swedishMonths: Record<string, string> = {
+  januari: "01",
+  februari: "02",
+  mars: "03",
+  april: "04",
+  maj: "05",
+  juni: "06",
+  juli: "07",
+  augusti: "08",
+  september: "09",
+  oktober: "10",
+  november: "11",
+  december: "12",
+};
+const [updatedDay, updatedMonth, updatedYear] = lastUpdated.split(" ");
+export const lastUpdatedIso = `${updatedYear}-${swedishMonths[updatedMonth]}-${updatedDay.padStart(2, "0")}`;
 export const electionDate = "13 september 2026";
 
 export const topics = [

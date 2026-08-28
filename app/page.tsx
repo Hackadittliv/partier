@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BrandLogo from "./brand-logo";
 import { electionDate, lastUpdated, parties, partiesByFounded, topics, type Party } from "./data";
@@ -288,6 +289,7 @@ export default function Home() {
                 <div className="cardActions">
                   <button onClick={() => setSelectedParty(party)}>Se hela partiprofilen</button>
                   <button className="quiet" onClick={() => { if (!compareIds.includes(party.id)) toggleCompare(party.id); setView("jamfor"); }}>Jämför</button>
+                  <Link href={`/partier/${party.id}`}>Egen sida</Link>
                 </div>
               </article>;
             })}
@@ -300,6 +302,13 @@ export default function Home() {
           <div><strong>{topics.length}</strong><span>sakområden</span></div>
           <div><strong>{sourceCount}</strong><span>officiella källor</span></div>
           <div className="trustText"><b>Fakta först.</b><p>Varje sammanfattning går att kontrollera mot partiets egen källa. Materialet bevakas dagligen fram till valet den {electionDate}.</p></div>
+        </section>
+        <section className="discoveryHub sectionWrap" aria-labelledby="discoverMoreTitle">
+          <div><p className="sectionLabel">Fördjupa dig</p><h2 id="discoverMoreTitle">Permanenta sidor för varje svar.</h2><p>Öppna en sakfråga eller ett parti direkt. Sidorna har egna adresser som går att dela, bokmärka och hitta via sökmotorer.</p></div>
+          <div className="discoveryLists">
+            <div><h3>Sakfrågor</h3>{topics.map((item) => <Link href={`/sakfragor/${item.id}`} key={item.id}>{item.label}</Link>)}</div>
+            <div><h3>Partier</h3>{partiesByFounded.map((party) => <Link href={`/partier/${party.id}`} key={party.id}>{party.name}</Link>)}</div>
+          </div>
         </section>
       </>}
 
@@ -346,7 +355,7 @@ export default function Home() {
         <div className="methodCard"><div><p className="sectionLabel">Metod</p><h2>Vad tjänsten gör</h2></div><p>Materialet sammanfattas från partiernas officiella källor. Lokal politik blandas inte med nationell politik. Fakta och analys hålls isär. Brytdatum för denna version är {lastUpdated}. Källor och nya valbesked kontrolleras dagligen fram till valet den {electionDate}.</p></div>
       </section>}
 
-      <footer className="footer"><div className="brand"><BrandLogo /></div><p>Politik på vanlig svenska. Byggd för förståelse, inte övertalning.</p><button onClick={() => setView("om")}>Metod och transparens</button></footer>
+      <footer className="footer"><div className="brand"><BrandLogo /></div><p>Politik på vanlig svenska. Byggd för förståelse, inte övertalning.</p><Link href="/om">Metod och transparens</Link></footer>
 
       {selectedParty && <div className="modalBackdrop" role="presentation" onMouseDown={() => setSelectedParty(null)}>
         <section className="partyModal" role="dialog" aria-modal="true" aria-labelledby="partyTitle" onMouseDown={(event) => event.stopPropagation()} style={{ "--party": selectedParty.color } as React.CSSProperties}>
