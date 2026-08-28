@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { parties, partiesByFounded } from "../app/data.ts";
-import { detectSearchGoal, findPartySearchContext, findSearchIntent, inferTopic, partyMatchScore, searchIntents } from "../app/search.ts";
+import { detectSearchGoal, findMentionedPartyIds, findPartySearchContext, findSearchConcept, findSearchIntent, getSearchSuggestions, inferTopic, partyMatchScore, searchIntents } from "../app/search.ts";
 
 test("tolkar tydliga politiska frågor", () => {
   assert.equal(findSearchIntent("Vilka vill bygga mer kärnkraft?")?.intent.id, "new-nuclear");
@@ -42,6 +42,33 @@ test("visar sammanhanget bakom en bred textträff", () => {
   const context = findPartySearchContext(medborgerligSamling, "kommunalt", "alla");
   assert.equal(context?.topic, "energi");
   assert.match(context?.text ?? "", /Kommunalt veto/);
+});
+
+test("skiljer direkta AI träffar från närliggande digital politik", () => {
+  const mod = parties.find((party) => party.id === "partietmod");
+  const centerpartiet = parties.find((party) => party.id === "centerpartiet");
+  const piratpartiet = parties.find((party) => party.id === "piratpartiet");
+  assert.ok(mod && centerpartiet && piratpartiet);
+  assert.equal(findSearchConcept("Vad säger partierna om AI?")?.id, "ai");
+  assert.equal(findPartySearchContext(mod, "AI", "alla")?.kind, "direct");
+  assert.match(findPartySearchContext(mod, "AI", "alla")?.text ?? "", /AI/);
+  assert.equal(findPartySearchContext(centerpartiet, "AI", "alla")?.kind, "related");
+  assert.match(findPartySearchContext(centerpartiet, "AI", "alla")?.text ?? "", /algoritmer/);
+  assert.equal(findPartySearchContext(piratpartiet, "AI", "alla")?.kind, "related");
+  assert.match(findPartySearchContext(piratpartiet, "AI", "alla")?.text ?? "", /digitalisering/);
+});
+
+test("förstår utskrivet AI begrepp och ger ett relevant frågeförslag", () => {
+  const mod = parties.find((party) => party.id === "partietmod");
+  assert.ok(mod);
+  assert.equal(findPartySearchContext(mod, "artificiell intelligens", "alla")?.kind, "direct");
+  assert.equal(getSearchSuggestions("artificiell intelligens", 1)[0], "Vad säger partierna om AI och digitalisering?");
+});
+
+test("avgränsar en fråga som nämner ett eller flera partier", () => {
+  assert.deepEqual(findMentionedPartyIds("Vad vill Moderaterna göra med skolan?"), ["moderaterna"]);
+  assert.deepEqual(findMentionedPartyIds("Jämför M och S om skolan"), ["moderaterna", "socialdemokraterna"]);
+  assert.deepEqual(findMentionedPartyIds("Vad vill partierna göra med skolan?"), []);
 });
 
 test("alla granskade jämförelser omfattar samtliga partier", () => {

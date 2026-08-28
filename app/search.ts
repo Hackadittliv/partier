@@ -23,9 +23,22 @@ export type IntentMatch = {
 };
 
 export type PartySearchContext = {
-  topic: TopicId;
+  topic: TopicId | null;
   text: string;
   score: number;
+  kind: "direct" | "related";
+  label: string;
+  directTerms: string[];
+  relatedTerms: string[];
+  source?: { title: string; url: string };
+};
+
+export type SearchConcept = {
+  id: string;
+  label: string;
+  signals: string[];
+  relatedTerms: string[];
+  exampleQuestion: string;
 };
 
 export const stanceMeta: Record<Stance, { label: string; shortLabel: string; description: string }> = {
@@ -154,7 +167,120 @@ const topicSignals: Record<TopicId, string[]> = {
   regering: ["regering", "regeringsfrågan", "samarbete", "block", "statsminister", "koalition", "regeringsunderlag"],
 };
 
-const stopWords = new Set(["hur", "vad", "vilka", "vilket", "vill", "ska", "skulle", "gor", "gora", "parti", "partier", "partierna", "partiernas", "syn", "skiljer", "sig", "och", "eller", "att", "med", "for", "fran", "till", "inom", "mot", "som", "det", "den", "de", "pa", "om", "at", "mer", "sverige", "svenska"]);
+export const searchConcepts: SearchConcept[] = [
+  {
+    id: "ai",
+    label: "AI och digitalisering",
+    signals: ["ai", "artificiell intelligens", "maskininlärning", "chatgpt"],
+    relatedTerms: ["algoritm", "algoritmer", "automatisering", "digitalisering", "digital teknik"],
+    exampleQuestion: "Vad säger partierna om AI och digitalisering?",
+  },
+  {
+    id: "housing",
+    label: "Bostäder och boende",
+    signals: ["bostad", "bostäder", "boende", "hyra", "hyror", "bostadsbrist"],
+    relatedTerms: ["småhus", "bostadsbyggande", "byggkrediter", "byggande"],
+    exampleQuestion: "Hur vill partierna lösa bostadsbristen?",
+  },
+  {
+    id: "business",
+    label: "Företagande",
+    signals: ["företag", "företagande", "entreprenör", "småföretag", "näringsliv"],
+    relatedTerms: ["arbetsgivaravgift", "anställa", "regelförenkling", "tillstånd", "frihandel"],
+    exampleQuestion: "Vad vill partierna göra för företagare?",
+  },
+  {
+    id: "pensions",
+    label: "Pensioner och äldre",
+    signals: ["pension", "pensioner", "pensionär", "pensionärer"],
+    relatedTerms: ["äldre", "äldres", "äldreomsorg", "äldrevård"],
+    exampleQuestion: "Vad vill partierna göra för pensionärer?",
+  },
+  {
+    id: "mental-health",
+    label: "Psykisk hälsa",
+    signals: ["psykisk hälsa", "psykiatri", "depression", "ångest", "självmord"],
+    relatedTerms: ["elevhälsa", "ungas hälsa", "vårdgaranti"],
+    exampleQuestion: "Hur vill partierna förbättra den psykiska hälsan?",
+  },
+  {
+    id: "defence",
+    label: "Försvar och beredskap",
+    signals: ["försvar", "försvaret", "beredskap", "värnplikt", "nato"],
+    relatedTerms: ["ukraina", "civilförsvar", "totalförsvar", "militärt försvar"],
+    exampleQuestion: "Vad vill partierna göra med Sveriges försvar?",
+  },
+  {
+    id: "rural",
+    label: "Landsbygd och jordbruk",
+    signals: ["landsbygd", "landsbygden", "jordbruk", "lantbruk", "skogsbruk"],
+    relatedTerms: ["lokal infrastruktur", "livsmedel", "skog", "regional utveckling"],
+    exampleQuestion: "Vad vill partierna göra för landsbygden?",
+  },
+  {
+    id: "transport",
+    label: "Transporter och drivmedel",
+    signals: ["transport", "transporter", "trafik", "bil", "bensin", "diesel", "drivmedel"],
+    relatedTerms: ["järnväg", "kollektivtrafik", "vägar", "laddinfrastruktur"],
+    exampleQuestion: "Vad vill partierna göra med bensinpriset?",
+  },
+  {
+    id: "rights",
+    label: "Rättigheter och jämställdhet",
+    signals: ["abort", "aborträtt", "hbtqi", "jämställdhet", "diskriminering"],
+    relatedTerms: ["kvinnors rättigheter", "liberala rättigheter", "minoriteter"],
+    exampleQuestion: "Hur ser partierna på aborträtten?",
+  },
+  {
+    id: "privacy",
+    label: "Integritet och övervakning",
+    signals: ["integritet", "övervakning", "massövervakning", "yttrandefrihet", "censur"],
+    relatedTerms: ["digitala rättigheter", "sociala medier", "algoritmer", "rättsstat"],
+    exampleQuestion: "Vad säger partierna om integritet och övervakning?",
+  },
+  {
+    id: "dental-care",
+    label: "Tandvård",
+    signals: ["tandvård", "tänder", "tandläkare", "tandvårdsstöd"],
+    relatedTerms: ["högkostnadsskydd", "munhälsa"],
+    exampleQuestion: "Vad vill partierna göra med tandvården?",
+  },
+];
+
+const partyAliases: Record<string, string[]> = {
+  centerpartiet: ["centerpartiet", "centern"],
+  kristdemokraterna: ["kristdemokraterna", "kd"],
+  liberalerna: ["liberalerna"],
+  miljopartiet: ["miljöpartiet", "mp"],
+  moderaterna: ["moderaterna"],
+  socialdemokraterna: ["socialdemokraterna", "sossarna"],
+  sverigedemokraterna: ["sverigedemokraterna", "sd"],
+  vansterpartiet: ["vänsterpartiet"],
+  medborgerligsamling: ["medborgerlig samling"],
+  nyans: ["partiet nyans", "nyans"],
+  orebropartiet: ["örebropartiet"],
+  alternativforsverige: ["alternativ för sverige", "afs"],
+  piratpartiet: ["piratpartiet"],
+  partietmod: ["partiet mod"],
+};
+
+const partyInitialisms: Record<string, string[]> = {
+  centerpartiet: ["C"],
+  kristdemokraterna: ["KD"],
+  liberalerna: ["L"],
+  miljopartiet: ["MP"],
+  moderaterna: ["M"],
+  socialdemokraterna: ["S"],
+  sverigedemokraterna: ["SD"],
+  vansterpartiet: ["V"],
+  medborgerligsamling: ["MED"],
+  orebropartiet: ["ÖP"],
+  alternativforsverige: ["AfS"],
+  piratpartiet: ["PP"],
+  partietmod: ["MoD"],
+};
+
+const stopWords = new Set(["hur", "vad", "vilka", "vilket", "vem", "varfor", "vill", "ska", "skulle", "gor", "gora", "sager", "tycker", "anser", "parti", "partier", "partierna", "partiernas", "politik", "politiska", "forslag", "syn", "svar", "skiljer", "sig", "och", "eller", "att", "med", "for", "fran", "till", "inom", "mot", "som", "det", "den", "de", "deras", "pa", "om", "at", "mer", "sverige", "svenska"]);
 
 export function normalizeText(value: string) {
   return value.toLocaleLowerCase("sv").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
@@ -180,38 +306,132 @@ function levenshtein(a: string, b: string) {
 }
 
 function wordsMatch(queryWord: string, signalWord: string) {
-  if (queryWord === signalWord) return 2;
-  if (queryWord.length >= 5 && signalWord.length >= 5 && levenshtein(queryWord, signalWord) <= 1) return 1;
+  if (queryWord === signalWord) return 4;
+  if (queryWord.length >= 5 && signalWord.length >= 5 && levenshtein(queryWord, signalWord) <= 1) return 3;
+  const shortest = Math.min(queryWord.length, signalWord.length);
+  if (shortest >= 5 && Math.abs(queryWord.length - signalWord.length) <= 4 && (queryWord.startsWith(signalWord) || signalWord.startsWith(queryWord))) return 2;
   return 0;
-}
-
-export function findPartySearchContext(party: Party, query: string, activeTopic: string): PartySearchContext | null {
-  const words = queryWords(query);
-  if (!words.length) return null;
-
-  const candidates = (Object.entries(party.positions) as [TopicId, string][])
-    .filter(([topic]) => activeTopic === "alla" || topic === activeTopic)
-    .map(([topic, text]) => {
-      const textWords = normalizeText(text).split(" ");
-      const score = words.reduce((total, word) => total + Math.max(0, ...textWords.map((candidate) => wordsMatch(word, candidate))), 0);
-      return { topic, text, score };
-    })
-    .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score);
-
-  return candidates[0] ?? null;
 }
 
 function phraseScore(value: string, signal: string) {
   const normalizedValue = normalizeText(value);
   const normalizedSignal = normalizeText(signal);
-  if (normalizedValue.includes(normalizedSignal)) return 8 + normalizedSignal.split(" ").length * 2;
+  if (!normalizedValue || !normalizedSignal) return 0;
+  if (` ${normalizedValue} `.includes(` ${normalizedSignal} `)) return 8 + normalizedSignal.split(" ").length * 2;
+  if (!normalizedSignal.includes(" ") && normalizedSignal.length >= 4 && normalizedValue.split(" ").some((word) => word.includes(normalizedSignal))) return 7;
 
   const valueWords = normalizedValue.split(" ");
   const signalWords = normalizedSignal.split(" ").filter((word) => word.length > 2);
   if (!signalWords.length) return 0;
   const matches = signalWords.map((signalWord) => Math.max(0, ...valueWords.map((queryWord) => wordsMatch(queryWord, signalWord))));
   return matches.every((match) => match > 0) ? matches.reduce((total, match) => total + match, 0) : 0;
+}
+
+export function findSearchConcept(value: string) {
+  if (!value.trim()) return null;
+  const candidates = searchConcepts
+    .map((concept) => ({ concept, score: Math.max(...[...concept.signals, ...concept.relatedTerms].map((signal) => phraseScore(value, signal))) }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score);
+  return candidates[0]?.concept ?? null;
+}
+
+export function findMentionedPartyIds(value: string) {
+  const normalized = ` ${normalizeText(value)} `;
+  if (!normalized.trim()) return [];
+  const exactInitialisms = new Set(Object.entries(partyInitialisms)
+    .filter(([, aliases]) => aliases.some((alias) => new RegExp(`(^|[^A-Za-zÅÄÖåäö])${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^A-Za-zÅÄÖåäö]|$)`).test(value)))
+    .map(([id]) => id));
+  return Object.entries(partyAliases)
+    .filter(([id, aliases]) => exactInitialisms.has(id) || aliases.some((alias) => normalized.includes(` ${normalizeText(alias)} `)))
+    .map(([id]) => id);
+}
+
+type SearchCandidate = {
+  topic: TopicId | null;
+  label: string;
+  text: string;
+  searchText: string;
+  weight: number;
+  source?: { title: string; url: string };
+};
+
+function partyCandidates(party: Party, activeTopic: string): SearchCandidate[] {
+  const positions = (Object.entries(party.positions) as [TopicId, string][])
+    .filter(([topic]) => activeTopic === "alla" || topic === activeTopic)
+    .map(([topic, text]) => ({ topic, label: "Sakområde", text, searchText: text, weight: 4 }));
+  const general = activeTopic === "alla" ? [
+    { topic: null, label: "Partiprofil", text: party.overview, searchText: `${party.name} ${party.short} ${party.ideology} ${party.overview}`, weight: 2 },
+    ...party.priorities.map((text) => ({ topic: null, label: "Prioritering", text, searchText: text, weight: 3 })),
+    ...party.sources.map((source) => ({ topic: null, label: "Officiell källa", text: source.title, searchText: source.title, weight: 1, source: { title: source.title, url: source.url } })),
+  ] : [];
+  return [...positions, ...general];
+}
+
+function matchingTerms(value: string, terms: string[]) {
+  return terms.filter((term) => phraseScore(value, term) > 0);
+}
+
+export function findPartySearchContext(party: Party, query: string, activeTopic: string): PartySearchContext | null {
+  const directTerms = queryWords(query);
+  const concept = findSearchConcept(query);
+  const matchedConceptSignal = concept?.signals.some((signal) => phraseScore(query, signal) > 0) ?? false;
+  const directPool = concept && matchedConceptSignal ? [...new Set([...directTerms, ...concept.signals])] : directTerms;
+  const relatedPool = concept
+    ? [...new Set([...(matchedConceptSignal ? [] : concept.signals), ...concept.relatedTerms])].filter((term) => !directTerms.includes(normalizeText(term)))
+    : [];
+  if (!directTerms.length && !findMentionedPartyIds(query).includes(party.id)) return null;
+
+  const candidates = partyCandidates(party, activeTopic)
+    .map((candidate) => {
+      const directMatches = matchingTerms(candidate.searchText, directPool);
+      const relatedMatches = matchingTerms(candidate.searchText, relatedPool);
+      const directScore = directMatches.reduce((total, term) => total + phraseScore(candidate.searchText, term), 0);
+      const relatedScore = relatedMatches.reduce((total, term) => total + phraseScore(candidate.searchText, term), 0);
+      const kind = directScore > 0 ? "direct" as const : "related" as const;
+      const score = directScore * 4 + relatedScore + candidate.weight;
+      return { ...candidate, score, kind, directTerms: directMatches, relatedTerms: relatedMatches };
+    })
+    .filter(({ score, directTerms: matchedDirect, relatedTerms }) => score > 0 && (matchedDirect.length > 0 || relatedTerms.length > 0))
+    .sort((a, b) => b.score - a.score);
+
+  const best = candidates[0];
+  if (best) return best;
+  if (findMentionedPartyIds(query).includes(party.id)) {
+    return { topic: null, label: "Partiprofil", text: party.overview, score: 30, kind: "direct", directTerms: [], relatedTerms: [] };
+  }
+  return null;
+}
+
+export function searchTokenKind(value: string, context: PartySearchContext) {
+  const normalized = normalizeText(value);
+  if (!normalized) return null;
+  if (context.directTerms.some((term) => phraseScore(normalized, term) > 0)) return "direct";
+  if (context.relatedTerms.some((term) => phraseScore(normalized, term) > 0)) return "related";
+  return null;
+}
+
+export function getSearchSuggestions(value: string, limit = 5) {
+  const pool = [
+    ...searchIntents.map((intent) => intent.question),
+    ...searchConcepts.map((concept) => concept.exampleQuestion),
+  ];
+  const normalized = normalizeText(value);
+  if (!normalized) return pool.slice(0, limit);
+  const conceptSuggestion = findSearchConcept(value)?.exampleQuestion;
+  const words = queryWords(value);
+  const matches = pool
+    .map((suggestion) => {
+      const normalizedSuggestion = normalizeText(suggestion);
+      const exact = normalizedSuggestion.includes(normalized) ? 20 : 0;
+      const wordScore = words.reduce((total, word) => total + Math.max(0, ...normalizedSuggestion.split(" ").map((candidate) => wordsMatch(word, candidate))), 0);
+      return { suggestion, score: exact + wordScore };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score || a.suggestion.localeCompare(b.suggestion, "sv"))
+    .slice(0, limit)
+    .map(({ suggestion }) => suggestion);
+  return [...new Set([...(conceptSuggestion ? [conceptSuggestion] : []), ...matches])].slice(0, limit);
 }
 
 export function findSearchIntent(value: string): IntentMatch | null {
@@ -249,15 +469,9 @@ export function partyMatchScore(party: Party, query: string, activeTopic: string
   if (!query && activeTopic === "alla") return 1;
   if (!query) return party.positions[activeTopic] ? 1 : 0;
 
-  const words = queryWords(query);
-  const selectedText = activeTopic === "alla" ? Object.values(party.positions).join(" ") : party.positions[activeTopic] ?? "";
-  const haystack = normalizeText([party.name, party.short, party.ideology, party.overview, ...party.priorities, selectedText].join(" "));
-  const haystackWords = haystack.split(" ");
-  const partyName = normalizeText(party.name);
-  const normalizedQuery = normalizeText(query);
-  const directPartyMatch = normalizedQuery.includes(partyName) || partyName.includes(normalizedQuery) ? 20 : 0;
-  const wordScore = words.reduce((score, word) => score + Math.max(0, ...haystackWords.map((candidate) => wordsMatch(word, candidate))), 0);
-  return directPartyMatch + wordScore + (inferredTopic ? 6 : 0);
+  const context = findPartySearchContext(party, query, activeTopic);
+  const directPartyMatch = findMentionedPartyIds(query).includes(party.id) ? 30 : 0;
+  return directPartyMatch + (context?.score ?? 0) + (inferredTopic ? 6 : 0);
 }
 
 export function stanceSortValue(stance: Stance, goal: SearchGoal) {

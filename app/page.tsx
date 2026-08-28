@@ -5,14 +5,14 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BrandLogo from "./brand-logo";
 import { electionDate, lastUpdated, parties, partiesByFounded, topics, type Party } from "./data";
-import { detectSearchGoal, findPartySearchContext, findSearchIntent, inferTopic, normalizeText, partyMatchScore, queryWords, stanceMeta, stanceSortValue, type Stance } from "./search";
+import { detectSearchGoal, findMentionedPartyIds, findPartySearchContext, findSearchConcept, findSearchIntent, getSearchSuggestions, inferTopic, partyMatchScore, searchTokenKind, stanceMeta, stanceSortValue, type PartySearchContext, type Stance } from "./search";
 import { buildPublicSearch, parsePublicUrl, type View } from "./url-state";
 
 const suggestions = [
+  "Vad säger partierna om AI och digitalisering?",
   "Vilka partier vill bygga mer kärnkraft?",
   "Vilka vill stoppa vinster i skolan?",
   "Vilka vill föra en stramare migrationspolitik?",
-  "Vilka partier vill lämna EU?",
 ];
 
 function badgeClass(status: Party["status"]) {
@@ -29,9 +29,11 @@ function PartyEmblem({ party, compact = false, hero = false }: { party: Party; c
   </span>;
 }
 
-function HighlightedText({ text, query }: { text: string; query: string }) {
-  const words = queryWords(query);
-  return <>{text.split(/(\s+)/).map((part, index) => words.includes(normalizeText(part)) ? <mark key={`${part}-${index}`}>{part}</mark> : part)}</>;
+function HighlightedText({ text, context }: { text: string; context: PartySearchContext }) {
+  return <>{text.split(/(\s+)/).map((part, index) => {
+    const kind = searchTokenKind(part, context);
+    return kind ? <mark className={kind} key={`${part}-${index}`}>{part}</mark> : part;
+  })}</>;
 }
 
 const riksdagParties = partiesByFounded.filter((party) => party.group === "riksdag");
@@ -43,6 +45,7 @@ const publicUrlOptions = {
 };
 
 export default function Home() {
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const resultsRef = useRef<HTMLElement | null>(null);
   const filteredResultsRef = useRef<HTMLDivElement | null>(null);
   const [view, setView] = useState<View>("utforska");
@@ -55,6 +58,8 @@ export default function Home() {
   const [stanceFilter, setStanceFilter] = useState<"all" | Stance>("all");
   const [linkCopied, setLinkCopied] = useState(false);
   const [urlReady, setUrlReady] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
 
   useEffect(() => {
     function restoreUrlState() {
@@ -81,6 +86,20 @@ export default function Home() {
     window.history.replaceState(null, "", `${window.location.pathname}${search}${window.location.hash}`);
   }, [urlReady, view, query, topic, compareIds, compareTopic]);
 
+  useEffect(() => {
+    function focusSearch(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      const isTyping = target?.matches("input, textarea, select, [contenteditable='true']");
+      if (event.key === "/" && !isTyping) {
+        event.preventDefault();
+        setView("utforska");
+        window.requestAnimationFrame(() => searchInputRef.current?.focus());
+      }
+    }
+    window.addEventListener("keydown", focusSearch);
+    return () => window.removeEventListener("keydown", focusSearch);
+  }, []);
+
   const rawIntentMatch = query.trim() ? findSearchIntent(query) : null;
   const intentMatch = rawIntentMatch && (topic === "alla" || rawIntentMatch.intent.topic === topic) ? rawIntentMatch : null;
   const searchGoal = intentMatch ? detectSearchGoal(query, intentMatch.intent) : "compare";
@@ -88,10 +107,14 @@ export default function Home() {
   const activeTopic = topic === "alla" ? inferredTopic ?? "alla" : topic;
   const activeTopicLabel = activeTopic === "alla" ? null : topics.find((item) => item.id === activeTopic)?.label;
   const isTextSearch = Boolean(query.trim() && !intentMatch && !activeTopicLabel);
+  const searchConcept = query.trim() ? findSearchConcept(query) : null;
+  const mentionedPartyIds = useMemo(() => findMentionedPartyIds(query), [query]);
+  const autocompleteSuggestions = useMemo(() => query.trim().length >= 2 ? getSearchSuggestions(query) : [], [query]);
+  const showAutocomplete = searchFocused && autocompleteSuggestions.length > 0;
 
   const results = useMemo(() => parties
     .map((party) => ({ party, score: partyMatchScore(party, query, activeTopic, inferredTopic) }))
-    .filter(({ score }) => score > 0)
+    .filter(({ party, score }) => score > 0 && (!mentionedPartyIds.length || mentionedPartyIds.includes(party.id)))
     .sort((a, b) => {
       if (!query.trim()) return a.party.founded - b.party.founded || a.party.name.localeCompare(b.party.name, "sv");
       if (intentMatch) {
@@ -102,11 +125,17 @@ export default function Home() {
       }
       return b.score - a.score || a.party.name.localeCompare(b.party.name, "sv");
     })
-    .map(({ party }) => party), [query, activeTopic, inferredTopic, intentMatch, searchGoal]);
+    .map(({ party }) => party), [query, activeTopic, inferredTopic, intentMatch, searchGoal, mentionedPartyIds]);
 
   const compared = compareIds.map((id) => parties.find((party) => party.id === id)).filter(Boolean) as Party[];
   const filteredResults = intentMatch && stanceFilter !== "all" ? results.filter((party) => (intentMatch.intent.stances[party.id] ?? "unclear") === stanceFilter) : results;
   const visibleResults = showAll ? filteredResults : filteredResults.slice(0, 6);
+  const searchContexts = useMemo(() => new Map(results.map((party) => [party.id, findPartySearchContext(party, query, activeTopic)])), [results, query, activeTopic]);
+  const textMatchCounts = isTextSearch ? filteredResults.reduce((counts, party) => {
+    const kind = searchContexts.get(party.id)?.kind;
+    if (kind) counts[kind] += 1;
+    return counts;
+  }, { direct: 0, related: 0 }) : null;
   const stanceCounts = intentMatch ? parties.reduce((counts, party) => {
     const stance = intentMatch.intent.stances[party.id] ?? "unclear";
     counts[stance] += 1;
@@ -144,7 +173,17 @@ export default function Home() {
     setStanceFilter("all");
     setShowAll(false);
     setView("utforska");
+    setSearchFocused(false);
+    setActiveSuggestion(-1);
     window.requestAnimationFrame(() => window.requestAnimationFrame(scrollToResults));
+  }
+
+  function clearSearch() {
+    setQuery("");
+    setStanceFilter("all");
+    setShowAll(false);
+    setActiveSuggestion(-1);
+    searchInputRef.current?.focus();
   }
 
   async function copyShareLink() {
@@ -192,30 +231,71 @@ export default function Home() {
           </div>
           <div className="searchPanel">
             <label htmlFor="mainSearch">Vad vill du förstå?</label>
-            <div className="searchInput">
-              <span aria-hidden="true">⌕</span>
-              <input
-                id="mainSearch"
-                value={query}
-                onChange={(event) => { setQuery(event.target.value); setStanceFilter("all"); setShowAll(false); }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && query.trim()) {
-                    event.preventDefault();
-                    scrollToResults();
-                  }
-                }}
-                aria-describedby={query.trim() ? "searchHint searchFeedback" : "searchHint"}
-                placeholder="Fråga exempelvis vilka som vill bygga kärnkraft"
-              />
-              {query && <button onClick={() => { setQuery(""); setStanceFilter("all"); setShowAll(false); }} aria-label="Rensa sökningen">Rensa</button>}
+            <div
+              className="searchInputWrap"
+              onFocusCapture={() => setSearchFocused(true)}
+              onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  setSearchFocused(false);
+                  setActiveSuggestion(-1);
+                }
+              }}
+            >
+              <div className="searchInput">
+                <span aria-hidden="true">⌕</span>
+                <input
+                  ref={searchInputRef}
+                  id="mainSearch"
+                  value={query}
+                  onChange={(event) => { setQuery(event.target.value); setStanceFilter("all"); setShowAll(false); setSearchFocused(true); setActiveSuggestion(-1); }}
+                  onKeyDown={(event) => {
+                    if (event.key === "ArrowDown" && autocompleteSuggestions.length) {
+                      event.preventDefault();
+                      setActiveSuggestion((current) => Math.min(current + 1, autocompleteSuggestions.length - 1));
+                    } else if (event.key === "ArrowUp" && autocompleteSuggestions.length) {
+                      event.preventDefault();
+                      setActiveSuggestion((current) => Math.max(current - 1, 0));
+                    } else if (event.key === "Escape") {
+                      setSearchFocused(false);
+                      setActiveSuggestion(-1);
+                    } else if (event.key === "Enter" && query.trim()) {
+                      event.preventDefault();
+                      if (activeSuggestion >= 0 && autocompleteSuggestions[activeSuggestion]) runSuggestion(autocompleteSuggestions[activeSuggestion]);
+                      else scrollToResults();
+                    }
+                  }}
+                  aria-describedby={query.trim() ? "searchHint searchFeedback" : "searchHint"}
+                  aria-autocomplete="list"
+                  aria-controls="searchSuggestions"
+                  aria-expanded={showAutocomplete}
+                  aria-activedescendant={activeSuggestion >= 0 ? `searchSuggestion${activeSuggestion}` : undefined}
+                  role="combobox"
+                  autoComplete="off"
+                  placeholder="Fråga exempelvis vad partierna säger om AI"
+                />
+                {!query && <kbd aria-label="Kortkommando, snedstreck">/</kbd>}
+                {query && <button onClick={clearSearch} aria-label="Rensa sökningen">Rensa</button>}
+              </div>
+              {showAutocomplete && <div className="searchAutocomplete" id="searchSuggestions" role="listbox" aria-label="Sökförslag">
+                <span>Förslag på frågor</span>
+                {autocompleteSuggestions.map((suggestion, index) => <button
+                  id={`searchSuggestion${index}`}
+                  key={suggestion}
+                  className={activeSuggestion === index ? "active" : ""}
+                  role="option"
+                  aria-selected={activeSuggestion === index}
+                  onMouseEnter={() => setActiveSuggestion(index)}
+                  onClick={() => runSuggestion(suggestion)}
+                ><b aria-hidden="true">⌕</b>{suggestion}</button>)}
+              </div>}
             </div>
-            <p className="searchHint" id="searchHint">Resultaten uppdateras direkt när du skriver. Otydliga svar markeras öppet.</p>
+            <p className="searchHint" id="searchHint">Sökningen förstår frågor, partinamn, förkortningar, stavfel och närliggande politiska begrepp.</p>
             {query.trim() && <div className="searchFeedback">
               <div className="feedbackStatus" id="searchFeedback" role="status" aria-live="polite">
                 <span aria-hidden="true" />
                 <div>
-                  <b>{activeTopicLabel ? `Tolkad som ${activeTopicLabel}` : "Textträffar hittade"}</b>
-                  <small>{filteredResults.length} {filteredResults.length === 1 ? "träff är redo" : "träffar är redo"} längre ner på sidan.</small>
+                  <b>{activeTopicLabel ? `Tolkad som ${activeTopicLabel}` : searchConcept ? `Tolkad som ${searchConcept.label}` : mentionedPartyIds.length ? "Parti identifierat" : "Textträffar hittade"}</b>
+                  <small>{textMatchCounts ? `${textMatchCounts.direct} direkta och ${textMatchCounts.related} närliggande träffar.` : `${filteredResults.length} ${filteredResults.length === 1 ? "träff är redo" : "träffar är redo"} längre ner på sidan.`}</small>
                 </div>
               </div>
               <button onClick={scrollToResults}>Visa {filteredResults.length} {filteredResults.length === 1 ? "träff" : "träffar"} <span aria-hidden="true">↓</span></button>
@@ -257,11 +337,13 @@ export default function Home() {
 
           {query && !intentMatch && inferredTopic && <div className="topicInterpretation" aria-live="polite"><span>Sakområde identifierat</span><strong>{activeTopicLabel}</strong><p>Frågan ger ännu ingen säker riktning mellan för och emot. Därför visas partiernas fulla ståndpunkt inom området.</p></div>}
 
+          {query && isTextSearch && searchConcept && textMatchCounts && <div className="topicInterpretation semanticInterpretation" aria-live="polite"><span>Begrepp identifierat</span><strong>{searchConcept.label}</strong><p>Vi visar ordagranna träffar först och därefter närliggande material. En närliggande träff betyder inte automatiskt att partiet har publicerat en uttrycklig ståndpunkt i exakt den fråga du sökte efter.</p></div>}
+
           <div className="resultHeader" ref={filteredResultsRef} tabIndex={-1}>
             <div>
-              <p className="sectionLabel">{isTextSearch ? "Textträffar" : "Sakliga svar"}</p>
-              <h2>{query && intentMatch ? intentMatch.intent.proposition : query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Textträffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
-              {query && inferredTopic && <span className="interpretationTag" aria-live="polite">Tolkad som {activeTopicLabel}</span>}
+              <p className="sectionLabel">{isTextSearch && searchConcept ? "Direkta och närliggande träffar" : isTextSearch ? "Textträffar" : "Sakliga svar"}</p>
+              <h2>{query && intentMatch ? intentMatch.intent.proposition : query && activeTopicLabel ? `Partiernas svar om ${activeTopicLabel.toLocaleLowerCase("sv")}` : query ? `Träffar för ”${query}”` : topic === "alla" ? "En överblick över partierna" : topics.find((item) => item.id === topic)?.question}</h2>
+              {query && (inferredTopic || searchConcept) && <span className="interpretationTag" aria-live="polite">Tolkad som {activeTopicLabel ?? searchConcept?.label}</span>}
             </div>
             <div className="resultMeta">
               <span>{filteredResults.length} {isTextSearch ? filteredResults.length === 1 ? "textträff" : "textträffar" : inferredTopic ? "partier jämförda" : query.trim() ? "partier" : "partier · äldst till yngst"}</span>
@@ -271,9 +353,10 @@ export default function Home() {
 
           {visibleResults.length ? <div className="resultGrid">
             {visibleResults.map((party) => {
-              const searchContext = isTextSearch ? findPartySearchContext(party, query, activeTopic) : null;
+              const searchContext = isTextSearch ? searchContexts.get(party.id) ?? null : null;
               const cardText = searchContext?.text ?? (activeTopic === "alla" ? party.overview : party.positions[activeTopic]);
-              const contextLabel = searchContext ? topics.find((item) => item.id === searchContext.topic)?.label : null;
+              const contextLabel = searchContext?.topic ? topics.find((item) => item.id === searchContext.topic)?.label : searchContext?.label;
+              const displayedSource = searchContext?.source ?? party.sources[0];
               return <article className="partyCard" key={party.id} style={{ "--party": party.color } as React.CSSProperties}>
                 <div className="partyCardTop">
                   <div className="partyIdentity"><PartyEmblem party={party} /><div><h3>{party.name}</h3><p>Grundat {party.founded} · {party.ideology}</p></div></div>
@@ -281,11 +364,11 @@ export default function Home() {
                 </div>
                 <div className="factBlock">
                   {intentMatch && <div className="stanceLine"><b className={`stanceBadge ${intentMatch.intent.stances[party.id] ?? "unclear"}`}>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].label}</b><small>{stanceMeta[intentMatch.intent.stances[party.id] ?? "unclear"].description}</small></div>}
-                  {searchContext && <div className="matchContext"><span>Textträff</span><b>{contextLabel}</b></div>}
-                  <span>{searchContext ? "Matchande text" : intentMatch ? "Partiets publicerade position" : "Sammanfattad ståndpunkt"}</span>
-                  <p>{searchContext ? <HighlightedText text={cardText} query={query} /> : cardText}</p>
+                  {searchContext && <div className={`matchContext ${searchContext.kind}`}><span>{searchContext.kind === "direct" ? "Direkt träff" : "Närliggande träff"}</span><b>{contextLabel}</b></div>}
+                  <span>{searchContext ? searchContext.kind === "direct" ? "Matchande text" : "Närliggande publicerat material" : intentMatch ? "Partiets publicerade position" : "Sammanfattad ståndpunkt"}</span>
+                  <p>{searchContext ? <HighlightedText text={cardText} context={searchContext} /> : cardText}</p>
                 </div>
-                {party.sources[0] && <a className="inlineSource" href={party.sources[0].url} target="_blank" rel="noreferrer"><span>Officiell källa</span><b>{party.sources[0].title}</b><i>↗</i></a>}
+                {displayedSource && <a className="inlineSource" href={displayedSource.url} target="_blank" rel="noreferrer"><span>Officiell källa</span><b>{displayedSource.title}</b><i>↗</i></a>}
                 <div className="cardActions">
                   <button onClick={() => setSelectedParty(party)}>Se hela partiprofilen</button>
                   <button className="quiet" onClick={() => { if (!compareIds.includes(party.id)) toggleCompare(party.id); setView("jamfor"); }}>Jämför</button>
@@ -293,7 +376,7 @@ export default function Home() {
                 </div>
               </article>;
             })}
-          </div> : <div className="emptyState"><span>?</span><h3>Ingen tydlig träff ännu</h3><p>Prova ett bredare ord, exempelvis vård, skatt, skola, energi eller trygghet.</p></div>}
+          </div> : <div className="emptyState"><span>?</span><h3>Ingen tydlig träff ännu</h3><p>Prova ett bredare ord, välj ett sakområde eller använd ett av frågeförslagen ovan. Vi visar aldrig en påhittad ståndpunkt när underlaget saknas.</p></div>}
           {filteredResults.length > 6 && <button className="showMore" onClick={() => setShowAll((value) => !value)}>{showAll ? "Visa färre" : `Visa alla ${filteredResults.length} partier`}</button>}
         </section>
 
