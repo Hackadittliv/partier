@@ -22,6 +22,7 @@ test("endast frågeförslagen får egen horisontell mobilrullning", async () => 
     css,
     /@media \(max-width: 680px\)[\s\S]*?\.suggestions \{[^}]*overflow-x: auto[^}]*overscroll-behavior-x: contain[^}]*scroll-snap-type: x mandatory/,
   );
+  assert.doesNotMatch(css, /\.suggestions \{[^}]*touch-action: pan-x/);
   assert.match(css, /\.suggestions button \{[^}]*flex: 0 0 100%[^}]*scroll-snap-align: start/);
   assert.match(css, /\.partyCard \{[^}]*min-width: 0[^}]*max-width: 100%/);
 });

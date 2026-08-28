@@ -505,7 +505,7 @@ h1, h2, h3, p { margin-top: 0; }
   .searchAutocomplete { max-height: 330px; overflow-y: auto; }
   .searchFeedback { align-items: stretch; flex-direction: column; }
   .searchFeedback > button { width: 100%; }
-  .suggestions { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 0; touch-action: pan-x; scrollbar-width: none; }
+  .suggestions { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 0; scrollbar-width: none; }
   .suggestions::-webkit-scrollbar { display: none; }
   .suggestions button { flex: 0 0 100%; max-width: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
   .directAnswer { padding: 20px; border-radius: 17px; }

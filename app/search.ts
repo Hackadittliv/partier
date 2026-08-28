@@ -281,13 +281,19 @@ const partyInitialisms: Record<string, string[]> = {
 };
 
 const stopWords = new Set(["hur", "vad", "vilka", "vilket", "vem", "varfor", "vill", "ska", "skall", "skulle", "kan", "kunde", "borde", "behover", "gor", "gora", "sager", "tycker", "anser", "fa", "far", "fick", "man", "parti", "partier", "partierna", "partiernas", "politik", "politiska", "forslag", "syn", "svar", "skiljer", "sig", "och", "eller", "att", "med", "for", "fran", "till", "inom", "mot", "som", "det", "den", "de", "deras", "pa", "om", "at", "av", "en", "ett", "in", "ut", "upp", "ner", "ned", "mer", "sverige", "svenska"]);
+const accentSensitiveQueryWords = new Set(["män"]);
 
 export function normalizeText(value: string) {
   return value.toLocaleLowerCase("sv").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 }
 
 export function queryWords(value: string) {
-  return normalizeText(value).split(/\s+/).filter((word) => word.length > 1 && !stopWords.has(word));
+  return value.toLocaleLowerCase("sv")
+    .split(/[^a-z0-9åäö]+/)
+    .filter(Boolean)
+    .map((word) => ({ raw: word, normalized: normalizeText(word) }))
+    .filter(({ raw, normalized }) => normalized.length > 1 && (!stopWords.has(normalized) || accentSensitiveQueryWords.has(raw)))
+    .map(({ raw, normalized }) => accentSensitiveQueryWords.has(raw) ? raw : normalized);
 }
 
 function levenshtein(a: string, b: string) {
@@ -314,6 +320,10 @@ function wordsMatch(queryWord: string, signalWord: string) {
 }
 
 function phraseScore(value: string, signal: string) {
+  if (accentSensitiveQueryWords.has(signal)) {
+    const exactValue = value.toLocaleLowerCase("sv").replace(/[^a-z0-9åäö]+/g, " ").trim();
+    return ` ${exactValue} `.includes(` ${signal} `) ? 10 : 0;
+  }
   const normalizedValue = normalizeText(value);
   const normalizedSignal = normalizeText(signal);
   if (!normalizedValue || !normalizedSignal) return 0;

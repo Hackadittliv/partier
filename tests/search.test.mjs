@@ -74,11 +74,20 @@ test("låter bostadsbegreppet styra framför vanliga småord", () => {
 
   assert.deepEqual(queryWords(query), ["unga", "bostadsmarknaden"]);
   assert.equal(findSearchConcept(query)?.id, "housing");
+  assert.deepEqual(
+    parties.filter((party) => findPartySearchContext(party, query, "alla")).map((party) => party.id),
+    ["kristdemokraterna", "socialdemokraterna", "vansterpartiet", "nyans"],
+  );
   assert.equal(findPartySearchContext(alternativForSverige, query, "alla"), null);
   assert.equal(findPartySearchContext(kristdemokraterna, query, "alla")?.kind, "related");
   const nyansContext = findPartySearchContext(nyans, query, "alla");
   assert.equal(nyansContext?.kind, "direct");
   assert.equal(searchTokenKind("få", nyansContext), null);
+});
+
+test("skiljer pronomenet man från substantivet män", () => {
+  assert.deepEqual(queryWords("Hur skall man förbättra demokratin?"), ["forbattra", "demokratin"]);
+  assert.deepEqual(queryWords("Vad säger partierna om män?"), ["män"]);
 });
 
 test("avgränsar en fråga som nämner ett eller flera partier", () => {
