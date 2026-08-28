@@ -67,7 +67,9 @@ h1, h2, h3, p { margin-top: 0; }
 @keyframes feedbackPulse { 50% { box-shadow: 0 0 0 8px rgba(73,166,110,0); } }
 .suggestions { max-width: 100%; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .suggestions button { border: 1px solid var(--line); background: #fafaf8; color: #485565; border-radius: 999px; padding: 8px 11px; font-size: 12px; text-align: left; cursor: pointer; transition: .18s ease; }
-.suggestions button:hover { border-color: var(--accent); color: var(--accent-dark); transform: translateY(-1px); }
+@media (hover: hover) and (pointer: fine) {
+  .suggestions button:hover { border-color: var(--accent); color: var(--accent-dark); transform: translateY(-1px); }
+}
 
 .sectionWrap { width: min(1440px, 92%); max-width: calc(100% - 24px); min-width: 0; margin-inline: auto; }
 .workspace { padding-block: 48px 70px; scroll-margin-top: 90px; }
@@ -503,9 +505,9 @@ h1, h2, h3, p { margin-top: 0; }
   .searchAutocomplete { max-height: 330px; overflow-y: auto; }
   .searchFeedback { align-items: stretch; flex-direction: column; }
   .searchFeedback > button { width: 100%; }
-  .suggestions { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x; scrollbar-width: none; }
+  .suggestions { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 0; touch-action: pan-x; scrollbar-width: none; }
   .suggestions::-webkit-scrollbar { display: none; }
-  .suggestions button { flex: 0 0 230px; }
+  .suggestions button { flex: 0 0 100%; max-width: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
   .directAnswer { padding: 20px; border-radius: 17px; }
   .answerHeading h2 { font-size: 29px; }
   .stanceFilters { grid-template-columns: repeat(2, minmax(0, 1fr)); }

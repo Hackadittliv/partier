@@ -179,7 +179,7 @@ export const searchConcepts: SearchConcept[] = [
     id: "housing",
     label: "Bostäder och boende",
     signals: ["bostad", "bostäder", "boende", "hyra", "hyror", "bostadsbrist"],
-    relatedTerms: ["småhus", "bostadsbyggande", "byggkrediter", "byggande"],
+    relatedTerms: ["småhus", "bostadsbyggande", "byggkrediter", "bygga bostäder"],
     exampleQuestion: "Hur vill partierna lösa bostadsbristen?",
   },
   {
@@ -280,7 +280,7 @@ const partyInitialisms: Record<string, string[]> = {
   partietmod: ["MoD"],
 };
 
-const stopWords = new Set(["hur", "vad", "vilka", "vilket", "vem", "varfor", "vill", "ska", "skulle", "gor", "gora", "sager", "tycker", "anser", "parti", "partier", "partierna", "partiernas", "politik", "politiska", "forslag", "syn", "svar", "skiljer", "sig", "och", "eller", "att", "med", "for", "fran", "till", "inom", "mot", "som", "det", "den", "de", "deras", "pa", "om", "at", "mer", "sverige", "svenska"]);
+const stopWords = new Set(["hur", "vad", "vilka", "vilket", "vem", "varfor", "vill", "ska", "skall", "skulle", "kan", "kunde", "borde", "behover", "gor", "gora", "sager", "tycker", "anser", "fa", "far", "fick", "man", "parti", "partier", "partierna", "partiernas", "politik", "politiska", "forslag", "syn", "svar", "skiljer", "sig", "och", "eller", "att", "med", "for", "fran", "till", "inom", "mot", "som", "det", "den", "de", "deras", "pa", "om", "at", "av", "en", "ett", "in", "ut", "upp", "ner", "ned", "mer", "sverige", "svenska"]);
 
 export function normalizeText(value: string) {
   return value.toLocaleLowerCase("sv").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
@@ -376,7 +376,7 @@ export function findPartySearchContext(party: Party, query: string, activeTopic:
   const directTerms = queryWords(query);
   const concept = findSearchConcept(query);
   const matchedConceptSignal = concept?.signals.some((signal) => phraseScore(query, signal) > 0) ?? false;
-  const directPool = concept && matchedConceptSignal ? [...new Set([...directTerms, ...concept.signals])] : directTerms;
+  const directPool = concept && matchedConceptSignal ? concept.signals : directTerms;
   const relatedPool = concept
     ? [...new Set([...(matchedConceptSignal ? [] : concept.signals), ...concept.relatedTerms])].filter((term) => !directTerms.includes(normalizeText(term)))
     : [];

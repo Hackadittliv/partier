@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { parties, partiesByFounded } from "../app/data.ts";
-import { detectSearchGoal, findMentionedPartyIds, findPartySearchContext, findSearchConcept, findSearchIntent, getSearchSuggestions, inferTopic, partyMatchScore, searchIntents } from "../app/search.ts";
+import { detectSearchGoal, findMentionedPartyIds, findPartySearchContext, findSearchConcept, findSearchIntent, getSearchSuggestions, inferTopic, partyMatchScore, queryWords, searchIntents, searchTokenKind } from "../app/search.ts";
 
 test("tolkar tydliga politiska frågor", () => {
   assert.equal(findSearchIntent("Vilka vill bygga mer kärnkraft?")?.intent.id, "new-nuclear");
@@ -63,6 +63,22 @@ test("förstår utskrivet AI begrepp och ger ett relevant frågeförslag", () =>
   assert.ok(mod);
   assert.equal(findPartySearchContext(mod, "artificiell intelligens", "alla")?.kind, "direct");
   assert.equal(getSearchSuggestions("artificiell intelligens", 1)[0], "Vad säger partierna om AI och digitalisering?");
+});
+
+test("låter bostadsbegreppet styra framför vanliga småord", () => {
+  const query = "Hur skall man få ut unga på bostadsmarknaden";
+  const alternativForSverige = parties.find((party) => party.id === "alternativforsverige");
+  const kristdemokraterna = parties.find((party) => party.id === "kristdemokraterna");
+  const nyans = parties.find((party) => party.id === "nyans");
+  assert.ok(alternativForSverige && kristdemokraterna && nyans);
+
+  assert.deepEqual(queryWords(query), ["unga", "bostadsmarknaden"]);
+  assert.equal(findSearchConcept(query)?.id, "housing");
+  assert.equal(findPartySearchContext(alternativForSverige, query, "alla"), null);
+  assert.equal(findPartySearchContext(kristdemokraterna, query, "alla")?.kind, "related");
+  const nyansContext = findPartySearchContext(nyans, query, "alla");
+  assert.equal(nyansContext?.kind, "direct");
+  assert.equal(searchTokenKind("få", nyansContext), null);
 });
 
 test("avgränsar en fråga som nämner ett eller flera partier", () => {
