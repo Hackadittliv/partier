@@ -118,6 +118,13 @@ export default function Home() {
     });
   }
 
+  function goToStart() {
+    setView("utforska");
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    });
+  }
+
   function runSuggestion(value: string) {
     setQuery(value);
     setTopic("alla");
@@ -150,7 +157,7 @@ export default function Home() {
   return (
     <main>
       <header className="topbar">
-        <button className="brand" onClick={() => setView("utforska")} aria-label="Gå till startsidan">
+        <button className="brand" onClick={goToStart} aria-label="Gå till startsidan och sidans topp">
           <BrandLogo />
         </button>
         <nav aria-label="Huvudnavigering">
