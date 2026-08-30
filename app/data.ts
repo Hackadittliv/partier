@@ -14,7 +14,7 @@ export type Party = {
   sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "29 augusti 2026";
+export const lastUpdated = "30 augusti 2026";
 const swedishMonths: Record<string, string> = {
   januari: "01",
   februari: "02",
@@ -87,6 +87,7 @@ export const parties: Party[] = [
     sources: [
       { title: "Valmanifest 2026", url: "https://kristdemokraterna.se/download/18.3fb0a02c1a01f5f28f7326/1787292489599/Valmanifest%202026.pdf" },
       { title: "Ideologi och principprogram", url: "https://kristdemokraterna.se/var-politik/ideologi-och-principprogram" },
+      { title: "Rapport om nationellt vårdansvar", url: "https://kristdemokraterna.se/download/18.3fb0a02c1a01f5f28f784d/1787748435013/21%20anledningar%20att%20avskaffa%20regionerna%201.pdf", publishedAt: "26 augusti 2026" },
     ],
   },
   {
@@ -96,7 +97,7 @@ export const parties: Party[] = [
     positions: {
       ekonomi: "Halvera den statliga inkomstskatten på sikt, höj skattefritt sparande och sänk kostnaden för att anställa unga. Investera i utbildning, forskning och frihandel.",
       vard: "Ge alla möjlighet till en personlig fast läkare, bygg ut nära vård och stärk tandvård, psykisk vård, personlig assistans och LSS.",
-      skola: "Förstatliga skolan, minska klasserna och stärk lärares auktoritet. Ge varje elev läroböcker och fasa ut vinstintresset utan att avskaffa skolvalet.",
+      skola: "Förstatliga skolan, minska klasserna och stärk lärares auktoritet. Ge varje elev läroböcker och fasa ut vinstintresset utan att avskaffa skolvalet. Avveckla Akademiska Hus och ge lärosäten större kontroll över lokaler och möjlighet att äga fastigheter.",
       brott: "Stärk lokal polis, skärp straff för gängbrott och sexualbrott och bygg en finansiell elitstyrka mot kriminella nätverk.",
       migration: "Behåll en stram men human asylpolitik. Kräv svenska och samhällskunskap för medborgarskap och underlätta efterfrågad arbetskraftsinvandring.",
       klimat: "Använd EU:s utsläppshandel, elektrifiering och innovation. Skydda mer natur och förena klimatmål med konkurrenskraft.",
@@ -108,6 +109,7 @@ export const parties: Party[] = [
       { title: "Valmanifest 2026", url: "https://www.liberalerna.se/wp-content/uploads/liberalernas-valmanifest-2026-40s-komprimerad.pdf" },
       { title: "Program och rapporter", url: "https://www.liberalerna.se/program-och-rapporter" },
       { title: "Förslag mot antisemitism", url: "https://www.liberalerna.se/nyheter/liberalerna-presenterar-sex-forslag-for-ett-sverige-fritt-fran-antisemitism", publishedAt: "27 augusti 2026" },
+      { title: "Förslag om Akademiska Hus", url: "https://www.liberalerna.se/forskning/liberalerna-vill-avveckla-akademiska-hus", publishedAt: "28 augusti 2026" },
     ],
   },
   {
