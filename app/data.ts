@@ -14,7 +14,7 @@ export type Party = {
   sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "30 augusti 2026";
+export const lastUpdated = "31 augusti 2026";
 const swedishMonths: Record<string, string> = {
   januari: "01",
   februari: "02",
@@ -100,8 +100,8 @@ export const parties: Party[] = [
       skola: "Förstatliga skolan, minska klasserna och stärk lärares auktoritet. Ge varje elev läroböcker och fasa ut vinstintresset utan att avskaffa skolvalet. Avveckla Akademiska Hus och ge lärosäten större kontroll över lokaler och möjlighet att äga fastigheter.",
       brott: "Stärk lokal polis, skärp straff för gängbrott och sexualbrott och bygg en finansiell elitstyrka mot kriminella nätverk.",
       migration: "Behåll en stram men human asylpolitik. Kräv svenska och samhällskunskap för medborgarskap och underlätta efterfrågad arbetskraftsinvandring.",
-      klimat: "Använd EU:s utsläppshandel, elektrifiering och innovation. Skydda mer natur och förena klimatmål med konkurrenskraft.",
-      energi: "Bygg ny kärnkraft och annan fossilfri energi. Investera i elnät, laddning och en robust energiförsörjning.",
+      klimat: "Använd EU:s utsläppshandel, elektrifiering och innovation. Skapa 10 till 15 accelerationszoner för fossilfri industri, sänk skatten på el till fordonsladdning och bredda avdraget för grön teknik. Skydda mer natur och förena klimatmål med konkurrenskraft.",
+      energi: "Bygg ny kärnkraft och annan fossilfri energi. Inför en permanent kärnkraftspremie till värdkommuner och investera i elnät, laddning och en robust energiförsörjning.",
       demokrati: "Inför en författningsdomstol och stärk individuella rättigheter. Bekämpa antisemitism genom utbildning, lokala handlingsplaner, skärpta straff för hatbrott i skolmiljö och stoppade offentliga bidrag till föreningar som sprider judehat. Fördjupa EU samarbetet och stödet till Ukraina.",
       regering: "Partiet vill fortsätta styra tillsammans med Moderaterna, Kristdemokraterna och Sverigedemokraterna.",
     },
@@ -110,6 +110,7 @@ export const parties: Party[] = [
       { title: "Program och rapporter", url: "https://www.liberalerna.se/program-och-rapporter" },
       { title: "Förslag mot antisemitism", url: "https://www.liberalerna.se/nyheter/liberalerna-presenterar-sex-forslag-for-ett-sverige-fritt-fran-antisemitism", publishedAt: "27 augusti 2026" },
       { title: "Förslag om Akademiska Hus", url: "https://www.liberalerna.se/forskning/liberalerna-vill-avveckla-akademiska-hus", publishedAt: "28 augusti 2026" },
+      { title: "Fem klimatlöften för fossilfri tillväxt", url: "https://www.liberalerna.se/klimat/fossilfri-tillvaxt-liberalernas-klimatpolitik-for-ett-rikare-och-friare-sverige", publishedAt: "30 augusti 2026" },
     ],
   },
   {
@@ -122,7 +123,7 @@ export const parties: Party[] = [
       skola: "Avskaffa marknadsskolan och vinstuttagen. Fördela resurser efter behov, minska grupper och stärk elevstöd, kultur och ungas psykiska hälsa.",
       brott: "Kombinera lokal polis med skola, socialtjänst, vård och fritid. Bekämpa gängens ekonomi och våld mot kvinnor utan att fängsla barn.",
       migration: "Värna asylrätt och familjesammanhållning. Stoppa orimliga utvisningar av etablerade personer och bekämpa rasism och diskriminering.",
-      klimat: "Fasa snabbt ut fossila bränslen, gör utsläpp dyrare och hållbara val billigare. Återinför stadsmiljöavtalen med 1,5 miljarder kronor per år. Ta fram en nationell textilstrategi, gör reparation och second hand billigare och kräv minst 20 procent återvunnet material i ny textil senast 2035. Skydda mer skog, hav och biologisk mångfald.",
+      klimat: "Fasa snabbt ut fossila bränslen, gör utsläpp dyrare och hållbara val billigare. Återinför stadsmiljöavtalen med 1,5 miljarder kronor per år. Ta fram en nationell textilstrategi, gör reparation och second hand billigare och kräv minst 20 procent återvunnet material i ny textil senast 2035. Freda kustzonen ut till 12 sjömil från industrifiske, skärp kraven på minskat näringsläckage och investera 3,3 miljarder kronor i hav, vatten och restaurering. Skydda mer skog, hav och biologisk mångfald.",
       energi: "Bygg vind, sol, vattenkraft, lagring och effektivisering. Partiet avvisar ny kärnkraft och vill accelerera förnybar energi.",
       demokrati: "Försvara fria medier, kultur, forskning, minoriteter och samiska rättigheter. Stärk EU som klimataktör och fortsätt stödet till Ukraina.",
       regering: "Partiet vill se en rödgrön regering ledd av Socialdemokraterna med stark klimat och välfärdspolitik.",
@@ -132,6 +133,7 @@ export const parties: Party[] = [
       { title: "Partiprogram", url: "https://www.mp.se/om/partiprogram/" },
       { title: "Satsning på grönare städer", url: "https://www.mp.se/just-nu/mp-satsar-6-miljarder-pa-gronare-stader/", publishedAt: "27 augusti 2026" },
       { title: "Strategi för hållbara textilier", url: "https://www.mp.se/just-nu/129984/", publishedAt: "28 augusti 2026" },
+      { title: "Östersjöpaket för ett levande hav", url: "https://www.mp.se/just-nu/miljopartiet-presenterar-ostersjopaket-ostersjon-har-inte-rad-att-vanta/", publishedAt: "17 augusti 2026" },
     ],
   },
   {
@@ -164,7 +166,7 @@ export const parties: Party[] = [
       ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet, förstärk systemet för korttidsarbete och använd gröna kreditgarantier, investeringsstöd och statliga byggkrediter för fler jobb, industriinvesteringar och bostäder i hela landet.",
       vard: "Ge välfärden mer resurser och offentlig kontroll. Förbjud privata försäkringspatienter att ges förtur i offentligt finansierad vård, stoppa utförsäljning av akutsjukhus och motverka vinstjakt på nätläkarmarknaden.",
       skola: "Stoppa vinstjakt i skola och förskola, öka likvärdigheten och stärk lärare, elevhälsa och tidigt stöd. Inför intensivsvenska på lågstadiet för elever som behöver det.",
-      brott: "Slå mot maffialiknande strukturer och kriminell ekonomi med fler poliser och hårdare verktyg. Kombinera detta med socialtjänst, skola och områdespolitik.",
+      brott: "Slå mot maffialiknande strukturer och kriminell ekonomi med fler poliser och hårdare verktyg. Skärp straffen för grov kvinnofridskränkning, inför möjlighet till områdesarrest för särskilt farliga män, samla brottsoffers rättigheter i en brottsofferlag och säkra tillgången till skyddade boenden. Kombinera detta med socialtjänst, skola och områdespolitik.",
       migration: "Behåll en stram migrationslinje och ställ krav på svenska, arbete och integration. Höj kvaliteten i SFI, begränsa distansundervisningen och bygg ut utbildningar som kombinerar svenska med ett yrke.",
       klimat: "Driv klimatomställningen med gröna krediter, industristöd, elektrifierade transporter och offentlig upphandling. Stärk stödet till tunga elfordon och laddinfrastruktur. Stoppa storskaligt industrifiske av sill och strömming i Östersjön, flytta ut trålgränsen permanent och värna kustfisket. Gör kollektivtrafiken avgiftsfri för barn och unga på fritiden samt för heltidsstudenter under terminerna.",
       energi: "Bygg ut fossilfri el genom en teknikneutral mix av kärnkraft, vind, vatten och elnät. Staten ska ta större ansvar för energiplaneringen.",
@@ -180,6 +182,7 @@ export const parties: Party[] = [
       { title: "Vallöfte om Östersjöfisket", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-27-s-vallofte-stoppa-det-storskaliga-industrifisket-av-sill-och-stromming-i-ostersjon", publishedAt: "27 augusti 2026" },
       { title: "Vallöfte om ny språkpolitik", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-28-s-vallofte-en-ny-sprakpolitik", publishedAt: "28 augusti 2026" },
       { title: "Vallöfte om vård efter behov", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-28-s-vallofte-vard-ska-ges-efter-behov-inte-planbok", publishedAt: "28 augusti 2026" },
+      { title: "Fem reformer mot mäns våld mot kvinnor", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-30-s-gar-till-val-pa-fem-reformer-for-att-bekampa-mans-vald-mot-kvinnor", publishedAt: "30 augusti 2026" },
     ],
   },
   {
@@ -340,13 +343,14 @@ export const parties: Party[] = [
       klimat: "Stärk lokal och regional matproduktion, ekologiskt och regenerativt jordbruk och svensk självförsörjning. Fasa ut glyfosat och andra riskabla bekämpningsmedel.",
       energi: "Valmanifestet för 2026 presenterar inte någon fullständig modell för elsystemets kraftslag. Energifrågan behandlas främst genom självförsörjning, ekonomisk trygghet och nationellt självbestämmande.",
       demokrati: "Inför fler folkomröstningar, medborgarinitiativ och tjänstemannaansvar och avskaffa riksdagsspärren. Sverige ska lämna EU och Nato, skydda yttrandefrihet och stoppa generell massövervakning. AI ska utvecklas under demokratisk kontroll och inte användas för att kontrollera människor.",
-      regering: "Partiet fokuserar på riksdagsinträde och har inte publicerat en bindande nationell koalitionslinje för 2026.",
+      regering: "Partiet fokuserar på riksdagsinträde och har ingen bindande nationell koalitionslinje för 2026. Det är öppet för valtekniskt samarbete med andra partier och har kandidater från Enhet på sin riksdagslista.",
     },
     sources: [
       { title: "Valmanifest 2026", url: "https://partietmod.se/politik/valmanifest-2026/" },
       { title: "Partiprogram", url: "https://partietmod.se/politik/partiprogram/" },
       { title: "Riksdagslista 2026", url: "https://partietmod.se/aktuellt/nyheter/mod-staller-upp-i-riksdagsvalet-2026-har-ar-var-lista/" },
       { title: "Politiska besked i partiledardebatt", url: "https://partietmod.se/aktuellt/nyheter/gustaf-rydelius-i-partiledardebatt-det-ar-inte-socialism-det-ar-oligarki/", publishedAt: "28 augusti 2026" },
+      { title: "Besked om valtekniskt samarbete", url: "https://partietmod.se/aktuellt/nyheter/varfor-samarbetar-inte-mod-med-andra-smapartier-for-att-komma-in-i-riksdagen/", publishedAt: "30 augusti 2026" },
     ],
   },
 ];
