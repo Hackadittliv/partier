@@ -14,7 +14,7 @@ export type Party = {
   sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "31 augusti 2026";
+export const lastUpdated = "1 september 2026";
 const swedishMonths: Record<string, string> = {
   januari: "01",
   februari: "02",
@@ -51,12 +51,12 @@ export const parties: Party[] = [
     overview: "Centerpartiet kombinerar lägre kostnader för att anställa med stora klimatinvesteringar, stark landsbygdspolitik och liberala rättigheter.",
     priorities: ["Slopa arbetsgivaravgiften för de första tio anställda.", "Investera 50 miljarder kronor i landsbygder och lokal infrastruktur.", "Bygg ut fossilfri el, lagring och snabbare tillstånd.", "Ge fler en fast läkare och unga snabbare stöd för psykisk hälsa."],
     positions: {
-      ekonomi: "Sänk skatten på arbete och kostnaden för att anställa. Små och växande företag ska få enklare regler, snabbare tillstånd och bättre tillgång till kompetens.",
+      ekonomi: "Sänk skatten på arbete och kostnaden för att anställa. Gör de första 15 300 kronorna i arbetsinkomst per månad skattefria, vilket enligt partiets exempel ger 1 200 kronor lägre skatt vid en månadslön på 25 000 kronor. Små och växande företag ska få enklare regler, snabbare tillstånd och bättre tillgång till kompetens.",
       vard: "Bygg ut primärvården och garantera en fast läkare på den vårdcentral patienten väljer. Skapa fler utbildningsplatser och små lokala mottagningar, lagstadga rätt till fortbildning och säkra kontakt med vårdcentralen samma dag.",
       skola: "Behåll skolvalet i en gemensam modell utan långa köer. Ge elever tidigare stöd, minska lärarnas administration och grundlagsskydda aborträtten.",
       brott: "Öka lokal polisnärvaro och rikta straffen mot grova brott och kriminell ekonomi. Kombinera detta med tidiga insatser för barn och familjer.",
       migration: "För en rättssäker migration med tydliga krav. Stoppa kompetensutvisningar och låt integration börja direkt genom svenska, praktik och arbete.",
-      klimat: "Minska utsläppen genom elektrifiering, utsläppshandel, grön industri och billigare hållbara val. Jordbruk och skog ses som klimatlösning och beredskap.",
+      klimat: "Minska utsläppen genom elektrifiering, utsläppshandel, grön industri och billigare hållbara val. Genomför en klimatplan under regeringens första 100 dagar med fler elbilar och hållbara drivmedel, snabbare tillstånd, stöd till industrins och lantbrukets omställning samt klimatanpassning. Jordbruk och skog ses som klimatlösning och beredskap.",
       energi: "Prioritera vind, sol, vattenkraft, lagring och snabbare elnät. Partiet är öppet för fossilfria lösningar, medan ny kärnkraft inte är huvudspåret.",
       demokrati: "Stärk liberal demokrati, integritet, oberoende medier och EU. Reglera beroendeframkallande algoritmer för minderåriga, inför en åldersgräns på 15 år för sociala medier med föräldraundantag från 13 år och utred beskattning av sociala mediebolag. Öka stödet till Ukraina och bygg ut militärt och civilt försvar.",
       regering: "Partiet vill se en bred och stabil mittenregering. Varken Vänsterpartiet eller Sverigedemokraterna ska enligt partiet ha inflytande över regeringsbildningen.",
@@ -67,6 +67,8 @@ export const parties: Party[] = [
       { title: "Regeringsbesked om mittenregering", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-26-annie-loof-sverige-behover-en-regering-forankrad-i-mitten", publishedAt: "26 augusti 2026" },
       { title: "Förslag om sociala mediebolag", url: "https://www.centerpartiet.se/centerpartiet-lokalt/uppsala-lan/uppsala/nyheter/nyhetsarkiv---uppsala/2026-08-28-centerpartiet-vill-starka-skyddet-for-barn-och-unga-pa-sociala-medier", publishedAt: "28 augusti 2026" },
       { title: "Besked om fast läkare", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-28-centerpartiet-vill-sakra-ratten-till-fast-lakare", publishedAt: "28 augusti 2026" },
+      { title: "Klimatplan för de första 100 dagarna", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-31-centerpartiet-presenterar-klimatplan-infor-valet", publishedAt: "31 augusti 2026" },
+      { title: "Förslag om skattefri grundlön", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-31-centerpartiet-vill-sanka-skatten-mest-for-den-som-tjanar-minst", publishedAt: "31 augusti 2026" },
     ],
   },
   {
@@ -163,10 +165,10 @@ export const parties: Party[] = [
     overview: "Socialdemokraterna vill prioritera hushållens ekonomi, starkare välfärd, fler jobb genom industriinvesteringar, statlig närvaro i hela landet och en offensiv mot organiserad brottslighet.",
     priorities: ["Stärk hushållens ekonomi och minska ekonomiska klyftor.", "Stoppa vinstjakt i skola och förskola.", "Bekämpa gäng och kriminell ekonomi med polis och förebyggande politik.", "Stöd gröna industriinvesteringar, bostadsbyggande och ett Landsbygdslyft för fler jobb i hela landet."],
     positions: {
-      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet, förstärk systemet för korttidsarbete och använd gröna kreditgarantier, investeringsstöd och statliga byggkrediter för fler jobb, industriinvesteringar och bostäder i hela landet.",
-      vard: "Ge välfärden mer resurser och offentlig kontroll. Förbjud privata försäkringspatienter att ges förtur i offentligt finansierad vård, stoppa utförsäljning av akutsjukhus och motverka vinstjakt på nätläkarmarknaden.",
+      ekonomi: "Stärk hushåll med riktade lättnader och en mer progressiv skatt. Slut en tillväxtpakt med näringslivet, förstärk systemet för korttidsarbete och använd gröna kreditgarantier, investeringsstöd och statliga byggkrediter för fler jobb, industriinvesteringar och bostäder i hela landet. Bygg 10 000 fler studentbostäder och inför ett traineeprogram för nyexaminerade.",
+      vard: "Ge välfärden mer resurser och offentlig kontroll. Förbjud privata försäkringspatienter att ges förtur i offentligt finansierad vård, stoppa utförsäljning av akutsjukhus och motverka vinstjakt på nätläkarmarknaden. Gör tandvården avgiftsfri för unga.",
       skola: "Stoppa vinstjakt i skola och förskola, öka likvärdigheten och stärk lärare, elevhälsa och tidigt stöd. Inför intensivsvenska på lågstadiet för elever som behöver det.",
-      brott: "Slå mot maffialiknande strukturer och kriminell ekonomi med fler poliser och hårdare verktyg. Skärp straffen för grov kvinnofridskränkning, inför möjlighet till områdesarrest för särskilt farliga män, samla brottsoffers rättigheter i en brottsofferlag och säkra tillgången till skyddade boenden. Kombinera detta med socialtjänst, skola och områdespolitik.",
+      brott: "Slå mot maffialiknande strukturer och kriminell ekonomi med fler poliser och hårdare verktyg. Inför en svensk maffialag med kollektivt straffansvar, förstärk Ekobrottsmyndigheten till en myndighet mot organiserad brottslighet och använd förverkade tillgångar till trygghetsskapande insatser. Punktmarkera unga i riskzonen och skapa ett nationellt riskfamiljsprogram. Skärp straffen för grov kvinnofridskränkning, inför möjlighet till områdesarrest för särskilt farliga män, samla brottsoffers rättigheter i en brottsofferlag och säkra tillgången till skyddade boenden. Kombinera detta med socialtjänst, skola och områdespolitik.",
       migration: "Behåll en stram migrationslinje och ställ krav på svenska, arbete och integration. Höj kvaliteten i SFI, begränsa distansundervisningen och bygg ut utbildningar som kombinerar svenska med ett yrke.",
       klimat: "Driv klimatomställningen med gröna krediter, industristöd, elektrifierade transporter och offentlig upphandling. Stärk stödet till tunga elfordon och laddinfrastruktur. Stoppa storskaligt industrifiske av sill och strömming i Östersjön, flytta ut trålgränsen permanent och värna kustfisket. Gör kollektivtrafiken avgiftsfri för barn och unga på fritiden samt för heltidsstudenter under terminerna.",
       energi: "Bygg ut fossilfri el genom en teknikneutral mix av kärnkraft, vind, vatten och elnät. Staten ska ta större ansvar för energiplaneringen.",
@@ -183,6 +185,8 @@ export const parties: Party[] = [
       { title: "Vallöfte om ny språkpolitik", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-28-s-vallofte-en-ny-sprakpolitik", publishedAt: "28 augusti 2026" },
       { title: "Vallöfte om vård efter behov", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-28-s-vallofte-vard-ska-ges-efter-behov-inte-planbok", publishedAt: "28 augusti 2026" },
       { title: "Fem reformer mot mäns våld mot kvinnor", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-30-s-gar-till-val-pa-fem-reformer-for-att-bekampa-mans-vald-mot-kvinnor", publishedAt: "30 augusti 2026" },
+      { title: "Offensiv mot organiserad brottslighet", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-31-s-vallofte-offensiv-mot-den-organiserade-brottsligheten", publishedAt: "31 augusti 2026" },
+      { title: "Studentpaket för unga", url: "https://www.socialdemokraterna.se/nyheter/nyheter/2026-08-31-s-vallofte-studentpaket-med-battre---ekonomi-for-studenter-och-unga", publishedAt: "31 augusti 2026" },
     ],
   },
   {
@@ -211,7 +215,7 @@ export const parties: Party[] = [
     priorities: ["Frys hyror och pressa matpriser.", "Inför skatt på miljardärers förmögenheter.", "Stoppa vinstjakt i vård, skola och omsorg.", "Förkorta arbetstiden med bibehållen lön."],
     positions: {
       ekonomi: "Beskatta stora förmögenheter och höga inkomster mer. Låt staten investera i bostäder, energi och jobb och stärk löntagare och trygghetssystem.",
-      vard: "Driv välfärd efter behov utan vinstjakt. Öka statens långsiktiga finansiering och stärk fast läkare, personal, pensioner och jämlik vård.",
+      vard: "Driv välfärd efter behov utan vinstjakt. Avskaffa den tvingande lagen om valfrihetssystem i primärvården, tillsätt en avprivatiseringskommission, stoppa privata sjukvårdsförsäkringar i offentligt finansierad vård och begränsa nätläkarbolagens ersättning. Öka statens långsiktiga finansiering och stärk fast läkare, personal, pensioner och jämlik vård.",
       skola: "Avskaffa vinstuttag, fördela resurser efter behov och stärk elevhälsa och tidigt stöd. Skolan ska minska segregation och ekonomiska skillnader.",
       brott: "Stärk polis och rättsväsende, men ge lika stor vikt åt socialtjänst, elevhälsa, fritid, arbete och avhopparstöd.",
       migration: "Värna asylrätt och rättssäkerhet. Låt integration bygga på arbete, jämlikhet och gemensam välfärd i stället för assimilering.",
@@ -223,6 +227,7 @@ export const parties: Party[] = [
     sources: [
       { title: "Valplattform 2026", url: "https://www.vansterpartiet.se/val2026/darfor-ska-du-rosta-pa-vansterpartiet/" },
       { title: "Partiprogram 2024", url: "https://www.vansterpartiet.se/resursbank/partiprogram/" },
+      { title: "Plan mot gräddfiler i vården", url: "https://www.vansterpartiet.se/nyheter/stoppa-graddfilerna-i-varden-den-som-behover-vard-mest-ska-fa-den-forst/", publishedAt: "31 augusti 2026" },
     ],
   },
   {
