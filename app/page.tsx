@@ -16,7 +16,7 @@ const suggestions = [
 ];
 
 function badgeClass(status: Party["status"]) {
-  if (status === "Aktuellt valmanifest") return "verified";
+  if (status === "Aktuellt valmanifest" || status === "Aktuellt valprogram") return "verified";
   if (status === "Aktuella vallöften") return "current";
   if (status === "Valprogram publiceras löpande") return "current";
   return "review";
