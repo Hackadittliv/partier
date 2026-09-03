@@ -14,7 +14,7 @@ export type Party = {
   sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "2 september 2026";
+export const lastUpdated = "3 september 2026";
 const swedishMonths: Record<string, string> = {
   januari: "01",
   februari: "02",
@@ -53,8 +53,8 @@ export const parties: Party[] = [
     positions: {
       ekonomi: "Sänk skatten på arbete och kostnaden för att anställa. Gör de första 15 300 kronorna i arbetsinkomst per månad skattefria, vilket enligt partiets exempel ger 1 200 kronor lägre skatt vid en månadslön på 25 000 kronor. Små och växande företag ska få enklare regler, snabbare tillstånd och bättre tillgång till kompetens.",
       vard: "Bygg ut primärvården och garantera en fast läkare på den vårdcentral patienten väljer. Skapa fler utbildningsplatser och små lokala mottagningar, lagstadga rätt till fortbildning och säkra kontakt med vårdcentralen samma dag.",
-      skola: "Behåll skolvalet i en gemensam modell utan långa köer. Ge elever tidigare stöd, minska lärarnas administration och grundlagsskydda aborträtten.",
-      brott: "Öka lokal polisnärvaro och rikta straffen mot grova brott och kriminell ekonomi. Kombinera detta med tidiga insatser för barn och familjer.",
+      skola: "Behåll skolvalet i en gemensam modell utan långa köer. Ge elever tidigare stöd, minska lärarnas administration och grundlagsskydda aborträtten. För elever med neuropsykiatriska funktionsnedsättningar vill partiet ha fler behöriga lärare, mer specialpedagogisk kompetens, mindre klasser där stödbehoven är stora, yrkesprov som alternativ väg till yrkesprogram och en utbyggd elevhälsa.",
+      brott: "Öka lokal polisnärvaro och rikta straffen mot grova brott och kriminell ekonomi. Kombinera detta med tidiga insatser för barn och familjer. Stoppa permanent nedmonteringen av vägbelysning på landsbygden, ändra Trafikverkets kriterier och ersätt kommuner som betalar belysning längs statliga vägar.",
       migration: "För en rättssäker migration med tydliga krav. Stoppa kompetensutvisningar och låt integration börja direkt genom svenska, praktik och arbete.",
       klimat: "Minska utsläppen genom elektrifiering, utsläppshandel, grön industri och billigare hållbara val. Genomför en klimatplan under regeringens första 100 dagar. Målet är att 90 procent av alla nya personbilar som säljs 2030 ska vara elbilar. Inför en elbilsbonus på 50 000 kronor, bygg ut laddningen och stöd elektriska lastbilar. Skattebefria inblandade biodrivmedel efter godkännande från EU och öka andelen förnybart i tanken. Jordbruk och skog ses som klimatlösning och beredskap.",
       energi: "Prioritera vind, sol, vattenkraft, lagring och snabbare elnät. Partiet är öppet för fossilfria lösningar, medan ny kärnkraft inte är huvudspåret.",
@@ -71,6 +71,8 @@ export const parties: Party[] = [
       { title: "Förslag om skattefri grundlön", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-31-centerpartiet-vill-sanka-skatten-mest-for-den-som-tjanar-minst", publishedAt: "31 augusti 2026" },
       { title: "Mål om 90 procent elbilar 2030", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-31-centerpartiet-9-av-10-nya-bilar-ska-vara-elbilar-2030", publishedAt: "31 augusti 2026" },
       { title: "Förslag om skattebefriade biodrivmedel", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-08-31-centerpartiet-mer-fossilfritt-i-tanken-utan-hogre-pris-vid-pump", publishedAt: "31 augusti 2026" },
+      { title: "Förslag för elever med NPF", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-09-02-npf-elever-sviks-i-skolan---centerpartiet-vill-se-forandring", publishedAt: "2 september 2026" },
+      { title: "Förslag om vägbelysning på landsbygden", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-09-02-stoppa-nedslackningen-av-landsbygdens-vagar---centerpartiets-forslag", publishedAt: "2 september 2026" },
     ],
   },
   {
@@ -99,9 +101,9 @@ export const parties: Party[] = [
     overview: "Liberalerna sätter skolan först och kombinerar stora skattesänkningar med starkare EU samarbete, ny kärnkraft och en stram men human migrationspolitik.",
     priorities: ["Sätt ett tak på 20 elever per klass.", "Förstatliga skolan och fasa ut vinstintresset.", "Halvera den statliga inkomstskatten.", "Förbered en folkomröstning om euron 2030."],
     positions: {
-      ekonomi: "Halvera den statliga inkomstskatten på sikt, höj skattefritt sparande och sänk kostnaden för att anställa unga. Förbjud sms lån och telefonförsäljning för att motverka skuldfällor, bedrägerier och aggressiva försäljningsmetoder. Investera i utbildning, forskning och frihandel.",
+      ekonomi: "Halvera den statliga inkomstskatten på sikt, höj skattefritt sparande och sänk kostnaden för att anställa unga. Förbjud sms lån och telefonförsäljning för att motverka skuldfällor, bedrägerier och aggressiva försäljningsmetoder. Avveckla den arbetsmarknadspolitiska tjänsten Rusta och matcha under nästa mandatperiod. Investera i utbildning, forskning och frihandel.",
       vard: "Ge alla möjlighet till en personlig fast läkare, bygg ut nära vård och stärk tandvård, psykisk vård, personlig assistans och LSS.",
-      skola: "Förstatliga skolan, minska klasserna och stärk lärares auktoritet. Ge varje elev läroböcker och fasa ut vinstintresset utan att avskaffa skolvalet. Avveckla Akademiska Hus och ge lärosäten större kontroll över lokaler och möjlighet att äga fastigheter.",
+      skola: "Förstatliga skolan, minska klasserna och stärk lärares auktoritet. Ge varje elev läroböcker och fasa ut vinstintresset utan att avskaffa skolvalet. Ge legitimerade lärare och förskollärare en extra månadslön för varje år de fortsätter arbeta i stället för att gå i pension. Avveckla Akademiska Hus och ge lärosäten större kontroll över lokaler och möjlighet att äga fastigheter.",
       brott: "Stärk lokal polis, skärp straff för gängbrott och sexualbrott och bygg en finansiell elitstyrka mot kriminella nätverk.",
       migration: "Behåll en stram men human asylpolitik. Kräv svenska och samhällskunskap för medborgarskap och underlätta efterfrågad arbetskraftsinvandring.",
       klimat: "Använd EU:s utsläppshandel, elektrifiering och innovation. Skapa 10 till 15 accelerationszoner för fossilfri industri, sänk skatten på el till fordonsladdning och bredda avdraget för grön teknik. Skydda mer natur och förena klimatmål med konkurrenskraft.",
@@ -116,6 +118,8 @@ export const parties: Party[] = [
       { title: "Förslag om Akademiska Hus", url: "https://www.liberalerna.se/forskning/liberalerna-vill-avveckla-akademiska-hus", publishedAt: "28 augusti 2026" },
       { title: "Fem klimatlöften för fossilfri tillväxt", url: "https://www.liberalerna.se/klimat/fossilfri-tillvaxt-liberalernas-klimatpolitik-for-ett-rikare-och-friare-sverige", publishedAt: "30 augusti 2026" },
       { title: "Förslag om förbud mot sms lån och telefonförsäljning", url: "https://www.liberalerna.se/nyheter/liberalerna-forbjud-sms-lan-och-telefonforsaljning", publishedAt: "1 september 2026" },
+      { title: "Bonus för lärare som arbetar vidare", url: "https://www.liberalerna.se/nyheter/liberalerna-presenterar-ny-bonus-som-ska-fa-fler-larare-att-stanna-kvar-i-skolan", publishedAt: "2 september 2026" },
+      { title: "Besked om att avveckla Rusta och matcha", url: "https://www.liberalerna.se/nyheter/liberalerna-vill-skrota-centerpartiets-privatiseringsexperiment-2", publishedAt: "2 september 2026" },
     ],
   },
   {
@@ -149,7 +153,7 @@ export const parties: Party[] = [
       ekonomi: "Sänk skatten på arbete, pension och företagande, särskilt för arbetande föräldrar. Höj gränsen för skattefritt sparande och stärk arbetslinjen.",
       vard: "Försvara valfrihet och privata utförare med skärpt kvalitetskontroll. Korta vårdköer och prioritera kärnverksamhet framför administration.",
       skola: "Återupprätta kunskap, ordning och lärarnas auktoritet. Stärk statens kvalitetskontroll, behåll skolvalet och avskaffa avgiften för förskola och fritidshem.",
-      brott: "Bygg ut polis, domstolar och kriminalvård. Avskaffa mängdrabatten senast den 1 januari 2029, skärp straff och slå mot gängens ekonomi. Mot mäns våld mot kvinnor vill partiet bland annat utreda dubblerat minimistraff för grov kvinnofridskränkning, skärpa kontaktförbud, kriminalisera allvarlig spridning av kränkande deepfakes och införa en huvudregel om utvisning för utländska medborgare som döms för våld i nära relation. Stärk även skyddet för barn mot sexuella kränkningar och barnpornografibrott.",
+      brott: "Bygg ut polis, domstolar och kriminalvård. Avskaffa mängdrabatten senast den 1 januari 2029, skärp straff och slå mot gängens ekonomi. Gör deltagande i en kriminell sammanslutning till ett eget brott, med upp till fyra års fängelse för normalgraden, två till åtta år för grovt brott och upp till livstid för ledare. Mot mäns våld mot kvinnor vill partiet bland annat utreda dubblerat minimistraff för grov kvinnofridskränkning, skärpa kontaktförbud, kriminalisera allvarlig spridning av kränkande deepfakes och införa en huvudregel om utvisning för utländska medborgare som döms för våld i nära relation. Stärk även skyddet för barn mot sexuella kränkningar och barnpornografibrott.",
       migration: "Behåll en stram migrationspolitik och skärp kraven för medborgarskap, egen försörjning och integration. Utvisning ska användas mer vid brott.",
       klimat: "Minska utsläpp genom teknik, elektrifiering och investeringar som bevarar konkurrenskraft. Klimatpolitiken ska vara kostnadseffektiv.",
       energi: "Bygg ny kärnkraft, förstärk elnäten och säkra planerbar fossilfri el. Korta tillståndsprocesserna för energiinvesteringar.",
@@ -163,6 +167,7 @@ export const parties: Party[] = [
       { title: "Besked om avskaffad mängdrabatt", url: "https://moderaterna.se/nyhet/mangdrabatten-ska-avskaffas-2029/", publishedAt: "26 augusti 2026" },
       { title: "Regeringsbesked om skydd för barn", url: "https://moderaterna.se/nyhet/vi-star-pa-barnens-sida/" },
       { title: "Förslag mot mäns våld mot kvinnor", url: "https://moderaterna.se/nyhet/sa-ska-vi-stoppa-mans-vald-mot-kvinnor/", publishedAt: "31 augusti 2026" },
+      { title: "Förslag om straffbart deltagande i gäng", url: "https://moderaterna.se/nyhet/det-ska-vara-straffbart-att-delta-i-gang/", publishedAt: "2 september 2026" },
     ],
   },
   {
@@ -356,7 +361,7 @@ export const parties: Party[] = [
       migration: "Partiet vill återta nationell kontroll över gränspolitiken genom ett svenskt EU utträde. Någon fullständig migrationsmodell presenteras inte i valmanifestet för 2026.",
       klimat: "Stärk lokal och regional matproduktion, ekologiskt och regenerativt jordbruk och svensk självförsörjning. Fasa ut glyfosat och andra riskabla bekämpningsmedel.",
       energi: "Valmanifestet för 2026 presenterar inte någon fullständig modell för elsystemets kraftslag. Energifrågan behandlas främst genom självförsörjning, ekonomisk trygghet och nationellt självbestämmande.",
-      demokrati: "Inför fler folkomröstningar, medborgarinitiativ och tjänstemannaansvar och avskaffa riksdagsspärren. Sverige ska lämna EU och Nato, skydda yttrandefrihet och stoppa generell massövervakning. AI ska utvecklas under demokratisk kontroll och inte användas för att kontrollera människor.",
+      demokrati: "Inför fler folkomröstningar, medborgarinitiativ och tjänstemannaansvar och avskaffa riksdagsspärren. Sverige ska lämna EU och Nato, skydda yttrandefrihet och stoppa generell massövervakning. Stärk grundlagens spärrar så att regeringen inte ensam kan fatta långtgående beslut som begränsar fri- och rättigheter i en allvarlig fredstida kris. AI ska utvecklas under demokratisk kontroll och inte användas för att kontrollera människor.",
       regering: "Partiet fokuserar på riksdagsinträde och har ingen bindande nationell koalitionslinje för 2026. Det är öppet för valtekniskt samarbete med andra partier och har kandidater från Enhet på sin riksdagslista.",
     },
     sources: [
@@ -365,6 +370,7 @@ export const parties: Party[] = [
       { title: "Riksdagslista 2026", url: "https://partietmod.se/aktuellt/nyheter/mod-staller-upp-i-riksdagsvalet-2026-har-ar-var-lista/" },
       { title: "Politiska besked i partiledardebatt", url: "https://partietmod.se/aktuellt/nyheter/gustaf-rydelius-i-partiledardebatt-det-ar-inte-socialism-det-ar-oligarki/", publishedAt: "28 augusti 2026" },
       { title: "Besked om valtekniskt samarbete", url: "https://partietmod.se/aktuellt/nyheter/varfor-samarbetar-inte-mod-med-andra-smapartier-for-att-komma-in-i-riksdagen/", publishedAt: "30 augusti 2026" },
+      { title: "Grundlagsupprop om demokratiska spärrar i kris", url: "https://partietmod.se/aktuellt/nyheter/nu-startar-grundlagsuppropet-skriv-under-for-att-skydda-demokratin-aven-i-kris/", publishedAt: "2 september 2026" },
     ],
   },
 ];
