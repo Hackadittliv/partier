@@ -52,8 +52,8 @@ test("skiljer direkta AI träffar från närliggande digital politik", () => {
   assert.equal(findSearchConcept("Vad säger partierna om AI?")?.id, "ai");
   assert.equal(findPartySearchContext(mod, "AI", "alla")?.kind, "direct");
   assert.match(findPartySearchContext(mod, "AI", "alla")?.text ?? "", /AI/);
-  assert.equal(findPartySearchContext(centerpartiet, "AI", "alla")?.kind, "related");
-  assert.match(findPartySearchContext(centerpartiet, "AI", "alla")?.text ?? "", /algoritmer/);
+  assert.equal(findPartySearchContext(centerpartiet, "AI", "alla")?.kind, "direct");
+  assert.match(findPartySearchContext(centerpartiet, "AI", "alla")?.text ?? "", /AI forskare/);
   assert.equal(findPartySearchContext(piratpartiet, "AI", "alla")?.kind, "related");
   assert.match(findPartySearchContext(piratpartiet, "AI", "alla")?.text ?? "", /digitalisering/);
 });
