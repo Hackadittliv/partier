@@ -14,7 +14,7 @@ export type Party = {
   sources: { title: string; url: string; publishedAt?: string }[];
 };
 
-export const lastUpdated = "5 september 2026";
+export const lastUpdated = "6 september 2026";
 const swedishMonths: Record<string, string> = {
   januari: "01",
   februari: "02",
@@ -57,7 +57,7 @@ export const parties: Party[] = [
       brott: "Öka lokal polisnärvaro och rikta straffen mot grova brott och kriminell ekonomi. Kombinera detta med tidiga insatser för barn och familjer. Kriminalisera kontrollerande beteende och psykiskt våld och förenkla bodelningar för att motverka ekonomiskt våld. Stoppa permanent nedmonteringen av vägbelysning på landsbygden, ändra Trafikverkets kriterier och ersätt kommuner som betalar belysning längs statliga vägar.",
       migration: "För en rättssäker migration med tydliga krav. Ta bort lönegolvet på 34 450 kronor för arbetskraftsinvandring och ersätt det med kollektivavtalsenlig eller branschpraxisbaserad lön. Permanent uppehållstillstånd ska fortsätta vara permanent och ett särskilt startupvisum ska införas. Stoppa kompetensutvisningar och låt integration börja direkt genom svenska, praktik och arbete.",
       klimat: "Minska utsläppen genom elektrifiering, utsläppshandel, grön industri och billigare hållbara val. Genomför en klimatplan under regeringens första 100 dagar. Målet är att 90 procent av alla nya personbilar som säljs 2030 ska vara elbilar. Inför en elbilsbonus på 50 000 kronor, bygg ut laddningen och stöd elektriska lastbilar. Skattebefria inblandade biodrivmedel efter godkännande från EU och öka andelen förnybart i tanken. Jordbruk och skog ses som klimatlösning och beredskap.",
-      energi: "Prioritera vind, sol, vattenkraft, lagring och snabbare elnät. Partiet är öppet för fossilfria lösningar, medan ny kärnkraft inte är huvudspåret.",
+      energi: "Prioritera vind, sol, vattenkraft, lagring och snabbare elnät. Pressa elnätsavgifterna, bredda det gröna avdraget för energibesparingar i hemmet och sänk elskatten långsiktigt. Partiet vill påskynda utbyggnaden av all energiproduktion och är öppet för fossilfria lösningar, medan ny kärnkraft inte är huvudspåret.",
       demokrati: "Stärk liberal demokrati, integritet, oberoende medier och EU. Reglera beroendeframkallande algoritmer för minderåriga, inför en åldersgräns på 15 år för sociala medier med föräldraundantag från 13 år och utred beskattning av sociala mediebolag. Öka stödet till Ukraina och bygg ut militärt och civilt försvar.",
       regering: "Partiet vill se en bred och stabil mittenregering. Varken Vänsterpartiet eller Sverigedemokraterna ska enligt partiet ha inflytande över regeringsbildningen.",
     },
@@ -76,6 +76,7 @@ export const parties: Party[] = [
       { title: "Vallöften för stärkt konkurrenskraft", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-09-04-centerpartiet-presenterar-valloften-for-att-starka-sveriges-konkurrenskraft", publishedAt: "4 september 2026" },
       { title: "Förslag inom funktionsrättspolitiken", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-09-04-centerpartiets-funktionsrattspolitik", publishedAt: "4 september 2026" },
       { title: "Förslag mot mäns våld mot kvinnor", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-09-04-mans-vald-mot-kvinnor-maste-stoppas-med-centerpartiets-forslag-for-att-bade-forebygga-och-straffa", publishedAt: "4 september 2026" },
+      { title: "Förslag om lägre elräkningar", url: "https://www.centerpartiet.se/nyheter/arkiv-2026/2026-09-05-centerpartiet-vill-kapa-elrakningarna", publishedAt: "5 september 2026" },
     ],
   },
   {
@@ -106,7 +107,7 @@ export const parties: Party[] = [
     positions: {
       ekonomi: "Halvera den statliga inkomstskatten på sikt, höj skattefritt sparande och sänk kostnaden för att anställa unga. Förbjud sms lån och telefonförsäljning för att motverka skuldfällor, bedrägerier och aggressiva försäljningsmetoder. Avveckla den arbetsmarknadspolitiska tjänsten Rusta och matcha under nästa mandatperiod. Investera i utbildning, forskning och frihandel. För norra Sverige vill partiet korta tillståndstider, stärka lokala företag, säkra regionalflyg och statlig service samt färdigställa Norrbotniabanan och stärka Malmbanan och Ostkustbanan.",
       vard: "Ge alla möjlighet till en personlig fast läkare, bygg ut nära vård och stärk tandvård, psykisk vård, personlig assistans och LSS.",
-      skola: "Förstatliga skolan, minska klasserna och stärk lärares auktoritet. Ge varje elev läroböcker och fasa ut vinstintresset utan att avskaffa skolvalet. Ge legitimerade lärare och förskollärare en extra månadslön för varje år de fortsätter arbeta i stället för att gå i pension. Ta större hänsyn till små skolor, genomför ett statligt lönelyft för lärare och bygg ut yrkesutbildning i norra Sverige. Avveckla Akademiska Hus och ge lärosäten större kontroll över lokaler och möjlighet att äga fastigheter.",
+      skola: "Förstatliga skolan, minska klasserna och stärk lärares auktoritet. Ge varje elev läroböcker och fasa ut vinstintresset utan att avskaffa skolvalet. Kräv att rektorer och huvudmän ingriper när studieron brister, exempelvis med fler lärare eller särskilda stödklasser, och låt Skolinspektionen använda sanktioner när kraven inte följs. Ge legitimerade lärare och förskollärare en extra månadslön för varje år de fortsätter arbeta i stället för att gå i pension. Ta större hänsyn till små skolor, genomför ett statligt lönelyft för lärare och bygg ut yrkesutbildning i norra Sverige. Avveckla Akademiska Hus och ge lärosäten större kontroll över lokaler och möjlighet att äga fastigheter.",
       brott: "Stärk lokal polis, skärp straff för gängbrott och sexualbrott och bygg en finansiell elitstyrka mot kriminella nätverk.",
       migration: "Behåll en stram men human asylpolitik. Kräv svenska och samhällskunskap för medborgarskap och underlätta efterfrågad arbetskraftsinvandring.",
       klimat: "Använd EU:s utsläppshandel, elektrifiering och innovation. Skapa 10 till 15 accelerationszoner för fossilfri industri, sänk skatten på el till fordonsladdning och bredda avdraget för grön teknik. Skydda mer natur och förena klimatmål med konkurrenskraft.",
@@ -124,6 +125,7 @@ export const parties: Party[] = [
       { title: "Bonus för lärare som arbetar vidare", url: "https://www.liberalerna.se/nyheter/liberalerna-ny-bonus-ska-fa-fler-larare-att-stanna-kvar-i-skolan", publishedAt: "2 september 2026" },
       { title: "Besked om att avveckla Rusta och matcha", url: "https://www.liberalerna.se/nyheter/liberalerna-vill-skrota-centerpartiets-privatiseringsexperiment-2", publishedAt: "2 september 2026" },
       { title: "Förslag för ett lyft för norra Sverige", url: "https://www.liberalerna.se/nyheter/liberalerna-vill-skapa-ett-lyft-for-norra-sverige", publishedAt: "4 september 2026" },
+      { title: "Förslag om skyldighet att upprätthålla studiero", url: "https://www.liberalerna.se/ovrigt/l-alla-skolor-ska-vara-skyldiga-att-uppratthalla-studiero-2", publishedAt: "5 september 2026" },
     ],
   },
   {
@@ -160,7 +162,7 @@ export const parties: Party[] = [
       ekonomi: "Sänk skatten på arbete, pension och företagande, särskilt för arbetande föräldrar. Inför ett jobbat-avdrag för lägre skatt på arbetsrelaterade pensionsinkomster, sänk skatten för den som arbetar vidare efter pensionsåldern och motverka ålderism. Höj gränsen för skattefritt sparande och stärk arbetslinjen. Tillsätt en veterinärpriskommission som granskar regler, marknad och försäkringsbolag samt förbättrar prisjämförelser och information om billigare behandlingsalternativ.",
       vard: "Försvara valfrihet och privata utförare med skärpt kvalitetskontroll. Korta vårdköer och prioritera kärnverksamhet framför administration.",
       skola: "Återupprätta kunskap, ordning och lärarnas auktoritet. Stärk statens kvalitetskontroll, behåll skolvalet och avskaffa avgiften för förskola och fritidshem.",
-      brott: "Bygg ut polis, domstolar och kriminalvård. Avskaffa mängdrabatten senast den 1 januari 2029, skärp straff och slå mot gängens ekonomi. Gör deltagande i en kriminell sammanslutning till ett eget brott, med upp till fyra års fängelse för normalgraden, två till åtta år för grovt brott och upp till livstid för ledare. Mot mäns våld mot kvinnor vill partiet bland annat utreda dubblerat minimistraff för grov kvinnofridskränkning, skärpa kontaktförbud, kriminalisera allvarlig spridning av kränkande deepfakes och införa en huvudregel om utvisning för utländska medborgare som döms för våld i nära relation. Stärk även skyddet för barn mot sexuella kränkningar och barnpornografibrott.",
+      brott: "Bygg ut polis, domstolar och kriminalvård. Avskaffa mängdrabatten senast den 1 januari 2029, skärp straff och slå mot gängens ekonomi. Gör deltagande i en kriminell sammanslutning till ett eget brott, med upp till fyra års fängelse för normalgraden, två till åtta år för grovt brott och upp till livstid för ledare. Gör jakten på grovt kriminella utomlands till en utrikespolitisk prioritering, placera fler polissambandsmän vid ambassader och stärk utlämnings- och brottsbekämpningssamarbeten med fler länder. Mot mäns våld mot kvinnor vill partiet bland annat utreda dubblerat minimistraff för grov kvinnofridskränkning, skärpa kontaktförbud, kriminalisera allvarlig spridning av kränkande deepfakes och införa en huvudregel om utvisning för utländska medborgare som döms för våld i nära relation. Stärk även skyddet för barn mot sexuella kränkningar och barnpornografibrott.",
       migration: "Behåll en stram migrationspolitik och skärp kraven för medborgarskap, egen försörjning och integration. Utvisning ska användas mer vid brott.",
       klimat: "Minska utsläpp genom teknik, elektrifiering och investeringar som bevarar konkurrenskraft. Klimatpolitiken ska vara kostnadseffektiv.",
       energi: "Bygg ny kärnkraft, förstärk elnäten och säkra planerbar fossilfri el. Korta tillståndsprocesserna för energiinvesteringar.",
@@ -177,6 +179,7 @@ export const parties: Party[] = [
       { title: "Förslag om straffbart deltagande i gäng", url: "https://moderaterna.se/nyhet/det-ska-vara-straffbart-att-delta-i-gang/", publishedAt: "2 september 2026" },
       { title: "Förslag om jobbat-avdrag för pensionärer", url: "https://moderaterna.se/nyhet/du-som-har-arbetat-ska-fa-mer-i-pension/", publishedAt: "3 september 2026" },
       { title: "Förslag om lägre veterinärpriser", url: "https://moderaterna.se/nyhet/vi-vill-tvinga-ner-veterinarpriserna/", publishedAt: "4 september 2026" },
+      { title: "Förslag för att nå kriminella utomlands", url: "https://moderaterna.se/nyhet/vi-ska-komma-at-fler-kriminella-utomlands/", publishedAt: "5 september 2026" },
     ],
   },
   {
@@ -238,7 +241,7 @@ export const parties: Party[] = [
     overview: "Vänsterpartiet vill omfördela ekonomisk makt, stoppa vinster i välfärden, sänka hushållens kostnader och investera offentligt i jobb och klimatomställning.",
     priorities: ["Frys hyror och pressa matpriser.", "Inför skatt på miljardärers förmögenheter.", "Stoppa vinstjakt i vård, skola och omsorg.", "Förkorta arbetstiden med bibehållen lön."],
     positions: {
-      ekonomi: "Beskatta stora förmögenheter och höga inkomster mer. Låt staten investera i bostäder, energi och jobb och stärk löntagare och trygghetssystem. Skapa 30 000 offentliga ungdomsjobb och en renoveringsfond på en miljard kronor för hyresrätter, med villkor att renoveringsstödet inte leder till hyreshöjningar. Lägg fem miljarder kronor på ett ungdomspaket som bland annat höjer studiebidragsdelen med 500 kronor i månaden och ger stöd till billigare studentbostäder. Höj taket och grundbeloppet i arbetslöshetsförsäkringen, behåll 80 procents ersättning under hela perioden, indexera ersättningen efter löneutvecklingen och återinför studerandevillkoret. Inför bindande pristransparens i veterinärvården, utred nationella tariffer och ge Konkurrensverket verktyg att bryta upp oligopol.",
+      ekonomi: "Beskatta stora förmögenheter och höga inkomster mer. Låt staten investera i bostäder, energi och jobb och stärk löntagare och trygghetssystem. Förkorta arbetstiden med bibehållen lön, stärk rätten till heltid och lagstifta mot att arbetsgivare ensidigt sänker anställdas arbetstid. Skapa 30 000 offentliga ungdomsjobb och en renoveringsfond på en miljard kronor för hyresrätter, med villkor att renoveringsstödet inte leder till hyreshöjningar. Lägg fem miljarder kronor på ett ungdomspaket som bland annat höjer studiebidragsdelen med 500 kronor i månaden och ger stöd till billigare studentbostäder. Höj taket och grundbeloppet i arbetslöshetsförsäkringen, behåll 80 procents ersättning under hela perioden, indexera ersättningen efter löneutvecklingen och återinför studerandevillkoret. Inför bindande pristransparens i veterinärvården, utred nationella tariffer och ge Konkurrensverket verktyg att bryta upp oligopol.",
       vard: "Driv välfärd efter behov utan vinstjakt. Avskaffa den tvingande lagen om valfrihetssystem i primärvården, tillsätt en avprivatiseringskommission, stoppa privata sjukvårdsförsäkringar i offentligt finansierad vård och begränsa nätläkarbolagens ersättning. Öka statens långsiktiga finansiering och stärk fast läkare, personal, pensioner och jämlik vård. Återinför avgiftsfri tandvård för unga och låt staten betala hela tandvårdskostnaden över 1 400 kronor under en tolvmånadersperiod.",
       skola: "Avskaffa vinstuttag, fördela resurser efter behov och stärk elevhälsa och tidigt stöd. Skolan ska minska segregation och ekonomiska skillnader.",
       brott: "Stärk polis och rättsväsende, men ge lika stor vikt åt socialtjänst, elevhälsa, fritid, arbete och avhopparstöd.",
@@ -256,6 +259,7 @@ export const parties: Party[] = [
       { title: "Förslag om tariffer i veterinärvården", url: "https://www.vansterpartiet.se/nyheter/veterinarpriserna-skenar-vansterpartiet-vill-infora-tariffer/", publishedAt: "3 september 2026" },
       { title: "Ungdomspaket för studerande och unga", url: "https://www.vansterpartiet.se/nyheter/vansterpartiet-presenterar-ungdomspaketet-5-miljarder-for-studerande-och-unga/", publishedAt: "26 augusti 2026" },
       { title: "Investeringspaket för förorten", url: "https://www.vansterpartiet.se/nyheter/investera-i-fororten-jobb-bostader-och-framtidstro-i-hela-sverige/", publishedAt: "4 september 2026" },
+      { title: "Förslag om arbetstid och rätt till heltid", url: "https://www.vansterpartiet.se/nyheter/nooshi-dadgostar-du-ska-kunna-leva-pa-din-lon/", publishedAt: "5 september 2026" },
     ],
   },
   {
